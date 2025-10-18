@@ -130,8 +130,6 @@ PhysBody* ModulePhysics::CreateChain(int x, int y, int* points, int size, bodyTy
 	return pbody;
 }
 
-// To move the position of a body (external)
-// Mueve un cuerpo a (x, y). Si resetRotation es true, la rotación se pone a 0.
 void ModulePhysics::SetBodyPosition(PhysBody* pbody, int x, int y, bool resetRotation)
 {
 	if (pbody == nullptr || pbody->body == nullptr)

@@ -17,7 +17,6 @@ bool ModuleGame::Start()
 {
     printf("Loading game assets\n");
 
-    // Referencia a la bola
     ball = App->player; // Reference to the ball
     return true;
 }
