@@ -22,34 +22,11 @@ ModulePhysics::~ModulePhysics()
 
 bool ModulePhysics::Start()
 {
-	LOG("Creating Physics 2D environment");
+	printf("Creating Physics 2D environment\n");
 
 	// Vector gravedad: Y positiva hacia abajo
 	b2Vec2 gravity(0.0f, 10.0f);
 	world = new b2World(gravity);
-
-	b2BodyDef groundDef;
-	groundDef.position.Set(PIXELS_TO_METERS(SCREEN_WIDTH/2), PIXELS_TO_METERS(SCREEN_HEIGHT/2));
-	b2Body* ground = world->CreateBody(&groundDef);
-
-	b2PolygonShape groundBox;
-	groundBox.SetAsBox(PIXELS_TO_METERS(50), PIXELS_TO_METERS(10));
-	ground->CreateFixture(&groundBox, 0.0f);
-
-	b2BodyDef ballDef;
-	ballDef.type = b2_dynamicBody;
-	ballDef.position.Set(PIXELS_TO_METERS(640), PIXELS_TO_METERS(200)); // posición en píxeles convertida a metros
-	b2Body* ball = world->CreateBody(&ballDef);
-
-	b2CircleShape circle;
-	circle.m_radius = PIXELS_TO_METERS(20); // radio en píxeles convertido a metros
-
-	b2FixtureDef fixtureDef;
-	fixtureDef.shape = &circle;
-	fixtureDef.friction = 0;
-	fixtureDef.density = 1.0f;
-	fixtureDef.restitution = 0.8f;
-	ball->CreateFixture(&fixtureDef);
 
 	return true;
 }
@@ -153,6 +130,18 @@ PhysBody* ModulePhysics::CreateChain(int x, int y, int* points, int size, bodyTy
 	return pbody;
 }
 
+// To move the position of a body (external)
+void ModulePhysics::SetBodyPosition(PhysBody* pbody, int x, int y)
+{
+	if (pbody == nullptr || pbody->body == nullptr)
+		return;
+
+	b2Vec2 newPos(PIXELS_TO_METERS(x), PIXELS_TO_METERS(y));
+	float angle = pbody->body->GetAngle(); // mantenemos la rotación actual
+
+	pbody->body->SetTransform(newPos, angle);
+}
+
 update_status ModulePhysics::PostUpdate()
 {
 	
@@ -246,11 +235,10 @@ update_status ModulePhysics::PostUpdate()
 	return UPDATE_CONTINUE;
 }
 
-
 // Called before quitting
 bool ModulePhysics::CleanUp()
 {
-	LOG("Destroying physics world");
+	printf("Destroying physics world\n");
 
 	if (world != nullptr)
 	{

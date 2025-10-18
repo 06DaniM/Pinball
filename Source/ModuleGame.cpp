@@ -7,31 +7,56 @@
 
 ModuleGame::ModuleGame(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
-	
 }
 
 ModuleGame::~ModuleGame()
-{}
+{
+}
 
-// Load assets
 bool ModuleGame::Start()
 {
-	LOG("Loading Intro assets");
-	bool ret = true;
+    printf("Loading game assets\n");
 
-	return ret;
+    // Referencia a la bola
+    ball = App->player; // Reference to the ball
+    return true;
 }
 
-// Load assets
-bool ModuleGame::CleanUp()
-{
-	LOG("Unloading Intro scene");
-
-	return true;
-}
-
-// Update: draw background
 update_status ModuleGame::Update()
 {
-	return UPDATE_CONTINUE;
+    HandleInput();
+    DrawTable();
+
+    return UPDATE_CONTINUE;
+}
+
+bool ModuleGame::CleanUp()
+{
+    printf("Cleaning game scene\n");
+    return true;
+}
+
+void ModuleGame::HandleInput()
+{
+    // Shoot the ball
+    if (IsKeyPressed(KEY_DOWN))
+    {
+        ball->Launch(initialForce);
+    }
+
+    // Moving the flippers
+    if (IsKeyPressed(KEY_LEFT))
+    {
+        // Left flipper
+    }
+
+    if (IsKeyPressed(KEY_LEFT))
+    {
+        // Right flipper
+    }
+}
+
+void ModuleGame::DrawTable()
+{
+    // Draw the map
 }

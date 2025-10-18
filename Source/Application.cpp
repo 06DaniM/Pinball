@@ -14,6 +14,7 @@ Application::Application()
 	audio = new ModuleAudio(this, true);
 	physics = new ModulePhysics(this);
 	scene_intro = new ModuleGame(this);
+	player = new ModulePlayer(this);
 
 	// The order of calls is very important!
 	// Modules will Init() Start() and Update in this order
@@ -23,7 +24,8 @@ Application::Application()
 	AddModule(window);
 	AddModule(physics);
 	AddModule(audio);
-	
+	AddModule(player);
+
 	// Scenes
 	AddModule(scene_intro);
 
@@ -54,7 +56,7 @@ bool Application::Init()
 	}
 
 	// After all Init calls we call Start() in all modules
-	LOG("Application Start --------------");
+	printf("Application Start --------------\n");
 
 	for (auto it = list_modules.begin(); it != list_modules.end() && ret; ++it)
 	{

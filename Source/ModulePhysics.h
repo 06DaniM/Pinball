@@ -21,7 +21,10 @@ public:
     PhysBody* CreateCircle(int x, int y, int radius, ColliderType ctype = ColliderType::UNKNOWN, bodyType type = bodyType::DYNAMIC);
     PhysBody* CreateChain(int x, int y, int* points, int size, bodyType type = bodyType::STATIC);
 
-private:
+    void   SetBodyPosition(PhysBody* pbody, int x, int y);
+
     b2World* world = nullptr;
+
+private:
     bool debug = true;
 };
