@@ -24,7 +24,6 @@ bool ModulePhysics::Start()
 {
 	printf("Creating Physics 2D environment\n");
 
-	// Vector gravedad: Y positiva hacia abajo
 	b2Vec2 gravity(0.0f, 10.0f);
 	world = new b2World(gravity);
 
@@ -38,7 +37,6 @@ update_status ModulePhysics::PreUpdate()
 	return UPDATE_CONTINUE;
 }
 
-// Crea un rectángulo
 PhysBody* ModulePhysics::CreateRectangle(int x, int y, int width, int height, ColliderType ctype, bodyType type)
 {
 	b2BodyDef bodyDef;
@@ -67,7 +65,6 @@ PhysBody* ModulePhysics::CreateRectangle(int x, int y, int width, int height, Co
 	return pbody;
 }
 
-// Crea un círculo
 PhysBody* ModulePhysics::CreateCircle(int x, int y, int radius, ColliderType ctype, bodyType type)
 {
 	b2BodyDef bodyDef;
@@ -97,7 +94,6 @@ PhysBody* ModulePhysics::CreateCircle(int x, int y, int radius, ColliderType cty
 	return pbody;
 }
 
-// Crea un chain shape
 PhysBody* ModulePhysics::CreateChain(int x, int y, int* points, int size, bodyType type)
 {
 	b2BodyDef bodyDef;
@@ -230,7 +226,7 @@ update_status ModulePhysics::PostUpdate()
 
 			
 		}
-	}//
+	}
 
 	
 	return UPDATE_CONTINUE;
