@@ -64,5 +64,5 @@ void ModulePlayer::Reset()
 {
     if (!playerBody) return;
 
-    App->physics->SetBodyPosition(playerBody, initialPosition.x, initialPosition.y);
+    App->physics->SetBodyPosition(playerBody, initialPosition.x, initialPosition.y, true);
 }

@@ -131,15 +131,18 @@ PhysBody* ModulePhysics::CreateChain(int x, int y, int* points, int size, bodyTy
 }
 
 // To move the position of a body (external)
-void ModulePhysics::SetBodyPosition(PhysBody* pbody, int x, int y)
+// Mueve un cuerpo a (x, y). Si resetRotation es true, la rotación se pone a 0.
+void ModulePhysics::SetBodyPosition(PhysBody* pbody, int x, int y, bool resetRotation)
 {
 	if (pbody == nullptr || pbody->body == nullptr)
 		return;
 
 	b2Vec2 newPos(PIXELS_TO_METERS(x), PIXELS_TO_METERS(y));
-	float angle = pbody->body->GetAngle(); // mantenemos la rotación actual
+	float angle = resetRotation ? 0.0f : pbody->body->GetAngle();
 
 	pbody->body->SetTransform(newPos, angle);
+	pbody->body->SetLinearVelocity(b2Vec2(0, 0));
+	pbody->body->SetAngularVelocity(0);
 }
 
 update_status ModulePhysics::PostUpdate()
