@@ -42,7 +42,7 @@ update_status ModulePhysics::PreUpdate()
 	return UPDATE_CONTINUE;
 }
 
-PhysBody* ModulePhysics::CreateRectangle(int x, int y, int width, int height, ColliderType ctype, bodyType type)
+PhysBody* ModulePhysics::CreateRectangle(int x, int y, int width, int height, bool isSensor, ColliderType ctype, bodyType type)
 {
 	b2BodyDef bodyDef;
 	if (type == DYNAMIC) bodyDef.type = b2_dynamicBody;
@@ -58,6 +58,7 @@ PhysBody* ModulePhysics::CreateRectangle(int x, int y, int width, int height, Co
 
 	b2FixtureDef fixtureDef;
 	fixtureDef.shape = &box;
+	fixtureDef.isSensor = isSensor;
 	fixtureDef.friction = 0;
 	fixtureDef.density = 1.0f;
 	fixtureDef.restitution = 0.6f;

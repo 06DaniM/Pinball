@@ -13,7 +13,9 @@ public:
     update_status Update();
     bool CleanUp();
 
-    void Launch(float initialForce);
+    void GetPhysics();
+    void DrawBall();
+    void Launch();
     void Reset();
 
 private:

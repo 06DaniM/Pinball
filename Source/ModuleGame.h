@@ -25,5 +25,12 @@ private:
 
 public:
     ModulePlayer* ball = nullptr; // Reference to the ball
-    float initialForce = 5.0f;    // Initial force
+
+private:
+    PhysBody* leftWall;
+    PhysBody* rightWall;
+    PhysBody* downVoid;
+
+    b2Vec2 leftWallPos, rightWallPos, upWallPos, downVoidPos;
+    int wallsSizeW = 50, wallsSizeH = SCREEN_HEIGHT-100;
 };

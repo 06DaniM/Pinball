@@ -95,3 +95,12 @@ bool ModuleRender::DrawText(const char * text, int x, int y, Font font, int spac
 
     return ret;
 }
+
+// Función para dibujar un rectángulo centrado en (cx, cy)
+void ModuleRender::DrawRectangleCentered(int cx, int cy, int width, int height, Color color)
+{
+    int drawX = cx - width / 2;
+    int drawY = cy - height / 2;
+    DrawRectangle(drawX, drawY, width, height, color);
+}
+

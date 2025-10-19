@@ -18,6 +18,15 @@ bool ModuleGame::Start()
     printf("Loading game assets\n");
 
     ball = App->player; // Reference to the ball
+
+    leftWallPos.x = 100;
+    leftWallPos.y = SCREEN_HEIGHT / 2;
+    leftWall = App->physics->CreateRectangle(leftWallPos.x, leftWallPos.y, wallsSizeW, wallsSizeH, false, ColliderType::PLATFORM, STATIC);
+
+    rightWallPos.x = SCREEN_WIDTH - 100;
+    rightWallPos.y = SCREEN_HEIGHT / 2;
+    rightWall = App->physics->CreateRectangle(rightWallPos.x, rightWallPos.y, wallsSizeW, wallsSizeH, false, ColliderType::PLATFORM, STATIC);
+
     return true;
 }
 
@@ -40,7 +49,7 @@ void ModuleGame::HandleInput()
     // Shoot the ball
     if (IsKeyPressed(KEY_DOWN))
     {
-        ball->Launch(initialForce);
+        ball->Launch();
     }
 
     // Moving the flippers
@@ -57,5 +66,6 @@ void ModuleGame::HandleInput()
 
 void ModuleGame::DrawTable()
 {
-    // Draw the map
+    App->renderer->DrawRectangleCentered(leftWallPos.x, leftWallPos.y, wallsSizeW, wallsSizeH, BLACK);
+    App->renderer->DrawRectangleCentered(rightWallPos.x, rightWallPos.y, wallsSizeW, wallsSizeH, BLACK);
 }

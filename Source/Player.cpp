@@ -21,7 +21,7 @@ bool ModulePlayer::Start()
     playerBody = App->physics->CreateCircle(position.x, position.y, radius, ColliderType::PLAYER, DYNAMIC);
 
     // Creates a platform to confirm everything is working
-    App->physics->CreateRectangle(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 50, 500, 20, ColliderType::PLATFORM, STATIC);
+    App->physics->CreateRectangle(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 50, 500, 20, false, ColliderType::PLATFORM, STATIC);
     initialPosition = position;
 
     return true;
@@ -32,13 +32,8 @@ update_status ModulePlayer::Update()
 {
     if (!playerBody) return UPDATE_CONTINUE;
 
-    // Obtain the position of the ball
-    int x, y;
-    playerBody->GetPosition(x, y);
-    printf("%d %d\n", x, y);
-
-    // Draw the ball
-    DrawCircle(x, y, radius, RED);
+    GetPhysics();
+    DrawBall();
 
     return UPDATE_CONTINUE;
 }
@@ -51,8 +46,23 @@ bool ModulePlayer::CleanUp()
     return true;
 }
 
+void ModulePlayer::GetPhysics()
+{
+    int x, y;
+    playerBody->GetPosition(x, y);
+
+    position.x = (int)x;
+    position.y = (int)y;
+}
+
+void ModulePlayer::DrawBall()
+{
+    // Draw the ball
+    DrawCircle(position.x, position.y, radius, RED);
+}
+
 // Initial launch
-void ModulePlayer::Launch(float initialForce)
+void ModulePlayer::Launch()
 {
     if (!playerBody) return;
     printf("Launching\n");
