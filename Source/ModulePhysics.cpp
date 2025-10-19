@@ -32,7 +32,12 @@ bool ModulePhysics::Start()
 
 update_status ModulePhysics::PreUpdate()
 {
-	if (world != nullptr) world->Step(1.0f / 60.0f, 8, 3);
+	if (world != nullptr)
+	{
+		float dt = GetFrameTime();
+		world->Step(dt, 8, 3);
+	}
+
 
 	return UPDATE_CONTINUE;
 }
@@ -55,7 +60,7 @@ PhysBody* ModulePhysics::CreateRectangle(int x, int y, int width, int height, Co
 	fixtureDef.shape = &box;
 	fixtureDef.friction = 0;
 	fixtureDef.density = 1.0f;
-	fixtureDef.restitution = 0.2f;
+	fixtureDef.restitution = 0.6f;
 	b->CreateFixture(&fixtureDef);
 
 	PhysBody* pbody = new PhysBody();
@@ -83,7 +88,7 @@ PhysBody* ModulePhysics::CreateCircle(int x, int y, int radius, ColliderType cty
 	fixtureDef.shape = &shape;
 	fixtureDef.friction = 0;
 	fixtureDef.density = 1.0f;
-	fixtureDef.restitution = 0.8f;
+	fixtureDef.restitution = 0.6f;
 
 	b->CreateFixture(&fixtureDef);
 

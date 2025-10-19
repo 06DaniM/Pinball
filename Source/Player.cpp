@@ -35,7 +35,7 @@ update_status ModulePlayer::Update()
     // Obtener la posición real de la bola
     int x, y;
     playerBody->GetPosition(x, y);
-
+    printf("%d %d\n", x, y);
     // Dibujar la bola
     DrawCircle(x, y, radius, RED);
 
