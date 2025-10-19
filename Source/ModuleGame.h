@@ -20,7 +20,11 @@ public:
     bool CleanUp();
     
 private:
+    void CreateWalls();
+    void CreateTopArc();
     void HandleInput();
+    void DrawWall(PhysBody* wall, Color color);
+    void DrawTopArc();
     void DrawTable();
 
 public:
@@ -30,6 +34,9 @@ private:
     PhysBody* leftWall;
     PhysBody* rightWall;
     PhysBody* downVoid;
+    PhysBody* startGround;
+    PhysBody* startleftWall;
+    PhysBody* topArc;
 
     b2Vec2 leftWallPos, rightWallPos, upWallPos, downVoidPos;
     int wallsSizeW = 50, wallsSizeH = SCREEN_HEIGHT-100;

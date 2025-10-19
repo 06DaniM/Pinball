@@ -15,13 +15,11 @@ ModulePlayer::~ModulePlayer()
 bool ModulePlayer::Start()
 {
     printf("Loading Player\n");
-    position = { SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 };
+    position = { SCREEN_WIDTH - 140, SCREEN_HEIGHT / 2 };
 
     // Creates the ball
     playerBody = App->physics->CreateCircle(position.x, position.y, radius, ColliderType::PLAYER, DYNAMIC);
 
-    // Creates a platform to confirm everything is working
-    App->physics->CreateRectangle(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 50, 500, 20, false, ColliderType::PLATFORM, STATIC);
     initialPosition = position;
 
     return true;
@@ -66,6 +64,7 @@ void ModulePlayer::Launch()
 {
     if (!playerBody) return;
     printf("Launching\n");
+    playerBody->body->ApplyLinearImpulseToCenter({0,-5}, true);
 }
 
 // Reset the ball to a position

@@ -1,9 +1,10 @@
-#include "Globals.h"
+﻿#include "Globals.h"
 #include "Application.h"
 #include "ModuleRender.h"
 #include "ModuleGame.h"
 #include "ModuleAudio.h"
 #include "ModulePhysics.h"
+#include "Player.h"
 
 ModuleGame::ModuleGame(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
@@ -17,15 +18,8 @@ bool ModuleGame::Start()
 {
     printf("Loading game assets\n");
 
-    ball = App->player; // Reference to the ball
-
-    leftWallPos.x = 100;
-    leftWallPos.y = SCREEN_HEIGHT / 2;
-    leftWall = App->physics->CreateRectangle(leftWallPos.x, leftWallPos.y, wallsSizeW, wallsSizeH, false, ColliderType::PLATFORM, STATIC);
-
-    rightWallPos.x = SCREEN_WIDTH - 100;
-    rightWallPos.y = SCREEN_HEIGHT / 2;
-    rightWall = App->physics->CreateRectangle(rightWallPos.x, rightWallPos.y, wallsSizeW, wallsSizeH, false, ColliderType::PLATFORM, STATIC);
+    ball = App->player;
+    CreateWalls();
 
     return true;
 }
@@ -44,28 +38,74 @@ bool ModuleGame::CleanUp()
     return true;
 }
 
+void ModuleGame::CreateWalls()
+{
+    float restitution = 0.8f;
+
+    // Left wall
+    leftWallPos = { 100, SCREEN_HEIGHT / 2 };
+    leftWall = App->physics->CreateRectangle(leftWallPos.x, leftWallPos.y, wallsSizeW, wallsSizeH, restitution, false, ColliderType::PLATFORM, STATIC);
+
+    // Right wall
+    rightWallPos = { SCREEN_WIDTH - 100, SCREEN_HEIGHT / 2 };
+    rightWall = App->physics->CreateRectangle(rightWallPos.x, rightWallPos.y, wallsSizeW, wallsSizeH, restitution, false, ColliderType::PLATFORM, STATIC);
+
+    // Void to respawn
+    downVoidPos = { SCREEN_WIDTH / 2, SCREEN_HEIGHT + 100 };
+    downVoid = App->physics->CreateRectangle(downVoidPos.x, downVoidPos.y, SCREEN_WIDTH, 50, true, 0.0f,ColliderType::VOID, STATIC);
+
+    // Launch zone
+    startleftWall = App->physics->CreateRectangle(SCREEN_WIDTH - 180, 600, 50, 600, restitution, false, ColliderType::PLATFORM, STATIC);
+    startGround = App->physics->CreateRectangle(SCREEN_WIDTH - 140, 800, 30, 50, restitution, false, ColliderType::PLATFORM, STATIC);
+
+    // Create the arc
+    CreateTopArc();
+}
+
+void ModuleGame::CreateTopArc()
+{
+
+}
+
+void ModuleGame::DrawTable()
+{
+    DrawWall(leftWall, BLACK);
+    DrawWall(rightWall, BLACK);
+    App->renderer->DrawRectangleCentered(SCREEN_WIDTH - 180, 600, 50, 600, DARKBLUE);
+    App->renderer->DrawRectangleCentered(SCREEN_WIDTH - 140, 800, 30, 50, RED);
+
+    DrawTopArc();
+}
+
+void ModuleGame::DrawWall(PhysBody* wall, Color color)
+{
+    if (!wall) return;
+    int x, y;
+    wall->GetPosition(x, y);
+    App->renderer->DrawRectangleCentered(x, y, wallsSizeW, wallsSizeH, color);
+}
+
+void ModuleGame::DrawTopArc()
+{
+
+}
+
 void ModuleGame::HandleInput()
 {
-    // Shoot the ball
+    // Disparar la bola
     if (IsKeyPressed(KEY_DOWN))
     {
         ball->Launch();
     }
 
-    // Moving the flippers
+    // Mover flippers (aún no implementado)
     if (IsKeyPressed(KEY_LEFT))
     {
-        // Left flipper
+        // Flipper izquierdo
     }
 
-    if (IsKeyPressed(KEY_LEFT))
+    if (IsKeyPressed(KEY_RIGHT))
     {
-        // Right flipper
+        // Flipper derecho
     }
-}
-
-void ModuleGame::DrawTable()
-{
-    App->renderer->DrawRectangleCentered(leftWallPos.x, leftWallPos.y, wallsSizeW, wallsSizeH, BLACK);
-    App->renderer->DrawRectangleCentered(rightWallPos.x, rightWallPos.y, wallsSizeW, wallsSizeH, BLACK);
 }
