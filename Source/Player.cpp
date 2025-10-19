@@ -17,10 +17,10 @@ bool ModulePlayer::Start()
     printf("Loading Player\n");
     position = { SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 };
 
-    // Crear la bola
+    // Creates the ball
     playerBody = App->physics->CreateCircle(position.x, position.y, radius, ColliderType::PLAYER, DYNAMIC);
 
-    // Crear plataforma estática
+    // Creates a platform to confirm everything is working
     App->physics->CreateRectangle(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 50, 500, 20, ColliderType::PLATFORM, STATIC);
     initialPosition = position;
 
@@ -32,11 +32,12 @@ update_status ModulePlayer::Update()
 {
     if (!playerBody) return UPDATE_CONTINUE;
 
-    // Obtener la posición real de la bola
+    // Obtain the position of the ball
     int x, y;
     playerBody->GetPosition(x, y);
     printf("%d %d\n", x, y);
-    // Dibujar la bola
+
+    // Draw the ball
     DrawCircle(x, y, radius, RED);
 
     return UPDATE_CONTINUE;
@@ -55,8 +56,6 @@ void ModulePlayer::Launch(float initialForce)
 {
     if (!playerBody) return;
     printf("Launching\n");
-    b2Vec2 force(PIXELS_TO_METERS(0), PIXELS_TO_METERS(initialForce));
-    playerBody->body->ApplyLinearImpulseToCenter(force, true);
 }
 
 // Reset the ball to a position
