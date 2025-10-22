@@ -12,6 +12,7 @@ public:
     bool Start();
     update_status Update();
     bool CleanUp();
+    void OnCollision(PhysBody* bodyA, PhysBody* bodyB);
 
     void GetPhysics();
     void DrawBall();

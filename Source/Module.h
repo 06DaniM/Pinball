@@ -24,7 +24,7 @@ enum class ColliderType {
 class PhysBody
 {
 public:
-    PhysBody() : body(nullptr), ctype(ColliderType::UNKNOWN) {}
+    PhysBody() : body(nullptr), listener(nullptr), ctype(ColliderType::UNKNOWN) {}
     ~PhysBody() {}
 
     void GetPosition(int& x, int& y) const
@@ -57,6 +57,7 @@ public:
 public:
     b2Body* body = nullptr;
     ColliderType ctype;
+    Module* listener;
 };
 
 class Module
@@ -101,4 +102,5 @@ public:
     virtual bool CleanUp() { return true; }
 
     virtual void OnCollision(PhysBody* bodyA, PhysBody* bodyB) {}
+    virtual void EndCollision(PhysBody* bodyA, PhysBody* bodyB) {}
 };

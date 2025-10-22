@@ -51,8 +51,8 @@ void ModuleGame::CreateWalls()
     rightWall = App->physics->CreateRectangle(rightWallPos.x, rightWallPos.y, wallsSizeW, wallsSizeH, restitution, false, ColliderType::PLATFORM, STATIC);
 
     // Void to respawn
-    downVoidPos = { SCREEN_WIDTH / 2, SCREEN_HEIGHT + 100 };
-    downVoid = App->physics->CreateRectangle(downVoidPos.x, downVoidPos.y, SCREEN_WIDTH, 50, true, 0.0f,ColliderType::VOID, STATIC);
+    downVoidPos = { SCREEN_WIDTH / 2, SCREEN_HEIGHT - 800 };
+    downVoid = App->physics->CreateRectangle(downVoidPos.x, downVoidPos.y, SCREEN_WIDTH, 50, 0.0f, true, ColliderType::VOID, STATIC);
 
     // Launch zone
     startleftWall = App->physics->CreateRectangle(SCREEN_WIDTH - 180, 600, 50, 600, restitution, false, ColliderType::PLATFORM, STATIC);

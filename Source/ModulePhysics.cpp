@@ -1,3 +1,4 @@
+#include "Module.h"
 #include "Globals.h"
 #include "Application.h"
 #include "ModuleRender.h"
@@ -7,8 +8,6 @@
 #include "p2Point.h"
 
 #include <math.h>
-
-
 
 ModulePhysics::ModulePhysics(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
@@ -26,6 +25,7 @@ bool ModulePhysics::Start()
 
 	b2Vec2 gravity(0.0f, 10.0f);
 	world = new b2World(gravity);
+	world->SetContactListener(this);
 
 	return true;
 }
@@ -35,7 +35,21 @@ update_status ModulePhysics::PreUpdate()
 	if (world != nullptr)
 	{
 		float dt = GetFrameTime();
-		world->Step(dt, 8, 3);
+		world->Step(dt, 6, 2);
+	}
+
+	for (b2Contact* c = world->GetContactList(); c; c = c->GetNext())
+	{
+		if (c->GetFixtureA()->IsSensor() && c->IsTouching())
+		{
+			b2BodyUserData data1 = c->GetFixtureA()->GetBody()->GetUserData();
+			b2BodyUserData data2 = c->GetFixtureA()->GetBody()->GetUserData();
+
+			PhysBody* pb1 = (PhysBody*)data1.pointer;
+			PhysBody* pb2 = (PhysBody*)data2.pointer;
+			if (pb1 && pb2 && pb1->listener)
+				pb1->listener->OnCollision(pb1, pb2);
+		}
 	}
 
 
@@ -143,6 +157,36 @@ void ModulePhysics::SetBodyPosition(PhysBody* pbody, int x, int y, bool resetRot
 	pbody->body->SetTransform(newPos, angle);
 	pbody->body->SetLinearVelocity(b2Vec2(0, 0));
 	pbody->body->SetAngularVelocity(0);
+}
+
+void ModulePhysics::BeginContact(b2Contact* contact)
+{
+	b2BodyUserData dataA = contact->GetFixtureA()->GetBody()->GetUserData();
+	b2BodyUserData dataB = contact->GetFixtureB()->GetBody()->GetUserData();
+
+	PhysBody* physA = (PhysBody*)dataA.pointer;
+	PhysBody* physB = (PhysBody*)dataB.pointer;
+
+	if (physA && physA->listener != NULL)
+		physA->listener->OnCollision(physA, physB);
+
+	if (physB && physB->listener != NULL)
+		physB->listener->OnCollision(physB, physA);
+}
+
+void ModulePhysics::EndContact(b2Contact* contact)
+{
+	b2BodyUserData dataA = contact->GetFixtureA()->GetBody()->GetUserData();
+	b2BodyUserData dataB = contact->GetFixtureB()->GetBody()->GetUserData();
+
+	PhysBody* physA = (PhysBody*)dataA.pointer;
+	PhysBody* physB = (PhysBody*)dataB.pointer;
+
+	if (physA && physA->listener != NULL)
+		physA->listener->EndCollision(physA, physB);
+
+	if (physB && physB->listener != NULL)
+		physB->listener->EndCollision(physB, physA);
 }
 
 update_status ModulePhysics::PostUpdate()

@@ -20,7 +20,10 @@ public:
     PhysBody* CreateCircle(int x, int y, int radius, ColliderType ctype = ColliderType::UNKNOWN, bodyType type = bodyType::DYNAMIC);
     PhysBody* CreateChain(int x, int y, int* points, int size, bodyType type = bodyType::STATIC);
 
-    void   SetBodyPosition(PhysBody* pbody, int x, int y, bool resetRotation);
+    void SetBodyPosition(PhysBody* pbody, int x, int y, bool resetRotation);
+
+    void BeginContact(b2Contact* contact);
+    void EndContact(b2Contact* contact);
 
     b2World* world = nullptr;
 

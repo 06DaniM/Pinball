@@ -63,8 +63,7 @@ void ModulePlayer::DrawBall()
 void ModulePlayer::Launch()
 {
     if (!playerBody) return;
-    printf("Launching\n");
-    playerBody->body->ApplyLinearImpulseToCenter({0,-5}, true);
+    playerBody->body->ApplyLinearImpulseToCenter({0,-1.5f}, true);
 }
 
 // Reset the ball to a position
@@ -73,4 +72,20 @@ void ModulePlayer::Reset()
     if (!playerBody) return;
 
     App->physics->SetBodyPosition(playerBody, initialPosition.x, initialPosition.y, true);
+}
+
+void ModulePlayer::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
+{
+    switch (bodyA->ctype)
+    {
+    case ColliderType::VOID:
+        if (bodyB->ctype == ColliderType::PLAYER)
+        {
+            printf("Collide with void\n");
+            App->physics->SetBodyPosition(playerBody, initialPosition.x, initialPosition.y, true);
+        }
+
+    default:
+        break;
+    }
 }
