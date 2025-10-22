@@ -19,6 +19,7 @@ bool ModulePlayer::Start()
 
     // Creates the ball
     playerBody = App->physics->CreateCircle(position.x, position.y, radius, ColliderType::PLAYER, DYNAMIC);
+    playerBody->listener = this;
 
     initialPosition = position;
 
@@ -29,6 +30,21 @@ bool ModulePlayer::Start()
 update_status ModulePlayer::Update()
 {
     if (!playerBody) return UPDATE_CONTINUE;
+
+    if (needsReset)
+    {
+        float deltaTime = GetFrameTime(); // Raylib: tiempo entre frames (en segundos)
+        resetDelay -= deltaTime;
+
+        // Cuando pasa el tiempo, teletransportamos
+        if (resetDelay <= 0.0f)
+        {
+            App->physics->SetBodyPosition(playerBody, initialPosition.x, initialPosition.y, true);
+            playerBody->body->SetLinearVelocity(b2Vec2(0, 0)); // Detener movimiento
+            needsReset = false;
+            printf("Teleported back to start\n");
+        }
+    }
 
     GetPhysics();
     DrawBall();
@@ -76,14 +92,19 @@ void ModulePlayer::Reset()
 
 void ModulePlayer::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 {
-    switch (bodyA->ctype)
+    switch (bodyB->ctype)
     {
     case ColliderType::VOID:
-        if (bodyB->ctype == ColliderType::PLAYER)
+        if (bodyA->ctype == ColliderType::PLAYER)
         {
-            printf("Collide with void\n");
-            App->physics->SetBodyPosition(playerBody, initialPosition.x, initialPosition.y, true);
+            if (!needsReset) // Evitar reiniciar varias veces seguidas
+            {
+                printf("Collide with void\n");
+                needsReset = true;
+                resetDelay = resetDelayDuration; // Comienza el temporizador
+            }
         }
+        break;
 
     default:
         break;

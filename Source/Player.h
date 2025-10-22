@@ -19,6 +19,11 @@ public:
     void Launch();
     void Reset();
 
+    // Teleport 
+    bool needsReset = false;          // Indica si el jugador debe resetearse
+    float resetDelay = 0.0f;          // Tiempo restante antes de teletransportar
+    const float resetDelayDuration = 0.5f; // Duración del retraso (en segundos)
+
 private:
     PhysBody* playerBody = nullptr; // Body of the ball
     int radius = 12;                // Radius of the ball

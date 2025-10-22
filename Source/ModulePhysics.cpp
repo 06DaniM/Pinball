@@ -56,13 +56,12 @@ update_status ModulePhysics::PreUpdate()
 	return UPDATE_CONTINUE;
 }
 
-PhysBody* ModulePhysics::CreateRectangle(int x, int y, int width, int height, float restitution, bool isSensor, ColliderType ctype, bodyType type)
+PhysBody* ModulePhysics::CreateRectangle(int x, int y, int width, int height, bool isSensor, Module* listener, ColliderType ctype, bodyType type)
 {
 	b2BodyDef bodyDef;
 	if (type == DYNAMIC) bodyDef.type = b2_dynamicBody;
 	else if (type == KINEMATIC) bodyDef.type = b2_kinematicBody;
 	else bodyDef.type = b2_staticBody;
-
 	bodyDef.position.Set(PIXELS_TO_METERS(x), PIXELS_TO_METERS(y));
 
 	b2Body* b = world->CreateBody(&bodyDef);
@@ -75,12 +74,14 @@ PhysBody* ModulePhysics::CreateRectangle(int x, int y, int width, int height, fl
 	fixtureDef.isSensor = isSensor;
 	fixtureDef.friction = 0;
 	fixtureDef.density = 1.0f;
-	fixtureDef.restitution = restitution;
 	b->CreateFixture(&fixtureDef);
 
 	PhysBody* pbody = new PhysBody();
 	pbody->body = b;
 	pbody->ctype = ctype;
+	pbody->listener = listener;
+
+	b->GetUserData().pointer = (uintptr_t)pbody;
 
 	return pbody;
 }
@@ -110,6 +111,8 @@ PhysBody* ModulePhysics::CreateCircle(int x, int y, int radius, ColliderType cty
 	PhysBody* pbody = new PhysBody();
 	pbody->body = b;
 	pbody->ctype = ctype;
+
+	b->GetUserData().pointer = (uintptr_t)pbody;
 
 	return pbody;
 }

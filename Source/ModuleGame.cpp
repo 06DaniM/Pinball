@@ -40,23 +40,21 @@ bool ModuleGame::CleanUp()
 
 void ModuleGame::CreateWalls()
 {
-    float restitution = 0.8f;
-
     // Left wall
     leftWallPos = { 100, SCREEN_HEIGHT / 2 };
-    leftWall = App->physics->CreateRectangle(leftWallPos.x, leftWallPos.y, wallsSizeW, wallsSizeH, restitution, false, ColliderType::PLATFORM, STATIC);
+    leftWall = App->physics->CreateRectangle(leftWallPos.x, leftWallPos.y, wallsSizeW, wallsSizeH, false, this, ColliderType::PLATFORM, STATIC);
 
     // Right wall
     rightWallPos = { SCREEN_WIDTH - 100, SCREEN_HEIGHT / 2 };
-    rightWall = App->physics->CreateRectangle(rightWallPos.x, rightWallPos.y, wallsSizeW, wallsSizeH, restitution, false, ColliderType::PLATFORM, STATIC);
+    rightWall = App->physics->CreateRectangle(rightWallPos.x, rightWallPos.y, wallsSizeW, wallsSizeH, false, this, ColliderType::PLATFORM, STATIC);
 
     // Void to respawn
     downVoidPos = { SCREEN_WIDTH / 2, SCREEN_HEIGHT - 800 };
-    downVoid = App->physics->CreateRectangle(downVoidPos.x, downVoidPos.y, SCREEN_WIDTH, 50, 0.0f, true, ColliderType::VOID, STATIC);
+    downVoid = App->physics->CreateRectangle(downVoidPos.x, downVoidPos.y, SCREEN_WIDTH, 50, true, this, ColliderType::VOID, STATIC);
 
     // Launch zone
-    startleftWall = App->physics->CreateRectangle(SCREEN_WIDTH - 180, 600, 50, 600, restitution, false, ColliderType::PLATFORM, STATIC);
-    startGround = App->physics->CreateRectangle(SCREEN_WIDTH - 140, 800, 30, 50, restitution, false, ColliderType::PLATFORM, STATIC);
+    startleftWall = App->physics->CreateRectangle(SCREEN_WIDTH - 180, 600, 50, 600, false, this, ColliderType::PLATFORM, STATIC);
+    startGround = App->physics->CreateRectangle(SCREEN_WIDTH - 140, 800, 30, 50, false, this, ColliderType::PLATFORM, STATIC);
 
     // Create the arc
     CreateTopArc();
