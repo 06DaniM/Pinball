@@ -66,8 +66,8 @@ void ModuleGame::CreateTable()
     // Cambiar cuando se tenga el mapa
 	static int points[8] = {
 	10, 0,
-    10, 800,
-    910, 800,
+    10, 980,
+    910, 980,
     910, 0
 	};
     

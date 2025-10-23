@@ -43,10 +43,10 @@ private:
     PhysBody* rightFlipper;
 
     float leftFlipperPositionX = SCREEN_WIDTH / 2 - 100;
-    float leftFlipperPositionY = SCREEN_HEIGHT / 2;
+    float leftFlipperPositionY = SCREEN_HEIGHT - 100;
 
     float rightFlipperPositionX = SCREEN_WIDTH / 2 + 100;
-    float rightFlipperPositionY = SCREEN_HEIGHT / 2;
+    float rightFlipperPositionY = SCREEN_HEIGHT - 100;
 
     PhysBody* rightWall;
     PhysBody* downVoid;
