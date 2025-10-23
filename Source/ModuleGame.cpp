@@ -68,6 +68,33 @@ void ModuleGame::CreateTable()
 	physTable->listener = this;
 }
 
+void ModuleGame::Flippers(PhysBody* flipper)
+{
+
+}
+
+void ModuleGame::HandleInput()
+{
+    // Disparar la bola
+    if (IsKeyPressed(KEY_DOWN))
+    {
+        ball->Launch();
+    }
+
+    // Mover flippers (aún no implementado)
+    if (IsKeyPressed(KEY_LEFT))
+    {
+        // Flipper izquierdo
+        Flippers(leftFlipper);
+    }
+
+    if (IsKeyPressed(KEY_RIGHT))
+    {
+        // Flipper derecho
+        Flippers(rightFlipper);
+    }
+}
+
 void ModuleGame::DrawTable()
 {
     DrawWall(rightWall, BLACK);
@@ -88,24 +115,4 @@ void ModuleGame::DrawWall(PhysBody* wall, Color color)
 void ModuleGame::DrawTopArc()
 {
 
-}
-
-void ModuleGame::HandleInput()
-{
-    // Disparar la bola
-    if (IsKeyPressed(KEY_DOWN))
-    {
-        ball->Launch();
-    }
-
-    // Mover flippers (aún no implementado)
-    if (IsKeyPressed(KEY_LEFT))
-    {
-        // Flipper izquierdo
-    }
-
-    if (IsKeyPressed(KEY_RIGHT))
-    {
-        // Flipper derecho
-    }
 }

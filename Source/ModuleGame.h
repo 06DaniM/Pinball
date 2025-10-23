@@ -22,6 +22,7 @@ public:
 private:
     void CreateWalls();
     void CreateTable();
+    void Flippers(PhysBody* flipper);
     void HandleInput();
     void DrawWall(PhysBody* wall, Color color);
     void DrawTopArc();
@@ -32,8 +33,13 @@ public:
 
 private:
     PhysBody* physTable;
+
+    PhysBody* leftFlipper;
+    PhysBody* rightFlipper;
+
     PhysBody* rightWall;
     PhysBody* downVoid;
+
     PhysBody* startGround;
     PhysBody* startleftWall;
 
