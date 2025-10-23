@@ -118,7 +118,7 @@ void ModuleGame::Flippers(PhysBody*& flipper, b2RevoluteJoint*& joint, float x, 
     float flipperHeight = 20.0f;
 
     // Creates the dynamic body
-    flipper = App->physics->CreateRectangle(x, x, flipperWidth, flipperHeight, false, this, ColliderType::PLATFORM, DYNAMIC);
+    flipper = App->physics->CreateRectangle(x, y, flipperWidth, flipperHeight, false, this, ColliderType::PLATFORM, DYNAMIC);
 
     // Creates the pivot point
     b2Body* body = flipper->body;
@@ -132,27 +132,26 @@ void ModuleGame::Flippers(PhysBody*& flipper, b2RevoluteJoint*& joint, float x, 
     b2RevoluteJointDef jointDef;
     jointDef.bodyA = anchor;
     jointDef.bodyB = body;
-    jointDef.enableMotor = true;
+
+    // Desactivates the engine when the torque is being created
+    jointDef.enableMotor = false;
     jointDef.maxMotorTorque = 500.0f;
 
-    // To put the anchors to the ends
+    // Puts the anchor at the ends
     float halfWidth = PIXELS_TO_METERS(flipperWidth * 0.5f);
-
-    // Limites the angle that can turn
-    jointDef.enableLimit = true;
-
     if (isLeft)
-    {
-        jointDef.lowerAngle = -30 * DEG2RAD;
-        jointDef.upperAngle = 30 * DEG2RAD;
         jointDef.localAnchorB.Set(-halfWidth, 0);
-    }
     else
-    {
-        jointDef.lowerAngle = -30 * DEG2RAD;
-        jointDef.upperAngle = 30 * DEG2RAD;
         jointDef.localAnchorB.Set(halfWidth, 0);
-    }
 
+    // Limitate the angle of turn
+    jointDef.enableLimit = true;
+    jointDef.lowerAngle = -30 * DEG2RAD;
+    jointDef.upperAngle = 30 * DEG2RAD;
+
+    // Creates the joint
     joint = (b2RevoluteJoint*)App->physics->world->CreateJoint(&jointDef);
+
+    // Activates the engine when the flippers are in their position
+    joint->EnableMotor(true); // The flippers move at the begining until they were in their positions, activate the engine after solve it
 }
