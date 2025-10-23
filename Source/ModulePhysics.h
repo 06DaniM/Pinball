@@ -55,8 +55,6 @@ public:
     b2Body* body = nullptr;
     ColliderType ctype;
     Module* listener;
-
-    int w, h;
 };
 
 // Module --------------------------------------
