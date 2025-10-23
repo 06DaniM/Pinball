@@ -18,9 +18,16 @@ bool ModuleGame::Start()
 {
     printf("Loading game assets\n");
 
-    ball = App->player;
-    CreateWalls();
+    // Load flippers
+    Flippers(leftFlipper, leftFlipperJoint, leftFlipperPositionX, leftFlipperPositionY, true);      // Left flipper
+    Flippers(rightFlipper, rightFlipperJoint, rightFlipperPositionX, rightFlipperPositionY, false);   // Right flipper
+
+    // Load table
+    CreateWalls(); // momentaneo
 	CreateTable();
+
+
+    ball = App->player;
 
     return true;
 }
@@ -68,31 +75,22 @@ void ModuleGame::CreateTable()
 	physTable->listener = this;
 }
 
-void ModuleGame::Flippers(PhysBody* flipper)
-{
-
-}
-
 void ModuleGame::HandleInput()
 {
-    // Disparar la bola
     if (IsKeyPressed(KEY_DOWN))
-    {
         ball->Launch();
-    }
 
-    // Mover flippers (aún no implementado)
-    if (IsKeyPressed(KEY_LEFT))
-    {
-        // Flipper izquierdo
-        Flippers(leftFlipper);
-    }
+    // Left flipper
+    if (IsKeyDown(KEY_LEFT))
+        leftFlipperJoint->SetMotorSpeed(-10.0f);
+    else
+        leftFlipperJoint->SetMotorSpeed(10.0f);
 
-    if (IsKeyPressed(KEY_RIGHT))
-    {
-        // Flipper derecho
-        Flippers(rightFlipper);
-    }
+    // Right flipper
+    if (IsKeyDown(KEY_RIGHT))
+        rightFlipperJoint->SetMotorSpeed(10.0f);
+    else
+        rightFlipperJoint->SetMotorSpeed(-10.0f);
 }
 
 void ModuleGame::DrawTable()
@@ -101,7 +99,8 @@ void ModuleGame::DrawTable()
     App->renderer->DrawRectangleCentered(SCREEN_WIDTH - 180, 600, 50, 600, DARKBLUE);
     App->renderer->DrawRectangleCentered(SCREEN_WIDTH - 140, 800, 30, 50, RED);
 
-    DrawTopArc();
+    /*DrawCircle(leftFlipperPositionX, leftFlipperPositionY, 5, RED);
+    DrawCircle(rightFlipperPositionX, rightFlipperPositionY, 5, RED);*/
 }
 
 void ModuleGame::DrawWall(PhysBody* wall, Color color)
@@ -112,7 +111,48 @@ void ModuleGame::DrawWall(PhysBody* wall, Color color)
     App->renderer->DrawRectangleCentered(x, y, wallsSizeW, wallsSizeH, color);
 }
 
-void ModuleGame::DrawTopArc()
+void ModuleGame::Flippers(PhysBody*& flipper, b2RevoluteJoint*& joint, float x, float y, bool isLeft)
 {
+    // Creates the flipper body
+    float flipperWidth = 80.0f;
+    float flipperHeight = 20.0f;
 
+    // Creates the dynamic body
+    flipper = App->physics->CreateRectangle(x, x, flipperWidth, flipperHeight, false, this, ColliderType::PLATFORM, DYNAMIC);
+
+    // Creates the pivot point
+    b2Body* body = flipper->body;
+
+    b2BodyDef anchorDef;
+    anchorDef.type = b2_staticBody;
+    anchorDef.position.Set(PIXELS_TO_METERS(x), PIXELS_TO_METERS(y));
+    b2Body* anchor = App->physics->world->CreateBody(&anchorDef);
+
+    // Creates the revolute joint
+    b2RevoluteJointDef jointDef;
+    jointDef.bodyA = anchor;
+    jointDef.bodyB = body;
+    jointDef.enableMotor = true;
+    jointDef.maxMotorTorque = 500.0f;
+
+    // To put the anchors to the ends
+    float halfWidth = PIXELS_TO_METERS(flipperWidth * 0.5f);
+
+    // Limites the angle that can turn
+    jointDef.enableLimit = true;
+
+    if (isLeft)
+    {
+        jointDef.lowerAngle = -30 * DEG2RAD;
+        jointDef.upperAngle = 30 * DEG2RAD;
+        jointDef.localAnchorB.Set(-halfWidth, 0);
+    }
+    else
+    {
+        jointDef.lowerAngle = -30 * DEG2RAD;
+        jointDef.upperAngle = 30 * DEG2RAD;
+        jointDef.localAnchorB.Set(halfWidth, 0);
+    }
+
+    joint = (b2RevoluteJoint*)App->physics->world->CreateJoint(&jointDef);
 }

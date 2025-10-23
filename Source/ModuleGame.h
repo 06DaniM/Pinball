@@ -22,11 +22,13 @@ public:
 private:
     void CreateWalls();
     void CreateTable();
-    void Flippers(PhysBody* flipper);
+
     void HandleInput();
+
     void DrawWall(PhysBody* wall, Color color);
-    void DrawTopArc();
     void DrawTable();
+
+    void Flippers(PhysBody*& flipper, b2RevoluteJoint*& joint, float posX, float posY, bool isLeft);
 
 public:
     ModulePlayer* ball = nullptr; // Reference to the ball
@@ -34,8 +36,17 @@ public:
 private:
     PhysBody* physTable;
 
+    b2RevoluteJoint* leftFlipperJoint;
+    b2RevoluteJoint* rightFlipperJoint;
+
     PhysBody* leftFlipper;
     PhysBody* rightFlipper;
+
+    float leftFlipperPositionX = SCREEN_WIDTH / 2 - 100;
+    float leftFlipperPositionY = SCREEN_HEIGHT / 2;
+
+    float rightFlipperPositionX = SCREEN_WIDTH / 2 + 100;
+    float rightFlipperPositionY = SCREEN_HEIGHT / 2;
 
     PhysBody* rightWall;
     PhysBody* downVoid;
