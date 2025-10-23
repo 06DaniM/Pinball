@@ -71,7 +71,7 @@ public:
 
     PhysBody* CreateRectangle(int x, int y, int width, int height, bool isSensor, Module* listener, ColliderType ctype, bodyType type);
     PhysBody* CreateCircle(int x, int y, int radius, ColliderType ctype = ColliderType::UNKNOWN, bodyType type = bodyType::DYNAMIC);
-    PhysBody* CreateChain(int x, int y, int* points, int size, bodyType type = bodyType::STATIC);
+    PhysBody* CreateChain(int x, int y, int* points, int size, ColliderType ctype = ColliderType::UNKNOWN, bodyType type = bodyType::STATIC);
 
     void SetBodyPosition(PhysBody* pbody, int x, int y, bool resetRotation);
 

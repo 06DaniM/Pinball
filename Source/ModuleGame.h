@@ -21,7 +21,7 @@ public:
     
 private:
     void CreateWalls();
-    void CreateTopArc();
+    void CreateTable();
     void HandleInput();
     void DrawWall(PhysBody* wall, Color color);
     void DrawTopArc();
@@ -31,6 +31,7 @@ public:
     ModulePlayer* ball = nullptr; // Reference to the ball
 
 private:
+    PhysBody* physTable;
     PhysBody* leftWall;
     PhysBody* rightWall;
     PhysBody* downVoid;

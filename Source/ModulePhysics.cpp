@@ -117,7 +117,7 @@ PhysBody* ModulePhysics::CreateCircle(int x, int y, int radius, ColliderType cty
 	return pbody;
 }
 
-PhysBody* ModulePhysics::CreateChain(int x, int y, int* points, int size, bodyType type)
+PhysBody* ModulePhysics::CreateChain(int x, int y, int* points, int size, ColliderType ctype, bodyType type)
 {
 	b2BodyDef bodyDef;
 	if (type == DYNAMIC) bodyDef.type = b2_dynamicBody;
@@ -145,6 +145,8 @@ PhysBody* ModulePhysics::CreateChain(int x, int y, int* points, int size, bodyTy
 
 	PhysBody* pbody = new PhysBody();
 	pbody->body = b;
+
+	b->GetUserData().pointer = (uintptr_t)pbody;
 
 	return pbody;
 }

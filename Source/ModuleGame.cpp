@@ -20,6 +20,7 @@ bool ModuleGame::Start()
 
     ball = App->player;
     CreateWalls();
+	CreateTable();
 
     return true;
 }
@@ -49,20 +50,26 @@ void ModuleGame::CreateWalls()
     rightWall = App->physics->CreateRectangle(rightWallPos.x, rightWallPos.y, wallsSizeW, wallsSizeH, false, this, ColliderType::PLATFORM, STATIC);
 
     // Void to respawn
-    downVoidPos = { SCREEN_WIDTH / 2, SCREEN_HEIGHT - 800 };
+    downVoidPos = { SCREEN_WIDTH / 2, SCREEN_HEIGHT + 100 };
     downVoid = App->physics->CreateRectangle(downVoidPos.x, downVoidPos.y, SCREEN_WIDTH, 50, true, this, ColliderType::VOID, STATIC);
 
     // Launch zone
     startleftWall = App->physics->CreateRectangle(SCREEN_WIDTH - 180, 600, 50, 600, false, this, ColliderType::PLATFORM, STATIC);
     startGround = App->physics->CreateRectangle(SCREEN_WIDTH - 140, 800, 30, 50, false, this, ColliderType::PLATFORM, STATIC);
-
-    // Create the arc
-    CreateTopArc();
 }
 
-void ModuleGame::CreateTopArc()
+void ModuleGame::CreateTable()
 {
+    // Cambiar cuando se tenga el mapa
+	static int points[8] = {
+	10, 0,
+    10, 800,
+    910, 800,
+    910, 0
+	};
 
+	physTable = App->physics->CreateChain(0, 0, points, 8, ColliderType::PLATFORM);
+	physTable->listener = this;
 }
 
 void ModuleGame::DrawTable()
