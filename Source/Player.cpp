@@ -18,7 +18,7 @@ bool ModulePlayer::Start()
     position = { SCREEN_WIDTH - 140, SCREEN_HEIGHT / 2 };
 
     // Creates the ball
-    playerBody = App->physics->CreateCircle(position.x, position.y, radius, ColliderType::PLAYER, DYNAMIC);
+    playerBody = App->physics->CreateCircle(position.x, position.y, radius, false, ColliderType::PLAYER, DYNAMIC);
     playerBody->listener = this;
 
     initialPosition = position;

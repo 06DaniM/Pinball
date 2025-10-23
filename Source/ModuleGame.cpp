@@ -41,19 +41,15 @@ bool ModuleGame::CleanUp()
 
 void ModuleGame::CreateWalls()
 {
-    // Left wall
-    leftWallPos = { 100, SCREEN_HEIGHT / 2 };
-    leftWall = App->physics->CreateRectangle(leftWallPos.x, leftWallPos.y, wallsSizeW, wallsSizeH, false, this, ColliderType::PLATFORM, STATIC);
-
-    // Right wall
+    // Right wall (MOMENTANEO, En cuanto se tenga el mapa se quitará y se sustituirá por el CreateChain)
     rightWallPos = { SCREEN_WIDTH - 100, SCREEN_HEIGHT / 2 };
     rightWall = App->physics->CreateRectangle(rightWallPos.x, rightWallPos.y, wallsSizeW, wallsSizeH, false, this, ColliderType::PLATFORM, STATIC);
 
-    // Void to respawn
+    // Void to respawn (fijo, no es necesario cambiarlo)
     downVoidPos = { SCREEN_WIDTH / 2, SCREEN_HEIGHT + 100 };
     downVoid = App->physics->CreateRectangle(downVoidPos.x, downVoidPos.y, SCREEN_WIDTH, 50, true, this, ColliderType::VOID, STATIC);
 
-    // Launch zone
+    // Launch zone (MOMENTANEO, En cuanto se tenga el mapa se quitará y se sustituirá por el CreateChain)
     startleftWall = App->physics->CreateRectangle(SCREEN_WIDTH - 180, 600, 50, 600, false, this, ColliderType::PLATFORM, STATIC);
     startGround = App->physics->CreateRectangle(SCREEN_WIDTH - 140, 800, 30, 50, false, this, ColliderType::PLATFORM, STATIC);
 }
@@ -67,8 +63,8 @@ void ModuleGame::CreateTable()
     910, 800,
     910, 0
 	};
-
-	physTable = App->physics->CreateChain(0, 0, points, 8, ColliderType::PLATFORM);
+    
+	physTable = App->physics->CreateChain(0, 0, points, 8, false, ColliderType::PLATFORM);
 	physTable->listener = this;
 }
 

@@ -86,7 +86,7 @@ PhysBody* ModulePhysics::CreateRectangle(int x, int y, int width, int height, bo
 	return pbody;
 }
 
-PhysBody* ModulePhysics::CreateCircle(int x, int y, int radius, ColliderType ctype, bodyType type)
+PhysBody* ModulePhysics::CreateCircle(int x, int y, int radius, bool isSensor, ColliderType ctype, bodyType type)
 {
 	b2BodyDef bodyDef;
 	if (type == DYNAMIC) bodyDef.type = b2_dynamicBody;
@@ -102,6 +102,7 @@ PhysBody* ModulePhysics::CreateCircle(int x, int y, int radius, ColliderType cty
 
 	b2FixtureDef fixtureDef;
 	fixtureDef.shape = &shape;
+	fixtureDef.isSensor = isSensor;
 	fixtureDef.friction = 0;
 	fixtureDef.density = 1.0f;
 	fixtureDef.restitution = 0.6f;
@@ -117,7 +118,7 @@ PhysBody* ModulePhysics::CreateCircle(int x, int y, int radius, ColliderType cty
 	return pbody;
 }
 
-PhysBody* ModulePhysics::CreateChain(int x, int y, int* points, int size, ColliderType ctype, bodyType type)
+PhysBody* ModulePhysics::CreateChain(int x, int y, int* points, int size, bool isSensor, ColliderType ctype, bodyType type)
 {
 	b2BodyDef bodyDef;
 	if (type == DYNAMIC) bodyDef.type = b2_dynamicBody;
@@ -140,6 +141,7 @@ PhysBody* ModulePhysics::CreateChain(int x, int y, int* points, int size, Collid
 
 	b2FixtureDef fixtureDef;
 	fixtureDef.shape = &chain;
+	fixtureDef.isSensor = isSensor;
 	fixtureDef.density = 1.0f;
 	b->CreateFixture(&fixtureDef);
 
