@@ -70,7 +70,6 @@ void ModuleGame::CreateTable()
 
 void ModuleGame::DrawTable()
 {
-    DrawWall(leftWall, BLACK);
     DrawWall(rightWall, BLACK);
     App->renderer->DrawRectangleCentered(SCREEN_WIDTH - 180, 600, 50, 600, DARKBLUE);
     App->renderer->DrawRectangleCentered(SCREEN_WIDTH - 140, 800, 30, 50, RED);

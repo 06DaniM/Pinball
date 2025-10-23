@@ -32,12 +32,10 @@ public:
 
 private:
     PhysBody* physTable;
-    PhysBody* leftWall;
     PhysBody* rightWall;
     PhysBody* downVoid;
     PhysBody* startGround;
     PhysBody* startleftWall;
-    PhysBody* topArc;
 
     b2Vec2 leftWallPos, rightWallPos, upWallPos, downVoidPos;
     int wallsSizeW = 50, wallsSizeH = SCREEN_HEIGHT-100;
