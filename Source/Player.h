@@ -14,15 +14,18 @@ public:
     bool CleanUp();
     void OnCollision(PhysBody* bodyA, PhysBody* bodyB);
 
+    void Launch();
+
+private:
     void GetPhysics();
     void DrawBall();
-    void Launch();
     void Reset();
 
+public:
     // Teleport 
-    bool needsReset = false;          // Indica si el jugador debe resetearse
-    float resetDelay = 0.0f;          // Tiempo restante antes de teletransportar
-    const float resetDelayDuration = 0.5f; // Duración del retraso (en segundos)
+    bool needsReset = false;               // Declare if has to reset when falling
+    float resetDelayTimer = 0.0f;               // Set the time left to reset
+    const float resetDelayDuration = 0.5f; // Set the total time to reset
 
 private:
     PhysBody* playerBody = nullptr; // Body of the ball

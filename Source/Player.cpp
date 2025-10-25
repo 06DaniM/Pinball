@@ -22,6 +22,7 @@ bool ModulePlayer::Start()
     playerBody->listener = this;
 
     initialPosition = position;
+    resetDelayTimer = resetDelayDuration;
 
     return true;
 }
@@ -31,22 +32,8 @@ update_status ModulePlayer::Update()
 {
     if (!playerBody) return UPDATE_CONTINUE;
 
-    if (needsReset)
-    {
-        float deltaTime = GetFrameTime(); // Raylib: tiempo entre frames (en segundos)
-        resetDelay -= deltaTime;
-
-        // Cuando pasa el tiempo, teletransportamos
-        if (resetDelay <= 0.0f)
-        {
-            App->physics->SetBodyPosition(playerBody, initialPosition.x, initialPosition.y, true);
-            playerBody->body->SetLinearVelocity(b2Vec2(0, 0)); // Detener movimiento
-            needsReset = false;
-            printf("Teleported back to start\n");
-        }
-    }
-
     GetPhysics();
+    Reset();
     DrawBall();
 
     return UPDATE_CONTINUE;
@@ -85,9 +72,20 @@ void ModulePlayer::Launch()
 // Reset the ball to a position
 void ModulePlayer::Reset()
 {
-    if (!playerBody) return;
+    if (!needsReset) return;
 
-    App->physics->SetBodyPosition(playerBody, initialPosition.x, initialPosition.y, true);
+    float deltaTime = GetFrameTime();
+    resetDelayTimer -= deltaTime;
+
+    // Teleport when the time passed
+    if (resetDelayTimer <= 0.0f)
+    {
+        App->physics->SetBodyPosition(playerBody, initialPosition.x, initialPosition.y, true);
+        playerBody->body->SetLinearVelocity(b2Vec2(0, 0));
+        needsReset = false;
+        resetDelayTimer = resetDelayDuration;
+        printf("Teleported back to start\n");
+    }
 }
 
 void ModulePlayer::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
@@ -97,11 +95,11 @@ void ModulePlayer::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
     case ColliderType::VOID:
         if (bodyA->ctype == ColliderType::PLAYER)
         {
-            if (!needsReset) // Evitar reiniciar varias veces seguidas
+            if (!needsReset) // Avoid reset more than one time
             {
                 printf("Collide with void\n");
                 needsReset = true;
-                resetDelay = resetDelayDuration; // Comienza el temporizador
+                resetDelayTimer = resetDelayDuration;
             }
         }
         break;

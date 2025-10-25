@@ -53,7 +53,7 @@ void ModuleGame::CreateWalls()
     rightWall = App->physics->CreateRectangle(rightWallPos.x, rightWallPos.y, wallsSizeW, wallsSizeH, false, this, ColliderType::PLATFORM, STATIC);
 
     // Void to respawn (fijo, no es necesario cambiarlo)
-    downVoidPos = { SCREEN_WIDTH / 2, SCREEN_HEIGHT + 100 };
+    downVoidPos = { SCREEN_WIDTH / 2, SCREEN_HEIGHT - 100 };
     downVoid = App->physics->CreateRectangle(downVoidPos.x, downVoidPos.y, SCREEN_WIDTH, 50, true, this, ColliderType::VOID, STATIC);
 
     // Launch zone (MOMENTANEO, En cuanto se tenga el mapa se quitará y se sustituirá por el CreateChain)

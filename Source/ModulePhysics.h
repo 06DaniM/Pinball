@@ -14,6 +14,7 @@ enum class ColliderType {
     PLAYER,
     PLATFORM,
     ITEM,
+    BOUNCE,
     VOID,
     UNKNOWN
 };
