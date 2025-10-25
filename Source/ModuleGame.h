@@ -30,6 +30,8 @@ private:
 
     void Flippers(PhysBody*& flipper, b2RevoluteJoint*& joint, float posX, float posY, bool isLeft);
 
+    void Spring(PhysBody*& base, PhysBody*& plunger, b2PrismaticJoint*& joint, float poxX, float posY);
+
 public:
     ModulePlayer* ball = nullptr; // Reference to the ball
 
@@ -53,6 +55,13 @@ private:
 
     PhysBody* startGround;
     PhysBody* startleftWall;
+
+    //spring
+    PhysBody* base;
+    PhysBody* plunger;
+    b2PrismaticJoint* joint;
+    float springGroundX = SCREEN_WIDTH - 140;
+    float springGroundY = SCREEN_HEIGHT - 250;
 
     b2Vec2 leftWallPos, rightWallPos, upWallPos, downVoidPos;
     int wallsSizeW = 50, wallsSizeH = SCREEN_HEIGHT-100;
