@@ -18,25 +18,25 @@ bool ModuleGame::Start()
 {
     printf("Loading game assets\n");
 
-    // Load flippers
+    // === LOAD THE FLIPPERS ===
     Flippers(leftFlipper, leftFlipperJoint, leftFlipperPositionX, leftFlipperPositionY, true);      // Left flipper
     Flippers(rightFlipper, rightFlipperJoint, rightFlipperPositionX, rightFlipperPositionY, false);   // Right flipper
-    //Load spring
+
+    // === LOAD THE SPRING
     Spring(base, plunger, joint, springGroundX, springGroundY);
-    // Load table
+
+    // === LOAD THE TABLE (MAP)
     CreateWalls(); // momentaneo
 	CreateTable();
 
-   
-
-
-    ball = App->player;
+    modulePlayer = App->player;
 
     return true;
 }
 
 update_status ModuleGame::Update()
 {
+    
     HandleInput();
     DrawTable();
 
@@ -118,6 +118,7 @@ void ModuleGame::DrawWall(PhysBody* wall, Color color)
     App->renderer->DrawRectangleCentered(x, y, wallsSizeW, wallsSizeH, color);
 }
 
+// MOVER LOS FLIPPERS Y EL SPRING AL MODULEPHYSICS
 void ModuleGame::Flippers(PhysBody*& flipper, b2RevoluteJoint*& joint, float x, float y, bool isLeft)
 {
     // Creates the flipper body
@@ -184,4 +185,21 @@ void ModuleGame::Spring(PhysBody*& base, PhysBody*& plunger, b2PrismaticJoint*& 
 
     joint = (b2PrismaticJoint*)App->physics->world->CreateJoint(&jointDef);
 
+}
+
+void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
+{
+    switch (physB->ctype)
+    {
+    case ColliderType::ITEM:
+        if (physA->ctype == ColliderType::PLAYER)
+        {
+            printf("Collide with an item\n");
+            currentScore += physB->itemScore;
+        }
+        break;
+
+    default:
+        break;
+    }
 }

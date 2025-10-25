@@ -18,6 +18,8 @@ public:
     bool Start();
     update_status Update();
     bool CleanUp();
+
+    void OnCollision(PhysBody* bodyA, PhysBody* bodyB);
     
 private:
     void CreateWalls();
@@ -33,36 +35,49 @@ private:
     void Spring(PhysBody*& base, PhysBody*& plunger, b2PrismaticJoint*& joint, float poxX, float posY);
 
 public:
-    ModulePlayer* ball = nullptr; // Reference to the ball
+    ModulePlayer* modulePlayer = NULL;      // Reference to the life of the module player
 
 private:
-    PhysBody* physTable;
+    // === TABLE (MAP) ===
+    PhysBody* physTable = NULL;     // Physbody of the table (map)
 
-    PhysBody* leftFlipper;
-    PhysBody* rightFlipper;
+    // === FLIPPERS ===
+    PhysBody* leftFlipper = NULL;   // Physbody of the left flipper 
+    PhysBody* rightFlipper = NULL;  // Physbody of the right flipper
 
-    b2RevoluteJoint* leftFlipperJoint;
-    b2RevoluteJoint* rightFlipperJoint;
+    b2RevoluteJoint* leftFlipperJoint;  // Revolute joint of the left flipper 
+    b2RevoluteJoint* rightFlipperJoint; // Revolute joint of the right flipper
 
-    float leftFlipperPositionX = SCREEN_WIDTH / 2 - 100;
-    float leftFlipperPositionY = SCREEN_HEIGHT - 100;
+    float leftFlipperPositionX = SCREEN_WIDTH / 2 - 100;  // Set the left flipper x position
+    float leftFlipperPositionY = SCREEN_HEIGHT - 100;     // Set the left flipper y position
+    
+    float rightFlipperPositionX = SCREEN_WIDTH / 2 + 100; // Set the right flipper x position
+    float rightFlipperPositionY = SCREEN_HEIGHT - 100;    // Set the right flipper y position
 
-    float rightFlipperPositionX = SCREEN_WIDTH / 2 + 100;
-    float rightFlipperPositionY = SCREEN_HEIGHT - 100;
+    // === SPRING ===
+    PhysBody* base;     // Physbody of the base of the plunger
+    PhysBody* plunger;  // Physbody of the plunger
 
+    b2PrismaticJoint* joint; // Prismatic joint of the spring
+
+    float springGroundX = SCREEN_WIDTH - 140;  // Set the x position of the spring
+    float springGroundY = SCREEN_HEIGHT - 250; // Set the y position of the spring
+
+    // === SCORE === 
+    int currentScore = 0;   // Set the current score during gameplay
+    int previousScore = 0;  // Set the previous score during gameplay
+    int highestScore = 0;   // Set the highest score during gameplay
+
+    // === VOID ===
+    PhysBody* downVoid; // Physbody of the void
+    b2Vec2 downVoidPos; // Set the position of the void
+
+    // === COLISIONES TEMPORALES HASTA TENER MAPA ===
     PhysBody* rightWall;
-    PhysBody* downVoid;
-
     PhysBody* startGround;
     PhysBody* startleftWall;
 
-    //spring
-    PhysBody* base;
-    PhysBody* plunger;
-    b2PrismaticJoint* joint;
-    float springGroundX = SCREEN_WIDTH - 140;
-    float springGroundY = SCREEN_HEIGHT - 250;
-
-    b2Vec2 leftWallPos, rightWallPos, upWallPos, downVoidPos;
-    int wallsSizeW = 50, wallsSizeH = SCREEN_HEIGHT-100;
+    // === VARIABLES TEMPORALES === 
+    b2Vec2 leftWallPos, rightWallPos, upWallPos;
+    int wallsSizeW = 50, wallsSizeH = SCREEN_HEIGHT - 100;
 };

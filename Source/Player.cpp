@@ -21,6 +21,8 @@ bool ModulePlayer::Start()
     playerBody = App->physics->CreateCircle(position.x, position.y, radius, false, ColliderType::PLAYER, DYNAMIC);
     playerBody->listener = this;
 
+    life = maxLife;
+
     initialPosition = position;
     resetDelayTimer = resetDelayDuration;
 
@@ -35,6 +37,8 @@ update_status ModulePlayer::Update()
     GetPhysics();
     Reset();
     DrawBall();
+
+    if (IsKeyPressed(KEY_A)) TeleportBallDebug();
 
     return UPDATE_CONTINUE;
 }
@@ -81,18 +85,24 @@ void ModulePlayer::Reset()
     }
 }
 
-void ModulePlayer::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
+void ModulePlayer::TeleportBallDebug()
 {
-    switch (bodyB->ctype)
+    App->physics->SetBodyPosition(playerBody, GetMousePosition().x, GetMousePosition().y, false);
+}
+
+void ModulePlayer::OnCollision(PhysBody* physA, PhysBody* physB)
+{
+    switch (physB->ctype)
     {
     case ColliderType::VOID:
-        if (bodyA->ctype == ColliderType::PLAYER)
+        if (physA->ctype == ColliderType::PLAYER)
         {
             if (!needsReset) // Avoid reset more than one time
             {
                 printf("Collide with void\n");
                 needsReset = true;
                 resetDelayTimer = resetDelayDuration;
+                life--;
             }
         }
         break;
