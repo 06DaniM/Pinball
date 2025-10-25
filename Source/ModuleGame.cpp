@@ -21,10 +21,13 @@ bool ModuleGame::Start()
     // Load flippers
     Flippers(leftFlipper, leftFlipperJoint, leftFlipperPositionX, leftFlipperPositionY, true);      // Left flipper
     Flippers(rightFlipper, rightFlipperJoint, rightFlipperPositionX, rightFlipperPositionY, false);   // Right flipper
-
+    //Load spring
+    Spring(base, plunger, joint, springGroundX, springGroundY);
     // Load table
     CreateWalls(); // momentaneo
 	CreateTable();
+
+   
 
 
     ball = App->player;
@@ -51,7 +54,7 @@ void ModuleGame::CreateWalls()
     // Right wall (MOMENTANEO, En cuanto se tenga el mapa se quitará y se sustituirá por el CreateChain)
     rightWallPos = { SCREEN_WIDTH - 100, SCREEN_HEIGHT / 2 };
     rightWall = App->physics->CreateRectangle(rightWallPos.x, rightWallPos.y, wallsSizeW, wallsSizeH, false, this, ColliderType::PLATFORM, STATIC);
-
+    
     // Void to respawn (fijo, no es necesario cambiarlo)
     downVoidPos = { SCREEN_WIDTH / 2, SCREEN_HEIGHT - 100 };
     downVoid = App->physics->CreateRectangle(downVoidPos.x, downVoidPos.y, SCREEN_WIDTH, 50, true, this, ColliderType::VOID, STATIC);
@@ -77,8 +80,16 @@ void ModuleGame::CreateTable()
 
 void ModuleGame::HandleInput()
 {
-    if (IsKeyPressed(KEY_DOWN))
-        ball->Launch();
+
+    if (IsKeyDown(KEY_DOWN)) {
+        // Pull down the spring
+        plunger->body->ApplyForceToCenter(b2Vec2(0, +10), true);
+    }
+
+    if (IsKeyReleased(KEY_DOWN)) {
+        // Release spring and propel ball
+        plunger->body->ApplyForceToCenter(b2Vec2(0, -2000), true);
+    }
 
     // Left flipper
     if (IsKeyDown(KEY_LEFT))
@@ -154,4 +165,29 @@ void ModuleGame::Flippers(PhysBody*& flipper, b2RevoluteJoint*& joint, float x, 
 
     // Activates the engine when the flippers are in their position
     joint->EnableMotor(true); // The flippers move at the begining until they were in their positions, activate the engine after solve it
+}
+
+void ModuleGame::Spring(PhysBody*& base, PhysBody*& plunger, b2PrismaticJoint*& joint, float poxX, float posY) {
+
+    float rectangleH = 20.0f;
+    float rectangleW = 60.0f;
+    float springH = 80.0f;
+
+    b2Vec2 worldAxis(0.0f, 1.0f);
+
+    base = App->physics->CreateRectangle(poxX, posY, rectangleW, rectangleH, false, this, ColliderType::PLATFORM, STATIC);
+    plunger = App->physics->CreateRectangle(poxX, posY - rectangleW, rectangleW, rectangleH, false, this, ColliderType::PLATFORM, DYNAMIC);
+    
+    b2PrismaticJointDef jointDef;
+    jointDef.bodyA = base->body;
+    jointDef.bodyB = plunger->body; 
+    jointDef.Initialize(jointDef.bodyA, jointDef.bodyB, jointDef.bodyA->GetWorldCenter(), worldAxis);
+    jointDef.enableLimit = true;
+    jointDef.lowerTranslation = -5.0f;
+    jointDef.upperTranslation = 0;
+
+
+
+    joint = (b2PrismaticJoint*)App->physics->world->CreateJoint(&jointDef);
+
 }
