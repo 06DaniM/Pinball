@@ -38,11 +38,11 @@ public:
 private:
     PhysBody* physTable;
 
-    b2RevoluteJoint* leftFlipperJoint;
-    b2RevoluteJoint* rightFlipperJoint;
-
     PhysBody* leftFlipper;
     PhysBody* rightFlipper;
+
+    b2RevoluteJoint* leftFlipperJoint;
+    b2RevoluteJoint* rightFlipperJoint;
 
     float leftFlipperPositionX = SCREEN_WIDTH / 2 - 100;
     float leftFlipperPositionY = SCREEN_HEIGHT - 100;

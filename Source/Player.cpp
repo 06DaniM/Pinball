@@ -62,13 +62,6 @@ void ModulePlayer::DrawBall()
     DrawCircle(position.x, position.y, radius, RED);
 }
 
-// Initial launch
-void ModulePlayer::Launch()
-{
-    if (!playerBody) return;
-    playerBody->body->ApplyLinearImpulseToCenter({0,-1.5f}, true);
-}
-
 // Reset the ball to a position
 void ModulePlayer::Reset()
 {

@@ -14,8 +14,6 @@ public:
     bool CleanUp();
     void OnCollision(PhysBody* bodyA, PhysBody* bodyB);
 
-    void Launch();
-
 private:
     void GetPhysics();
     void DrawBall();

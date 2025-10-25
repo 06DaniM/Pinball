@@ -56,7 +56,7 @@ void ModuleGame::CreateWalls()
     rightWall = App->physics->CreateRectangle(rightWallPos.x, rightWallPos.y, wallsSizeW, wallsSizeH, false, this, ColliderType::PLATFORM, STATIC);
     
     // Void to respawn (fijo, no es necesario cambiarlo)
-    downVoidPos = { SCREEN_WIDTH / 2, SCREEN_HEIGHT - 100 };
+    downVoidPos = { SCREEN_WIDTH / 2, SCREEN_HEIGHT + 100 };
     downVoid = App->physics->CreateRectangle(downVoidPos.x, downVoidPos.y, SCREEN_WIDTH, 50, true, this, ColliderType::VOID, STATIC);
 
     // Launch zone (MOMENTANEO, En cuanto se tenga el mapa se quitará y se sustituirá por el CreateChain)
@@ -92,16 +92,12 @@ void ModuleGame::HandleInput()
     }
 
     // Left flipper
-    if (IsKeyDown(KEY_LEFT))
-        leftFlipperJoint->SetMotorSpeed(-10.0f);
-    else
-        leftFlipperJoint->SetMotorSpeed(10.0f);
+    if (IsKeyDown(KEY_LEFT)) leftFlipperJoint->SetMotorSpeed(-10.0f);
+    else leftFlipperJoint->SetMotorSpeed(10.0f);
 
     // Right flipper
-    if (IsKeyDown(KEY_RIGHT))
-        rightFlipperJoint->SetMotorSpeed(10.0f);
-    else
-        rightFlipperJoint->SetMotorSpeed(-10.0f);
+    if (IsKeyDown(KEY_RIGHT)) rightFlipperJoint->SetMotorSpeed(10.0f);
+    else rightFlipperJoint->SetMotorSpeed(-10.0f);
 }
 
 void ModuleGame::DrawTable()
@@ -150,10 +146,8 @@ void ModuleGame::Flippers(PhysBody*& flipper, b2RevoluteJoint*& joint, float x, 
 
     // Puts the anchor at the ends
     float halfWidth = PIXELS_TO_METERS(flipperWidth * 0.5f);
-    if (isLeft)
-        jointDef.localAnchorB.Set(-halfWidth, 0);
-    else
-        jointDef.localAnchorB.Set(halfWidth, 0);
+    if (isLeft) jointDef.localAnchorB.Set(-halfWidth, 0);
+    else jointDef.localAnchorB.Set(halfWidth, 0);
 
     // Limitate the angle of turn
     jointDef.enableLimit = true;
