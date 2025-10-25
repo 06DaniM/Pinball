@@ -28,8 +28,7 @@ bool ModuleGame::Start()
     // === LOAD THE TABLE (MAP)
     CreateWalls(); // momentaneo
 	CreateTable();
-
-    modulePlayer = App->player;
+    CreateItems();
 
     return true;
 }
@@ -78,9 +77,17 @@ void ModuleGame::CreateTable()
 	physTable->listener = this;
 }
 
+void ModuleGame::CreateItems()
+{
+    PhysBody* item1 = App->physics->CreateCircle(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 5, true, ColliderType::ITEM, STATIC);
+    item1->itemScore = 100;
+
+    PhysBody* item2 = App->physics->CreateCircle(SCREEN_WIDTH / 2 + 100, SCREEN_HEIGHT / 2, 5, true, ColliderType::ITEM, STATIC);
+    item2->itemScore = 500;
+}
+
 void ModuleGame::HandleInput()
 {
-
     if (IsKeyDown(KEY_DOWN)) {
         // Pull down the spring
         plunger->body->ApplyForceToCenter(b2Vec2(0, +10), true);
@@ -105,7 +112,7 @@ void ModuleGame::DrawTable()
     DrawWall(rightWall, BLACK);
     App->renderer->DrawRectangleCentered(SCREEN_WIDTH - 180, 600, 50, 600, DARKBLUE);
     App->renderer->DrawRectangleCentered(SCREEN_WIDTH - 140, 800, 30, 50, RED);
-
+    
     /*DrawCircle(leftFlipperPositionX, leftFlipperPositionY, 5, RED);
     DrawCircle(rightFlipperPositionX, rightFlipperPositionY, 5, RED);*/
 }
@@ -185,21 +192,4 @@ void ModuleGame::Spring(PhysBody*& base, PhysBody*& plunger, b2PrismaticJoint*& 
 
     joint = (b2PrismaticJoint*)App->physics->world->CreateJoint(&jointDef);
 
-}
-
-void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
-{
-    switch (physB->ctype)
-    {
-    case ColliderType::ITEM:
-        if (physA->ctype == ColliderType::PLAYER)
-        {
-            printf("Collide with an item\n");
-            currentScore += physB->itemScore;
-        }
-        break;
-
-    default:
-        break;
-    }
 }

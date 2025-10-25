@@ -13,7 +13,7 @@ Application::Application()
 	renderer = new ModuleRender(this);
 	audio = new ModuleAudio(this, true);
 	physics = new ModulePhysics(this);
-	scene_intro = new ModuleGame(this);
+	game = new ModuleGame(this);
 	player = new ModulePlayer(this);
 
 	// The order of calls is very important!
@@ -27,7 +27,7 @@ Application::Application()
 	AddModule(player);
 
 	// Scenes
-	AddModule(scene_intro);
+	AddModule(game);
 
 	// Rendering happens at the end
 	AddModule(renderer);

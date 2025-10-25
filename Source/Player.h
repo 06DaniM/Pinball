@@ -3,6 +3,8 @@
 #include "Globals.h"
 #include "p2Point.h"
 
+class ModuleGame;
+
 class ModulePlayer : public Module
 {
 public:
@@ -21,6 +23,7 @@ private:
     void TeleportBallDebug();
 
 public:
+    ModuleGame* mGame = NULL;
 
     // Teleport 
     bool needsReset = false;               // Declare if has to reset when falling

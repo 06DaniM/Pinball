@@ -20,7 +20,7 @@ public:
 	ModuleWindow* window;
 	ModuleAudio* audio;
 	ModulePhysics* physics;
-	ModuleGame* scene_intro;
+	ModuleGame* game;
 	ModulePlayer* player;
 
 private:

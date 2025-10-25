@@ -1,6 +1,7 @@
 ﻿#include "Globals.h"
 #include "Application.h"
 #include "Player.h"
+#include "ModuleGame.h"
 #include "ModulePhysics.h"
 
 ModulePlayer::ModulePlayer(Application* app, bool start_enabled) : Module(app, start_enabled)
@@ -15,6 +16,7 @@ ModulePlayer::~ModulePlayer()
 bool ModulePlayer::Start()
 {
     printf("Loading Player\n");
+
     position = { SCREEN_WIDTH - 140, SCREEN_HEIGHT / 2 };
 
     // Creates the ball
@@ -23,6 +25,8 @@ bool ModulePlayer::Start()
 
     life = maxLife;
 
+    mGame = App->game;
+    
     initialPosition = position;
     resetDelayTimer = resetDelayDuration;
 
@@ -83,6 +87,7 @@ void ModulePlayer::Reset()
         resetDelayTimer = resetDelayDuration;
         printf("Teleported back to start\n");
     }
+  
 }
 
 void ModulePlayer::TeleportBallDebug()
@@ -97,13 +102,23 @@ void ModulePlayer::OnCollision(PhysBody* physA, PhysBody* physB)
     case ColliderType::VOID:
         if (physA->ctype == ColliderType::PLAYER)
         {
-            if (!needsReset) // Avoid reset more than one time
+            if (!needsReset) // Avoid reset more than one time (just in case)
             {
                 printf("Collide with void\n");
                 needsReset = true;
                 resetDelayTimer = resetDelayDuration;
                 life--;
             }
+        }
+        break;
+
+    case ColliderType::ITEM:
+        if (physA->ctype == ColliderType::PLAYER)
+        {
+            printf("Collide with an item\n");
+            mGame->currentScore += physB->itemScore;
+
+            if (mGame->highestScore <= mGame->currentScore) mGame->highestScore = mGame->currentScore;
         }
         break;
 

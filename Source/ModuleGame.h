@@ -18,12 +18,11 @@ public:
     bool Start();
     update_status Update();
     bool CleanUp();
-
-    void OnCollision(PhysBody* bodyA, PhysBody* bodyB);
     
 private:
     void CreateWalls();
     void CreateTable();
+    void CreateItems();
 
     void HandleInput();
 
@@ -35,7 +34,11 @@ private:
     void Spring(PhysBody*& base, PhysBody*& plunger, b2PrismaticJoint*& joint, float poxX, float posY);
 
 public:
-    ModulePlayer* modulePlayer = NULL;      // Reference to the life of the module player
+
+    // === SCORE === 
+    int currentScore = 0;   // Set the current score during gameplay
+    int previousScore = 0;  // Set the previous score during gameplay
+    int highestScore = 0;   // Set the highest score during gameplay
 
 private:
     // === TABLE (MAP) ===
@@ -62,11 +65,6 @@ private:
 
     float springGroundX = SCREEN_WIDTH - 140;  // Set the x position of the spring
     float springGroundY = SCREEN_HEIGHT - 250; // Set the y position of the spring
-
-    // === SCORE === 
-    int currentScore = 0;   // Set the current score during gameplay
-    int previousScore = 0;  // Set the previous score during gameplay
-    int highestScore = 0;   // Set the highest score during gameplay
 
     // === VOID ===
     PhysBody* downVoid; // Physbody of the void
