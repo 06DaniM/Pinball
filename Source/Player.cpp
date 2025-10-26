@@ -119,6 +119,19 @@ void ModulePlayer::OnCollision(PhysBody* physA, PhysBody* physB)
         }
         break;
 
+    case ColliderType::SUMLIFE:
+        if (physA->ctype == ColliderType::PLAYER)
+        {
+            printf("Collide with a sum life\n");
+            if (physB->isActive)
+            {
+                physB->isActive = false;
+                currentSumLife++;
+                if (currentSumLife == 3) life++;
+            }
+        }
+        break;
+
     default:
         break;
     }

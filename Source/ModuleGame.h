@@ -22,7 +22,8 @@ public:
 private:
     void CreateVoid();
     void CreateTable();
-    void CreateItems();
+    void CreateObstacles();
+    void CreateScoreItems();
 
     void HandleInput();
 
@@ -48,6 +49,16 @@ private:
     // === TABLE (MAP) ===
     PhysBody* physTable = NULL;     // Physbody of the table (map)
 
+    PhysBody* leftTriangle = NULL;
+    PhysBody* rightTriangle = NULL;
+
+    PhysBody* leftPlatform = NULL;
+    PhysBody* rightPlatform = NULL;
+
+    PhysBody* sumLife1 = NULL;
+    PhysBody* sumLife2 = NULL;
+    PhysBody* sumLife3 = NULL;
+
     // === FLIPPERS ===
     PhysBody* leftFlipper = NULL;   // Physbody of the left flipper 
     PhysBody* rightFlipper = NULL;  // Physbody of the right flipper
@@ -67,8 +78,8 @@ private:
 
     b2PrismaticJoint* joint; // Prismatic joint of the spring
 
-    float springGroundX = SCREEN_WIDTH - 140;  // Set the x position of the spring
-    float springGroundY = SCREEN_HEIGHT - 250; // Set the y position of the spring
+    float springGroundX = SCREEN_WIDTH - 20;  // Set the x position of the spring
+    float springGroundY = SCREEN_HEIGHT - 60; // Set the y position of the spring
 
     // === VOID ===
     PhysBody* downVoid; // Physbody of the void

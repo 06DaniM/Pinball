@@ -26,12 +26,12 @@ bool ModuleGame::Start()
     Flippers(rightFlipper, rightFlipperJoint, SCREEN_WIDTH / 2 + 45, SCREEN_HEIGHT - 55, false);   // Right flipper
 
     // === LOAD THE SPRING
-    Spring(base, plunger, joint, SCREEN_WIDTH - 20, SCREEN_HEIGHT - 60);
+    Spring(base, plunger, joint, springGroundX, springGroundY);
 
     // === LOAD THE TABLE (MAP)
     CreateTable();
     CreateVoid();
-    CreateItems();
+    CreateScoreItems();
 
     return true;
 }
@@ -47,7 +47,7 @@ update_status ModuleGame::Update()
 void ModuleGame::CreateTable()
 {
     const int p = 92;
-    // Cambiar cuando se tenga el mapa
+
 	static int points[p] = {
     20, 270,
     20, 300,
@@ -99,6 +99,57 @@ void ModuleGame::CreateTable()
     
 	physTable = App->physics->CreateChain(0, 0, points, p, false, ColliderType::PLATFORM);
 	physTable->listener = this;
+
+    CreateObstacles();
+}
+
+void ModuleGame::CreateObstacles()
+{
+    const int p1 = 6;
+
+    static int leftTrianglePoints[p1] = {
+        160, 690,
+        124, 672,
+        124, 632,
+    };
+
+    static int rightTrianglePoints[p1] = {
+        324, 632,
+        324, 672,
+        290, 690,
+    };
+
+    leftTriangle = App->physics->CreateChain(0, 0, leftTrianglePoints, p1, false, ColliderType::PLATFORM);
+    leftTriangle->listener = this;
+
+    rightTriangle = App->physics->CreateChain(0, 0, rightTrianglePoints, p1, false, ColliderType::PLATFORM);
+    rightTriangle->listener = this;
+
+    const int p2 = 12;
+
+    static int leftPlatformPoints[p2] = {
+        82, 702,
+        82, 632,
+        92, 632,
+        92, 690,
+        168, 740,
+        162, 755,
+    };
+
+    static int rightPlatformPoints[p2] = {
+        288, 755,
+        284, 740,
+        356, 690,
+        356, 632,
+        366, 632,
+        366, 702,
+    };
+
+    leftPlatform = App->physics->CreateChain(0, 0, leftPlatformPoints, p2, false, ColliderType::PLATFORM);
+    leftPlatform->listener = this;
+
+    rightPlatform = App->physics->CreateChain(0, 0, rightPlatformPoints, p2, false, ColliderType::PLATFORM);
+    rightPlatform->listener = this;
 }
 
 void ModuleGame::CreateVoid()
@@ -108,13 +159,13 @@ void ModuleGame::CreateVoid()
     downVoid = App->physics->CreateRectangle(downVoidPos.x, downVoidPos.y, SCREEN_WIDTH, 50, true, this, ColliderType::VOID, STATIC);
 }
 
-void ModuleGame::CreateItems()
+void ModuleGame::CreateScoreItems()
 {
-    /*PhysBody* item1 = App->physics->CreateCircle(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 5, true, ColliderType::ITEM, STATIC);
-    item1->itemScore = 100;
+    sumLife1 = App->physics->CreateCircle(164, 200, 10, true, ColliderType::SUMLIFE, STATIC);
 
-    PhysBody* item2 = App->physics->CreateCircle(SCREEN_WIDTH / 2 + 100, SCREEN_HEIGHT / 2, 5, true, ColliderType::ITEM, STATIC);
-    item2->itemScore = 500;*/
+    sumLife2 = App->physics->CreateCircle(204, 198, 10, true, ColliderType::SUMLIFE, STATIC);
+
+    sumLife3 = App->physics->CreateCircle(243, 200, 10, true, ColliderType::SUMLIFE, STATIC);
 }
 
 void ModuleGame::HandleInput()
@@ -130,17 +181,27 @@ void ModuleGame::HandleInput()
     }
 
     // Left flipper
-    if (IsKeyDown(KEY_LEFT)) leftFlipperJoint->SetMotorSpeed(-10.0f);
-    else leftFlipperJoint->SetMotorSpeed(10.0f);
+    if (IsKeyDown(KEY_LEFT)) leftFlipperJoint->SetMotorSpeed(-12.5f);
+    else leftFlipperJoint->SetMotorSpeed(12.5f);
 
     // Right flipper
-    if (IsKeyDown(KEY_RIGHT)) rightFlipperJoint->SetMotorSpeed(10.0f);
-    else rightFlipperJoint->SetMotorSpeed(-10.0f);
+    if (IsKeyDown(KEY_RIGHT)) rightFlipperJoint->SetMotorSpeed(12.5f);
+    else rightFlipperJoint->SetMotorSpeed(-12.5f);
 }
 
 void ModuleGame::Draw()
 {
     DrawTexture(mapTexture, 0, 0, WHITE);
+    int x, y;
+
+    sumLife1->GetPosition(x, y);
+    DrawCircle(x, y, 10, SKYBLUE);
+
+    sumLife2->GetPosition(x, y);
+    DrawCircle(x, y, 10, SKYBLUE);
+
+    sumLife3->GetPosition(x, y);
+    DrawCircle(x, y, 10, SKYBLUE);
 
     mPlayer->DrawBall();
     /*DrawCircle(leftFlipperPositionX, leftFlipperPositionY, 5, RED);
