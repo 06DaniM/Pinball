@@ -46,11 +46,13 @@ update_status ModuleGame::Update()
 
 void ModuleGame::CreateTable()
 {
-    const int p = 92;
+    const int p = 102;
 
 	static int points[p] = {
-    20, 270,
-    20, 300,
+    30, 250,
+    26, 260,
+    22, 270,
+    18, 300,
     15, 330,
 	15, 400,
     20, 430,
@@ -94,7 +96,10 @@ void ModuleGame::CreateTable()
     160, 145,
     130, 155,
     100, 170,
-    70, 190,
+    75, 190,
+    68, 200,
+    60, 210,
+    50, 220,
 	};
     
 	physTable = App->physics->CreateChain(0, 0, points, p, false, ColliderType::PLATFORM);
