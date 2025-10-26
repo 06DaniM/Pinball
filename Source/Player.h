@@ -16,14 +16,17 @@ public:
     bool CleanUp();
     void OnCollision(PhysBody* bodyA, PhysBody* bodyB);
 
+    void DrawBall();
+
 private:
     void GetPhysics();
-    void DrawBall();
     void Reset();
     void TeleportBallDebug();
 
 public:
     ModuleGame* mGame = NULL;
+
+    Texture2D ballTexture;
 
     // Teleport 
     bool needsReset = false;               // Declare if has to reset when falling
@@ -36,7 +39,7 @@ public:
 
 private:
     PhysBody* playerBody = nullptr; // Body of the ball
-    int radius = 12;                // Radius of the ball
+    float radius = 7.5f;                // Radius of the ball
     Vector2 position;               // Position of the ball
     Vector2 initialPosition;        // Initial position of the ball
 };

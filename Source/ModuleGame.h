@@ -20,14 +20,13 @@ public:
     bool CleanUp();
     
 private:
-    void CreateWalls();
+    void CreateVoid();
     void CreateTable();
     void CreateItems();
 
     void HandleInput();
 
-    void DrawWall(PhysBody* wall, Color color);
-    void DrawTable();
+    void Draw();
 
     void Flippers(PhysBody*& flipper, b2RevoluteJoint*& joint, float posX, float posY, bool isLeft);
 
@@ -41,6 +40,11 @@ public:
     int highestScore = 0;   // Set the highest score during gameplay
 
 private:
+
+    ModulePlayer* mPlayer = NULL;
+
+    Texture2D mapTexture;
+
     // === TABLE (MAP) ===
     PhysBody* physTable = NULL;     // Physbody of the table (map)
 

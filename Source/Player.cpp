@@ -16,8 +16,8 @@ ModulePlayer::~ModulePlayer()
 bool ModulePlayer::Start()
 {
     printf("Loading Player\n");
-
-    position = { SCREEN_WIDTH - 140, SCREEN_HEIGHT / 2 };
+    ballTexture = LoadTexture("Assets/Pokeball.png");
+    position = { SCREEN_WIDTH - 20, SCREEN_HEIGHT - 200 };
 
     // Creates the ball
     playerBody = App->physics->CreateCircle(position.x, position.y, radius, false, ColliderType::PLAYER, DYNAMIC);
@@ -40,19 +40,10 @@ update_status ModulePlayer::Update()
 
     GetPhysics();
     Reset();
-    DrawBall();
 
     if (IsKeyPressed(KEY_A)) TeleportBallDebug();
 
     return UPDATE_CONTINUE;
-}
-
-// Clean of the ball
-bool ModulePlayer::CleanUp()
-{
-    printf("Unloading Player\n");
-    playerBody = nullptr;
-    return true;
 }
 
 void ModulePlayer::GetPhysics()
@@ -64,13 +55,6 @@ void ModulePlayer::GetPhysics()
     position.y = (int)y;
 }
 
-void ModulePlayer::DrawBall()
-{
-    // Draw the ball
-    DrawCircle(position.x, position.y, radius, RED);
-}
-
-// Reset the ball to a position
 void ModulePlayer::Reset()
 {
     if (!needsReset) return;
@@ -90,9 +74,22 @@ void ModulePlayer::Reset()
   
 }
 
+void ModulePlayer::DrawBall()
+{
+    // Draw the ball
+    DrawTexture(ballTexture, position.x - radius, position.y - radius, WHITE);
+}
+
 void ModulePlayer::TeleportBallDebug()
 {
     App->physics->SetBodyPosition(playerBody, GetMousePosition().x, GetMousePosition().y, false);
+}
+
+bool ModulePlayer::CleanUp()
+{
+    printf("Unloading Player\n");
+    playerBody = nullptr;
+    return true;
 }
 
 void ModulePlayer::OnCollision(PhysBody* physA, PhysBody* physB)

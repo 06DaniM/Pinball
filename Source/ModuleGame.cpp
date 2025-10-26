@@ -18,16 +18,19 @@ bool ModuleGame::Start()
 {
     printf("Loading game assets\n");
 
+    mPlayer = App->player;
+    mapTexture = LoadTexture("Assets/Pinball table pokemon1.png");
+
     // === LOAD THE FLIPPERS ===
-    Flippers(leftFlipper, leftFlipperJoint, leftFlipperPositionX, leftFlipperPositionY, true);      // Left flipper
-    Flippers(rightFlipper, rightFlipperJoint, rightFlipperPositionX, rightFlipperPositionY, false);   // Right flipper
+    Flippers(leftFlipper, leftFlipperJoint, SCREEN_WIDTH / 2 - 70, SCREEN_HEIGHT - 55, true);      // Left flipper
+    Flippers(rightFlipper, rightFlipperJoint, SCREEN_WIDTH / 2 + 45, SCREEN_HEIGHT - 55, false);   // Right flipper
 
     // === LOAD THE SPRING
-    Spring(base, plunger, joint, springGroundX, springGroundY);
+    Spring(base, plunger, joint, SCREEN_WIDTH - 20, SCREEN_HEIGHT - 60);
 
     // === LOAD THE TABLE (MAP)
-    CreateWalls(); // momentaneo
-	CreateTable();
+    CreateTable();
+    CreateVoid();
     CreateItems();
 
     return true;
@@ -35,55 +38,83 @@ bool ModuleGame::Start()
 
 update_status ModuleGame::Update()
 {
-    
     HandleInput();
-    DrawTable();
+    Draw();
 
     return UPDATE_CONTINUE;
 }
 
-bool ModuleGame::CleanUp()
+void ModuleGame::CreateTable()
 {
-    printf("Cleaning game scene\n");
-    return true;
+    const int p = 92;
+    // Cambiar cuando se tenga el mapa
+	static int points[p] = {
+    20, 270,
+    20, 300,
+    15, 330,
+	15, 400,
+    20, 430,
+    28, 460,
+    40, 490,
+    55, 520,
+    85, 550,
+    85, 590,
+    55, 595,
+    45, 600,
+    40, 620,
+    40, 718,
+    180, 795,
+    180, 1200,
+    270, 1200,
+    270, 795,
+    410, 718,
+    410, 620,
+    405, 600,
+    395, 595,
+    365, 590,
+    365, 550,
+    395, 520,
+    410, 490,
+    422, 460,
+    430, 430,
+    435, 400,
+    435, 330,
+    430, 300,
+    420, 270,
+    410, 240,
+    390, 210,
+    372, 190,
+    350, 170,
+    320, 150,
+    290, 140,
+    260, 135,
+    230, 130,
+    210, 132,
+    190, 135,
+    160, 145,
+    130, 155,
+    100, 170,
+    70, 190,
+	};
+    
+	physTable = App->physics->CreateChain(0, 0, points, p, false, ColliderType::PLATFORM);
+	physTable->listener = this;
 }
 
-void ModuleGame::CreateWalls()
+void ModuleGame::CreateVoid()
 {
-    // Right wall (MOMENTANEO, En cuanto se tenga el mapa se quitará y se sustituirá por el CreateChain)
-    rightWallPos = { SCREEN_WIDTH - 100, SCREEN_HEIGHT / 2 };
-    rightWall = App->physics->CreateRectangle(rightWallPos.x, rightWallPos.y, wallsSizeW, wallsSizeH, false, this, ColliderType::PLATFORM, STATIC);
-    
     // Void to respawn (fijo, no es necesario cambiarlo)
     downVoidPos = { SCREEN_WIDTH / 2, SCREEN_HEIGHT + 100 };
     downVoid = App->physics->CreateRectangle(downVoidPos.x, downVoidPos.y, SCREEN_WIDTH, 50, true, this, ColliderType::VOID, STATIC);
-
-    // Launch zone (MOMENTANEO, En cuanto se tenga el mapa se quitará y se sustituirá por el CreateChain)
-    startleftWall = App->physics->CreateRectangle(SCREEN_WIDTH - 180, 600, 50, 600, false, this, ColliderType::PLATFORM, STATIC);
-    startGround = App->physics->CreateRectangle(SCREEN_WIDTH - 140, 800, 30, 50, false, this, ColliderType::PLATFORM, STATIC);
-}
-
-void ModuleGame::CreateTable()
-{
-    // Cambiar cuando se tenga el mapa
-	static int points[8] = {
-	10, 0,
-    10, 980,
-    910, 980,
-    910, 0
-	};
-    
-	physTable = App->physics->CreateChain(0, 0, points, 8, false, ColliderType::PLATFORM);
-	physTable->listener = this;
 }
 
 void ModuleGame::CreateItems()
 {
-    PhysBody* item1 = App->physics->CreateCircle(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 5, true, ColliderType::ITEM, STATIC);
+    /*PhysBody* item1 = App->physics->CreateCircle(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 5, true, ColliderType::ITEM, STATIC);
     item1->itemScore = 100;
 
     PhysBody* item2 = App->physics->CreateCircle(SCREEN_WIDTH / 2 + 100, SCREEN_HEIGHT / 2, 5, true, ColliderType::ITEM, STATIC);
-    item2->itemScore = 500;
+    item2->itemScore = 500;*/
 }
 
 void ModuleGame::HandleInput()
@@ -107,30 +138,27 @@ void ModuleGame::HandleInput()
     else rightFlipperJoint->SetMotorSpeed(-10.0f);
 }
 
-void ModuleGame::DrawTable()
+void ModuleGame::Draw()
 {
-    DrawWall(rightWall, BLACK);
-    App->renderer->DrawRectangleCentered(SCREEN_WIDTH - 180, 600, 50, 600, DARKBLUE);
-    App->renderer->DrawRectangleCentered(SCREEN_WIDTH - 140, 800, 30, 50, RED);
-    
+    DrawTexture(mapTexture, 0, 0, WHITE);
+
+    mPlayer->DrawBall();
     /*DrawCircle(leftFlipperPositionX, leftFlipperPositionY, 5, RED);
     DrawCircle(rightFlipperPositionX, rightFlipperPositionY, 5, RED);*/
 }
 
-void ModuleGame::DrawWall(PhysBody* wall, Color color)
+bool ModuleGame::CleanUp()
 {
-    if (!wall) return;
-    int x, y;
-    wall->GetPosition(x, y);
-    App->renderer->DrawRectangleCentered(x, y, wallsSizeW, wallsSizeH, color);
+    printf("Cleaning game scene\n");
+    return true;
 }
 
 // MOVER LOS FLIPPERS Y EL SPRING AL MODULEPHYSICS
 void ModuleGame::Flippers(PhysBody*& flipper, b2RevoluteJoint*& joint, float x, float y, bool isLeft)
 {
     // Creates the flipper body
-    float flipperWidth = 80.0f;
-    float flipperHeight = 20.0f;
+    float flipperWidth = 45.0f;
+    float flipperHeight = 10.0f;
 
     // Creates the dynamic body
     flipper = App->physics->CreateRectangle(x, y, flipperWidth, flipperHeight, false, this, ColliderType::PLATFORM, DYNAMIC);
@@ -172,7 +200,7 @@ void ModuleGame::Flippers(PhysBody*& flipper, b2RevoluteJoint*& joint, float x, 
 void ModuleGame::Spring(PhysBody*& base, PhysBody*& plunger, b2PrismaticJoint*& joint, float poxX, float posY) {
 
     float rectangleH = 20.0f;
-    float rectangleW = 60.0f;
+    float rectangleW = 40.0f;
     float springH = 80.0f;
 
     b2Vec2 worldAxis(0.0f, 1.0f);
