@@ -19,7 +19,7 @@ bool ModuleGame::Start()
     printf("Loading game assets\n");
 
     mPlayer = App->player;
-    mapTexture = LoadTexture("Assets/Pinball table pokemon1.png");
+    mapTexture = LoadTexture("Assets/Pinball table pokemon.png");
 
     // === LOAD THE FLIPPERS ===
     Flippers(leftFlipper, leftFlipperJoint, SCREEN_WIDTH / 2 - 70, SCREEN_HEIGHT - 55, true);      // Left flipper
