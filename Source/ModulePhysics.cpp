@@ -11,7 +11,7 @@
 
 ModulePhysics::ModulePhysics(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
-	debug = false;
+	debug = true;
 }
 
 // Destructor
@@ -259,12 +259,12 @@ update_status ModulePhysics::PostUpdate()
 					{
 						v = b->GetWorldPoint(shape->m_vertices[i]);
 						if(i > 0)
-							DrawLine(METERS_TO_PIXELS(prev.x), METERS_TO_PIXELS(prev.y), METERS_TO_PIXELS(v.x), METERS_TO_PIXELS(v.y), GREEN);
+							DrawLine(METERS_TO_PIXELS(prev.x), METERS_TO_PIXELS(prev.y), METERS_TO_PIXELS(v.x), METERS_TO_PIXELS(v.y), BLACK);
 						prev = v;
 					}
 
 					v = b->GetWorldPoint(shape->m_vertices[0]);
-					DrawLine(METERS_TO_PIXELS(prev.x), METERS_TO_PIXELS(prev.y), METERS_TO_PIXELS(v.x), METERS_TO_PIXELS(v.y), GREEN);
+					DrawLine(METERS_TO_PIXELS(prev.x), METERS_TO_PIXELS(prev.y), METERS_TO_PIXELS(v.x), METERS_TO_PIXELS(v.y), BLACK);
 				}
 				break;
 

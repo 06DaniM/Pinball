@@ -30,12 +30,13 @@ public:
 
     // Teleport 
     bool needsReset = false;               // Declare if has to reset when falling
-    float resetDelayTimer = 0.0f;               // Set the time left to reset
+    float resetDelayTimer = 0.0f;          // Set the time left to reset
     const float resetDelayDuration = 0.5f; // Set the total time to reset
 
     // === LIFE === 
-    int life = 0;
-    const int maxLife = 3;
+    int life = 0;               // Set the current life
+    const int maxLife = 3;      // Set the life when starting a round
+    int currentSumLife = 0;     // Set the the different number of times that has an item sumLife been hit
 
 private:
     PhysBody* playerBody = nullptr; // Body of the ball

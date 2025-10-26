@@ -14,6 +14,7 @@ enum class ColliderType {
     PLAYER,
     PLATFORM,
     ITEM,
+    SUMLIFE,
     BOUNCE,
     VOID,
     UNKNOWN
@@ -57,6 +58,7 @@ public:
     ColliderType ctype;
     Module* listener;
     int itemScore;
+    int isActive = true;
 };
 
 // Module --------------------------------------
