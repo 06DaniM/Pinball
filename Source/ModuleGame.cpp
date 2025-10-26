@@ -38,6 +38,9 @@ bool ModuleGame::Start()
 
 update_status ModuleGame::Update()
 {
+    if (isLaunching) physTable->SetSensor(true);
+    else physTable->SetSensor(false);
+
     HandleInput();
     Draw();
 

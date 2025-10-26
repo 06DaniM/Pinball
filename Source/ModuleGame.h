@@ -40,6 +40,8 @@ public:
     int previousScore = 0;  // Set the previous score during gameplay
     int highestScore = 0;   // Set the highest score during gameplay
 
+    bool isLaunching = false;
+
 private:
 
     ModulePlayer* mPlayer = NULL;

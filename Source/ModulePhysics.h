@@ -53,6 +53,17 @@ public:
         return false;
     }
 
+    void SetSensor(bool isSensor)
+    {
+        if (!body) return;
+
+        for (b2Fixture* f = body->GetFixtureList(); f; f = f->GetNext())
+        {
+            f->SetSensor(isSensor);
+        }
+    }
+
+
 public:
     b2Body* body = nullptr;
     ColliderType ctype;
