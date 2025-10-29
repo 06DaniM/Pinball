@@ -178,15 +178,27 @@ void ModuleGame::CreateScoreItems()
 
 void ModuleGame::HandleInput()
 {
-    if (IsKeyDown(KEY_DOWN)) {
-        // Pull down the spring
-        plunger->body->ApplyForceToCenter(b2Vec2(0, +10), true);
+    // === SPRING / PLUNGER ===
+    float pullLimit = -1.0f; // how far down the plunger can go
+
+    if (IsKeyDown(KEY_DOWN))
+    {
+        // Extend how far the plunger can move down
+        joint->SetLimits(pullLimit, 0.0f);
+
+        // Apply a strong downward force
+        plunger->body->ApplyForceToCenter(b2Vec2(0, +5.0f), true);
     }
 
-    if (IsKeyReleased(KEY_DOWN)) {
-        // Release spring and propel ball
-        plunger->body->ApplyForceToCenter(b2Vec2(0, -2000), true);
+    if (IsKeyReleased(KEY_DOWN))
+    {
+        // Reset limit
+        joint->SetLimits(-5.0f, 0.0f);
+
+        // Launch upward
+        plunger->body->ApplyLinearImpulseToCenter(b2Vec2(0, -20), true);
     }
+
 
     // Left flipper
     if (IsKeyDown(KEY_LEFT)) leftFlipperJoint->SetMotorSpeed(-12.5f);
@@ -270,23 +282,23 @@ void ModuleGame::Spring(PhysBody*& base, PhysBody*& plunger, b2PrismaticJoint*& 
 
     float rectangleH = 20.0f;
     float rectangleW = 40.0f;
-    float springH = 80.0f;
+    float springH = 50.0f;
 
-    b2Vec2 worldAxis(0.0f, 1.0f);
+    b2Vec2 worldAxis(0.0f, -1.0f);
 
     base = App->physics->CreateRectangle(poxX, posY, rectangleW, rectangleH, false, this, ColliderType::PLATFORM, STATIC);
-    plunger = App->physics->CreateRectangle(poxX, posY - rectangleW, rectangleW, rectangleH, false, this, ColliderType::PLATFORM, DYNAMIC);
+    plunger = App->physics->CreateRectangle(poxX, posY - springH, rectangleW, rectangleH, false, this, ColliderType::PLATFORM, DYNAMIC);
     
     b2PrismaticJointDef jointDef;
     jointDef.bodyA = base->body;
     jointDef.bodyB = plunger->body; 
     jointDef.Initialize(jointDef.bodyA, jointDef.bodyB, jointDef.bodyA->GetWorldCenter(), worldAxis);
     jointDef.enableLimit = true;
-    jointDef.lowerTranslation = -5.0f;
+    jointDef.lowerTranslation = 0;
     jointDef.upperTranslation = 0;
 
-
+    jointDef.enableMotor = false;
 
     joint = (b2PrismaticJoint*)App->physics->world->CreateJoint(&jointDef);
-
+    plunger->body->SetGravityScale(0.0f);
 }
