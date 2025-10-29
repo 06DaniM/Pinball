@@ -226,7 +226,7 @@ void ModuleGame::HandleInput()
         // Extend how far the plunger can move down
         joint->SetLimits(pullLimit, 0.0f);
 
-        // Apply a strong downward force
+        // Apply downward force
         plunger->body->ApplyForceToCenter(b2Vec2(0, +5.0f), true);
     }
 
@@ -236,7 +236,7 @@ void ModuleGame::HandleInput()
         joint->SetLimits(-5.0f, 0.0f);
 
         // Launch upward
-        plunger->body->ApplyLinearImpulseToCenter(b2Vec2(0, -20), true);
+        plunger->body->ApplyLinearImpulseToCenter(b2Vec2(0, -5.0f), true);
     }
 
     // Left flipper
