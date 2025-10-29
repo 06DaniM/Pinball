@@ -22,7 +22,9 @@ public:
 private:
     void CreateVoid();
     void CreateTable();
+    void CreateSlide();
     void CreateObstacles();
+    void CreateObjects();
     void CreateScoreItems();
 
     void HandleInput();
@@ -50,12 +52,18 @@ private:
 
     // === TABLE (MAP) ===
     PhysBody* physTable = NULL;     // Physbody of the table (map)
+    PhysBody* physSlide = NULL;
 
     PhysBody* leftTriangle = NULL;
     PhysBody* rightTriangle = NULL;
 
     PhysBody* leftPlatform = NULL;
     PhysBody* rightPlatform = NULL;
+
+    PhysBody* physLeftTv = NULL;
+
+    //  === OBJECTS === 
+    PhysBody* changePokeBall = NULL;
 
     PhysBody* sumLife1 = NULL;
     PhysBody* sumLife2 = NULL;
@@ -68,10 +76,10 @@ private:
     b2RevoluteJoint* leftFlipperJoint;  // Revolute joint of the left flipper 
     b2RevoluteJoint* rightFlipperJoint; // Revolute joint of the right flipper
 
-    float leftFlipperPositionX = SCREEN_WIDTH / 2 - 100;  // Set the left flipper x position
+    float leftFlipperPositionX = SCREEN_WIDTH / 2 - 80;  // Set the left flipper x position
     float leftFlipperPositionY = SCREEN_HEIGHT - 100;     // Set the left flipper y position
     
-    float rightFlipperPositionX = SCREEN_WIDTH / 2 + 100; // Set the right flipper x position
+    float rightFlipperPositionX = SCREEN_WIDTH / 2 + 80; // Set the right flipper x position
     float rightFlipperPositionY = SCREEN_HEIGHT - 100;    // Set the right flipper y position
 
     // === SPRING ===

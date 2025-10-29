@@ -16,6 +16,7 @@ enum class ColliderType {
     ITEM,
     SUMLIFE,
     BOUNCE,
+    OBJECT,
     VOID,
     UNKNOWN
 };
@@ -67,6 +68,7 @@ public:
 public:
     b2Body* body = nullptr;
     ColliderType ctype;
+    bodyType btype;
     Module* listener;
     int itemScore;
     int isActive = true;

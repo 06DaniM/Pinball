@@ -22,11 +22,19 @@ private:
     void GetPhysics();
     void Reset();
     void TeleportBallDebug();
+    void ChangeSkin();
 
 public:
     ModuleGame* mGame = NULL;
 
-    Texture2D ballTexture;
+    Texture2D pokeBallTexture;
+    Texture2D superBallTexture;
+    Texture2D ultraBallTexture;
+    Texture2D masterBallTexture;
+
+    bool canDraw = true;
+    bool changingPokeball = false;
+    int currentPokeball = 0;
 
     // Teleport 
     bool needsReset = false;               // Declare if has to reset when falling

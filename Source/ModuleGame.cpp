@@ -105,10 +105,27 @@ void ModuleGame::CreateTable()
     50, 220,
 	};
     
-	physTable = App->physics->CreateChain(0, 0, points, p, false, ColliderType::PLATFORM);
+	physTable = App->physics->CreateChain(0, 0, points, p, false, ColliderType::PLATFORM, STATIC);
 	physTable->listener = this;
 
+    CreateSlide();
+    CreateObjects();
     CreateObstacles();
+}
+
+void ModuleGame::CreateSlide()
+{
+    const int p = 8;
+
+    static int slide[p] = {
+        78, 456,
+        50, 400,
+        55, 400,
+        84, 456,
+    };
+
+    physSlide = App->physics->CreateChain(0, 0, slide, p, false, ColliderType::PLATFORM, STATIC);
+    physSlide->listener = this;
 }
 
 void ModuleGame::CreateObstacles()
@@ -127,10 +144,10 @@ void ModuleGame::CreateObstacles()
         290, 690,
     };
 
-    leftTriangle = App->physics->CreateChain(0, 0, leftTrianglePoints, p1, false, ColliderType::PLATFORM);
+    leftTriangle = App->physics->CreateChain(0, 0, leftTrianglePoints, p1, false, ColliderType::PLATFORM, STATIC);
     leftTriangle->listener = this;
 
-    rightTriangle = App->physics->CreateChain(0, 0, rightTrianglePoints, p1, false, ColliderType::PLATFORM);
+    rightTriangle = App->physics->CreateChain(0, 0, rightTrianglePoints, p1, false, ColliderType::PLATFORM, STATIC);
     rightTriangle->listener = this;
 
     const int p2 = 12;
@@ -153,11 +170,34 @@ void ModuleGame::CreateObstacles()
         366, 702,
     };
 
-    leftPlatform = App->physics->CreateChain(0, 0, leftPlatformPoints, p2, false, ColliderType::PLATFORM);
+    leftPlatform = App->physics->CreateChain(0, 0, leftPlatformPoints, p2, false, ColliderType::PLATFORM, STATIC);
     leftPlatform->listener = this;
 
-    rightPlatform = App->physics->CreateChain(0, 0, rightPlatformPoints, p2, false, ColliderType::PLATFORM);
+    rightPlatform = App->physics->CreateChain(0, 0, rightPlatformPoints, p2, false, ColliderType::PLATFORM, STATIC);
     rightPlatform->listener = this;
+
+    const int p3 = 20;
+
+    static int leftTvPoints[p3] = {
+        80, 280,
+        100, 270,
+        135, 265,
+        180, 348,
+        150, 365,
+        120, 330,
+        100, 340,
+        120, 390,
+        90, 400,
+        60, 320,
+    };
+
+    physLeftTv = App->physics->CreateChain(0, 0, leftTvPoints, p3, false, ColliderType::PLATFORM, STATIC);
+    physLeftTv->listener = this;
+}
+
+void ModuleGame::CreateObjects()
+{
+    changePokeBall = App->physics->CreateCircle(112, 340, 10, true, ColliderType::OBJECT, STATIC);
 }
 
 void ModuleGame::CreateVoid()
@@ -180,8 +220,8 @@ void ModuleGame::HandleInput()
 {
     // === SPRING / PLUNGER ===
     float pullLimit = -1.0f; // how far down the plunger can go
-
     if (IsKeyDown(KEY_DOWN))
+
     {
         // Extend how far the plunger can move down
         joint->SetLimits(pullLimit, 0.0f);
@@ -198,7 +238,6 @@ void ModuleGame::HandleInput()
         // Launch upward
         plunger->body->ApplyLinearImpulseToCenter(b2Vec2(0, -20), true);
     }
-
 
     // Left flipper
     if (IsKeyDown(KEY_LEFT)) leftFlipperJoint->SetMotorSpeed(-12.5f);

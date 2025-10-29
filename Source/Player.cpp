@@ -16,8 +16,13 @@ ModulePlayer::~ModulePlayer()
 bool ModulePlayer::Start()
 {
     printf("Loading Player\n");
-    ballTexture = LoadTexture("Assets/Pokeball.png");
-    position = { SCREEN_WIDTH - 20, SCREEN_HEIGHT - 200 };
+
+    pokeBallTexture = LoadTexture("Assets/Pokeball.png");
+    superBallTexture = LoadTexture("Assets/Superball.png");
+    ultraBallTexture = LoadTexture("Assets/UltraBall.png");
+    masterBallTexture = LoadTexture("Assets/Masterball.png");
+
+    position = { SCREEN_WIDTH - 20, SCREEN_HEIGHT - 250 };
 
     // Creates the ball
     playerBody = App->physics->CreateCircle(position.x, position.y, radius, false, ColliderType::PLAYER, DYNAMIC);
@@ -36,6 +41,7 @@ bool ModulePlayer::Start()
 // Update of the ball
 update_status ModulePlayer::Update()
 {
+    SetTargetFPS(240);
     if (!playerBody) return UPDATE_CONTINUE;
 
     GetPhysics();
@@ -77,12 +83,33 @@ void ModulePlayer::Reset()
 void ModulePlayer::DrawBall()
 {
     // Draw the ball
-    DrawTexture(ballTexture, position.x - radius, position.y - radius, WHITE);
+    if (canDraw)
+    {
+        if (currentPokeball == 0) DrawTexture(pokeBallTexture, position.x - radius, position.y - radius, WHITE);
+        else if (currentPokeball == 1) DrawTexture(superBallTexture, position.x - radius, position.y - radius, WHITE);
+        else if (currentPokeball == 2) DrawTexture(ultraBallTexture, position.x - radius, position.y - radius, WHITE);
+        else DrawTexture(masterBallTexture, position.x - radius, position.y - radius, WHITE);
+    }
 }
 
 void ModulePlayer::TeleportBallDebug()
 {
     App->physics->SetBodyPosition(playerBody, GetMousePosition().x, GetMousePosition().y, false);
+}
+
+void ModulePlayer::ChangeSkin()
+{
+    currentPokeball++;
+    changingPokeball = true;
+    playerBody->btype = KINEMATIC;
+    playerBody->body->SetLinearVelocity(b2Vec2_zero);
+
+    // Añadir un timer para luego lanzar la pelota
+    // Timer(float time);
+    /*playerBody->body->SetLinearVelocity(b2Vec2_zero);
+    changingPokeball = false;
+    playerBody->btype = DYNAMIC;
+    canDraw = true;*/
 }
 
 bool ModulePlayer::CleanUp()
@@ -116,6 +143,19 @@ void ModulePlayer::OnCollision(PhysBody* physA, PhysBody* physB)
             mGame->currentScore += physB->itemScore;
 
             if (mGame->highestScore <= mGame->currentScore) mGame->highestScore = mGame->currentScore;
+        }
+        break;
+
+    case ColliderType::OBJECT:
+        if (physA->ctype == ColliderType::PLAYER)
+        {
+            printf("Collide with an object\n");
+            
+            if (!changingPokeball)
+            {
+                printf("Changing pokeball\n");
+                ChangeSkin();
+            }
         }
         break;
 
