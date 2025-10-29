@@ -64,7 +64,6 @@ public:
         }
     }
 
-
 public:
     b2Body* body = nullptr;
     ColliderType ctype;

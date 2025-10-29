@@ -209,10 +209,14 @@ void ModuleGame::CreateVoid()
 
 void ModuleGame::CreateScoreItems()
 {
+    sumTvScore = App->physics->CreateCircle(109, 396, 10, true, ColliderType::ITEM, STATIC);
+    sumTvScore->itemScore = 100;
+
+    minusTvScore = App->physics->CreateCircle(169, 360, 10, true, ColliderType::ITEM, STATIC);
+    minusTvScore->itemScore = -100;
+
     sumLife1 = App->physics->CreateCircle(164, 200, 10, true, ColliderType::SUMLIFE, STATIC);
-
     sumLife2 = App->physics->CreateCircle(204, 198, 10, true, ColliderType::SUMLIFE, STATIC);
-
     sumLife3 = App->physics->CreateCircle(243, 200, 10, true, ColliderType::SUMLIFE, STATIC);
 }
 

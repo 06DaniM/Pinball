@@ -65,6 +65,9 @@ private:
     //  === OBJECTS === 
     PhysBody* changePokeBall = NULL;
 
+    PhysBody* sumTvScore = NULL;
+    PhysBody* minusTvScore = NULL;
+
     PhysBody* sumLife1 = NULL;
     PhysBody* sumLife2 = NULL;
     PhysBody* sumLife3 = NULL;

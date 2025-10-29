@@ -41,7 +41,6 @@ bool ModulePlayer::Start()
 // Update of the ball
 update_status ModulePlayer::Update()
 {
-    SetTargetFPS(240);
     if (!playerBody) return UPDATE_CONTINUE;
 
     GetPhysics();
@@ -143,6 +142,7 @@ void ModulePlayer::OnCollision(PhysBody* physA, PhysBody* physB)
             mGame->currentScore += physB->itemScore;
 
             if (mGame->highestScore <= mGame->currentScore) mGame->highestScore = mGame->currentScore;
+            printf("%d\n", mGame->currentScore);
         }
         break;
 
