@@ -91,8 +91,10 @@ private:
 
     b2PrismaticJoint* joint; // Prismatic joint of the spring
 
-    float springGroundX = SCREEN_WIDTH - 20;  // Set the x position of the spring
-    float springGroundY = SCREEN_HEIGHT - 40; // Set the y position of the spring
+    const float springGroundX = SCREEN_WIDTH - 20;  // x position of the spring
+    const float springGroundY = SCREEN_HEIGHT - 40; // y position of the spring
+    const float pullSpeed = 2.0f;    // pulling down speed
+    const float launchSpeed = -20.0f; // release (upwards) speed
 
     // === VOID ===
     PhysBody* downVoid; // Physbody of the void
