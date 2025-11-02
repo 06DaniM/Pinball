@@ -20,12 +20,16 @@ public:
     bool CleanUp();
     
 private:
+    void InitializeTextures();
+
     void CreateVoid();
     void CreateTable();
     void CreateSlide();
     void CreateObstacles();
     void CreateObjects();
     void CreateScoreItems();
+
+    void SpringTexture();
 
     void HandleInput();
 
@@ -65,6 +69,10 @@ private:
     //  === OBJECTS === 
     PhysBody* changePokeBall = NULL;
 
+    PhysBody* shroomish1 = NULL;
+    PhysBody* shroomish2 = NULL;
+    PhysBody* shroomish3 = NULL;
+
     PhysBody* sumTvScore = NULL;
     PhysBody* minusTvScore = NULL;
 
@@ -73,19 +81,24 @@ private:
     PhysBody* sumLife3 = NULL;
 
     // === FLIPPERS ===
+    Texture2D leftFlipperTexture;
+    Texture2D rightFlipperTexture;
+
     PhysBody* leftFlipper = NULL;   // Physbody of the left flipper 
     PhysBody* rightFlipper = NULL;  // Physbody of the right flipper
 
     b2RevoluteJoint* leftFlipperJoint;  // Revolute joint of the left flipper 
     b2RevoluteJoint* rightFlipperJoint; // Revolute joint of the right flipper
 
-    float leftFlipperPositionX = SCREEN_WIDTH / 2 - 80;  // Set the left flipper x position
-    float leftFlipperPositionY = SCREEN_HEIGHT - 100;     // Set the left flipper y position
+    float leftFlipperPositionX = SCREEN_WIDTH / 2 - 70;  // Set the left flipper x position
+    float leftFlipperPositionY = SCREEN_HEIGHT - 55;     // Set the left flipper y position
     
-    float rightFlipperPositionX = SCREEN_WIDTH / 2 + 80; // Set the right flipper x position
-    float rightFlipperPositionY = SCREEN_HEIGHT - 100;    // Set the right flipper y position
+    float rightFlipperPositionX = SCREEN_WIDTH / 2 + 45; // Set the right flipper x position
+    float rightFlipperPositionY = SCREEN_HEIGHT - 55;    // Set the right flipper y position
 
     // === SPRING ===
+    Texture2D springTexture;
+
     PhysBody* base;     // Physbody of the base of the plunger
     PhysBody* plunger;  // Physbody of the plunger
 
@@ -99,11 +112,6 @@ private:
     // === VOID ===
     PhysBody* downVoid; // Physbody of the void
     b2Vec2 downVoidPos; // Set the position of the void
-
-    // === COLISIONES TEMPORALES HASTA TENER MAPA ===
-    PhysBody* rightWall;
-    PhysBody* startGround;
-    PhysBody* startleftWall;
 
     // === VARIABLES TEMPORALES === 
     b2Vec2 leftWallPos, rightWallPos, upWallPos;

@@ -48,7 +48,7 @@ public:
 
 private:
     PhysBody* playerBody = nullptr; // Body of the ball
-    float radius = 7.5f;                // Radius of the ball
+    float radius = 7.5f;            // Radius of the ball
     Vector2 position;               // Position of the ball
     Vector2 initialPosition;        // Initial position of the ball
 };

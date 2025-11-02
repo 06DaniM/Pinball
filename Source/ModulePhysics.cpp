@@ -74,6 +74,10 @@ PhysBody* ModulePhysics::CreateRectangle(int x, int y, int width, int height, bo
 	fixtureDef.isSensor = isSensor;
 	fixtureDef.friction = 0;
 	fixtureDef.density = 1.0f;
+
+	if (ctype == ColliderType::BOUNCE)
+		fixtureDef.restitution = 1.2f;
+
 	b->CreateFixture(&fixtureDef);
 
 	PhysBody* pbody = new PhysBody();
@@ -105,7 +109,11 @@ PhysBody* ModulePhysics::CreateCircle(int x, int y, int radius, bool isSensor, C
 	fixtureDef.isSensor = isSensor;
 	fixtureDef.friction = 0;
 	fixtureDef.density = 1.0f;
-	fixtureDef.restitution = 0.6f;
+
+	if (ctype == ColliderType::BOUNCE)
+		fixtureDef.restitution = 1.2f;
+	else
+		fixtureDef.restitution = 0.6f;
 
 	b->CreateFixture(&fixtureDef);
 
@@ -143,6 +151,10 @@ PhysBody* ModulePhysics::CreateChain(int x, int y, int* points, int size, bool i
 	fixtureDef.shape = &chain;
 	fixtureDef.isSensor = isSensor;
 	fixtureDef.density = 1.0f;
+
+	if (ctype == ColliderType::BOUNCE)
+		fixtureDef.restitution = 1.2f;
+
 	b->CreateFixture(&fixtureDef);
 
 	PhysBody* pbody = new PhysBody();

@@ -19,17 +19,22 @@ bool ModuleGame::Start()
     printf("Loading game assets\n");
 
     mPlayer = App->player;
-    mapTexture = LoadTexture("Assets/Pinball table pokemon1.png");
+    InitializeTextures();
 
     // === LOAD THE FLIPPERS ===
-    Flippers(leftFlipper, leftFlipperJoint, SCREEN_WIDTH / 2 - 70, SCREEN_HEIGHT - 55, true);      // Left flipper
-    Flippers(rightFlipper, rightFlipperJoint, SCREEN_WIDTH / 2 + 45, SCREEN_HEIGHT - 55, false);   // Right flipper
+    Flippers(leftFlipper, leftFlipperJoint, leftFlipperPositionX, leftFlipperPositionY, true);      // Left flipper
+    Flippers(rightFlipper, rightFlipperJoint, rightFlipperPositionX, rightFlipperPositionY, false);   // Right flipper
 
     // === LOAD THE SPRING
     Spring(base, plunger, joint, springGroundX, springGroundY);
 
     // === LOAD THE TABLE (MAP)
     CreateTable();
+
+    CreateSlide();
+    CreateObjects();
+    CreateObstacles();
+
     CreateVoid();
     CreateScoreItems();
 
@@ -44,7 +49,20 @@ update_status ModuleGame::Update()
     HandleInput();
     Draw();
 
+    DrawCircle(leftFlipperPositionX, leftFlipperPositionY, 5, RED);
+    DrawCircle(rightFlipperPositionX, rightFlipperPositionY, 5, RED);
+
     return UPDATE_CONTINUE;
+}
+
+void ModuleGame::InitializeTextures()
+{
+    mapTexture = LoadTexture("Assets/Pinball table pokemon1.png");
+
+    leftFlipperTexture = LoadTexture("Assets/LeftFlipperSprite.png");
+    rightFlipperTexture = LoadTexture("Assets/RightFlipperSprite.png");
+
+    springTexture = LoadTexture("Assets/Spoink_Spritesheet.png");
 }
 
 void ModuleGame::CreateTable()
@@ -107,10 +125,6 @@ void ModuleGame::CreateTable()
     
 	physTable = App->physics->CreateChain(0, 0, points, p, false, ColliderType::PLATFORM, STATIC);
 	physTable->listener = this;
-
-    CreateSlide();
-    CreateObjects();
-    CreateObstacles();
 }
 
 void ModuleGame::CreateSlide()
@@ -144,14 +158,14 @@ void ModuleGame::CreateObstacles()
         290, 690,
     };
 
-    leftTriangle = App->physics->CreateChain(0, 0, leftTrianglePoints, p1, false, ColliderType::PLATFORM, STATIC);
+    leftTriangle = App->physics->CreateChain(0, 0, leftTrianglePoints, p1, false, ColliderType::BOUNCE, STATIC);
     leftTriangle->listener = this;
 
-    rightTriangle = App->physics->CreateChain(0, 0, rightTrianglePoints, p1, false, ColliderType::PLATFORM, STATIC);
+    rightTriangle = App->physics->CreateChain(0, 0, rightTrianglePoints, p1, false, ColliderType::BOUNCE, STATIC);
     rightTriangle->listener = this;
 
     const int p2 = 12;
-
+    
     static int leftPlatformPoints[p2] = {
         82, 702,
         82, 632,
@@ -198,6 +212,10 @@ void ModuleGame::CreateObstacles()
 void ModuleGame::CreateObjects()
 {
     changePokeBall = App->physics->CreateCircle(112, 340, 10, true, ColliderType::OBJECT, STATIC);
+
+    shroomish1 = App->physics->CreateCircle(215, 250, 15, false, ColliderType::BOUNCE, STATIC);
+    shroomish2 = App->physics->CreateCircle(190, 285, 15, false, ColliderType::BOUNCE, STATIC);
+    shroomish3 = App->physics->CreateCircle(240, 280, 15, false, ColliderType::BOUNCE, STATIC);
 }
 
 void ModuleGame::CreateVoid()
@@ -248,20 +266,19 @@ void ModuleGame::HandleInput()
 void ModuleGame::Draw()
 {
     DrawTexture(mapTexture, 0, 0, WHITE);
+
     int x, y;
-
-    sumLife1->GetPosition(x, y);
-    DrawCircle(x, y, 10, SKYBLUE);
-
-    sumLife2->GetPosition(x, y);
-    DrawCircle(x, y, 10, SKYBLUE);
-
-    sumLife3->GetPosition(x, y);
-    DrawCircle(x, y, 10, SKYBLUE);
+    sumLife1->GetPosition(x, y);  DrawCircle(x, y, 10, SKYBLUE);
+    sumLife2->GetPosition(x, y);  DrawCircle(x, y, 10, SKYBLUE);
+    sumLife3->GetPosition(x, y);  DrawCircle(x, y, 10, SKYBLUE);
 
     mPlayer->DrawBall();
-    /*DrawCircle(leftFlipperPositionX, leftFlipperPositionY, 5, RED);
-    DrawCircle(rightFlipperPositionX, rightFlipperPositionY, 5, RED);*/
+
+    // 🔹 Dibuja pivotes de referencia
+    DrawCircle(leftFlipperPositionX, leftFlipperPositionY, 5, RED);
+    DrawCircle(rightFlipperPositionX, rightFlipperPositionY, 5, RED);
+
+    DrawTextureEx(leftFlipperTexture, { leftFlipperPositionX, leftFlipperPositionY-15 }, 0, 1.5f, WHITE);
 }
 
 bool ModuleGame::CleanUp()
