@@ -67,6 +67,12 @@ private:
 
     PhysBody* physLeftTv = NULL;
 
+    PhysBody* physGroundTerrain = NULL;
+
+    PhysBody* rectSumLife1 = NULL;
+    PhysBody* rectSumLife2 = NULL;
+    PhysBody* rectSumLife3 = NULL;
+
     //  === OBJECTS === 
     PhysBody* changePokeBall = NULL;
 
@@ -80,12 +86,12 @@ private:
     PhysBody* shroomish2 = NULL;
     PhysBody* shroomish3 = NULL;
 
-    PhysBody* sumTvScore = NULL;
-    PhysBody* minusTvScore = NULL;
-
     PhysBody* sumLife1 = NULL;
     PhysBody* sumLife2 = NULL;
     PhysBody* sumLife3 = NULL;
+
+    PhysBody* sumTvScore = NULL;
+    PhysBody* minusTvScore = NULL;
 
     // === FLIPPERS ===
     Texture2D leftFlipperTexture;
@@ -122,8 +128,4 @@ private:
     // === VOID ===
     PhysBody* downVoid; // Physbody of the void
     b2Vec2 downVoidPos; // Set the position of the void
-
-    // === VARIABLES TEMPORALES === 
-    b2Vec2 leftWallPos, rightWallPos, upWallPos;
-    int wallsSizeW = 50, wallsSizeH = SCREEN_HEIGHT - 100;
 };

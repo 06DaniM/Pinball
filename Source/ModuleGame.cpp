@@ -225,6 +225,61 @@ void ModuleGame::CreateObstacles()
 
     physLeftTv = App->physics->CreateChain(0, 0, leftTvPoints, p3, false, ColliderType::PLATFORM, STATIC);
     physLeftTv->listener = this;
+
+    const int p4 = 86;
+
+    static int terrainGrounPoints[p4] = {
+        292, 380,
+        302, 365,
+        307, 345,
+        305, 325,
+        280, 315,
+        267, 338,
+        265, 338,
+        262, 310,
+        290, 270,
+        310, 240,
+        300, 230,
+        290, 225,
+        270, 220,
+        260, 215,
+        255, 207,
+        262, 182,
+        270, 182,
+        280, 185,
+        300, 192,
+        325, 200,
+        350, 224,
+        360, 250,
+        380, 280,
+        390, 300,
+        395, 350,
+        397, 390,
+        390, 398,
+        360, 407,
+        350, 405,
+        350, 390,
+        352, 380,
+        375, 360,
+        385, 340,
+        380, 320,
+        370, 317,
+        350, 320,
+        330, 335,
+        325, 350,
+        320, 370,
+        300, 400,
+        295, 408,
+        287, 403,
+        289, 390,
+    };
+
+    physGroundTerrain = App->physics->CreateChain(0, 0, terrainGrounPoints, p4, false, ColliderType::PLATFORM, STATIC);
+    physGroundTerrain->listener = this;
+
+    rectSumLife1 = App->physics->CreateRectangle(145, 217, 10, 40, false, this, ColliderType::PLATFORM, STATIC);
+    rectSumLife2 = App->physics->CreateRectangle(185, 205, 10, 40, false, this, ColliderType::PLATFORM, STATIC);
+    rectSumLife3 = App->physics->CreateRectangle(225, 200, 10, 40, false, this, ColliderType::PLATFORM, STATIC);
 }
 
 void ModuleGame::CreateObjects()
