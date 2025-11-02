@@ -2,6 +2,7 @@
 #include "Module.h"
 #include "Globals.h"
 #include "p2Point.h"
+#include "Coroutine.h"
 
 class ModuleGame;
 
@@ -38,6 +39,7 @@ public:
 
     // Teleport 
     bool needsReset = false;               // Declare if has to reset when falling
+    bool teleporting = false;
     float resetDelayTimer = 0.0f;          // Set the time left to reset
     const float resetDelayDuration = 0.5f; // Set the total time to reset
 
@@ -46,9 +48,11 @@ public:
     const int maxLife = 3;      // Set the life when starting a round
     int currentSumLife = 0;     // Set the the different number of times that has an item sumLife been hit
 
+    CoroutineManager coroutineManager;
+
 private:
     PhysBody* playerBody = nullptr; // Body of the ball
-    float radius = 7.5f;            // Radius of the ball
+    float radius = 11.25f;            // Radius of the ball
     Vector2 position;               // Position of the ball
     Vector2 initialPosition;        // Initial position of the ball
 };

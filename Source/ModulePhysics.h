@@ -17,6 +17,7 @@ enum class ColliderType {
     SUMLIFE,
     BOUNCE,
     OBJECT,
+    SHROOMISH,
     VOID,
     UNKNOWN
 };
@@ -86,7 +87,7 @@ public:
     bool CleanUp() override;
 
     PhysBody* CreateRectangle(int x, int y, int width, int height, bool isSensor, Module* listener, ColliderType ctype, bodyType type);
-    PhysBody* CreateCircle(int x, int y, int radius, bool isSensor, ColliderType ctype = ColliderType::UNKNOWN, bodyType type = bodyType::DYNAMIC);
+    PhysBody* CreateCircle(int x, int y, int radius, bool isSensor, Module* listener, ColliderType ctype = ColliderType::UNKNOWN, bodyType type = bodyType::DYNAMIC);
     PhysBody* CreateChain(int x, int y, int* points, int size, bool isSensor, ColliderType ctype = ColliderType::UNKNOWN, bodyType type = bodyType::STATIC);
 
     void SetBodyPosition(PhysBody* pbody, int x, int y, bool resetRotation);

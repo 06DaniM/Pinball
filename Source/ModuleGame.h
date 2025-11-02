@@ -19,6 +19,7 @@ public:
     bool Start();
     update_status Update();
     bool CleanUp();
+    void OnCollision(PhysBody* bodyA, PhysBody* bodyB);
     
 private:
     void InitializeTextures();
@@ -29,8 +30,6 @@ private:
     void CreateObstacles();
     void CreateObjects();
     void CreateScoreItems();
-
-    void SpringTexture();
 
     void HandleInput();
 

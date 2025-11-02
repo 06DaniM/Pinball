@@ -34,6 +34,9 @@
     <ClCompile Include="Source\Animation.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Coroutine.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source/Application.h">
@@ -70,6 +73,9 @@
       <Filter>Headers\Containers</Filter>
     </ClInclude>
     <ClInclude Include="Source\Animation.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Coroutine.h">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>

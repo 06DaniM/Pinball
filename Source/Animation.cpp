@@ -89,3 +89,8 @@ void Animator::Draw(Vector2 position, float scale, Color tint)
 
     DrawTexturePro(*texture, src, dest, origin, 0.0f, tint);
 }
+
+const std::string& Animator::GetCurrentAnimName() const
+{
+    return currentClipName;
+}

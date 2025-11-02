@@ -90,7 +90,7 @@ PhysBody* ModulePhysics::CreateRectangle(int x, int y, int width, int height, bo
 	return pbody;
 }
 
-PhysBody* ModulePhysics::CreateCircle(int x, int y, int radius, bool isSensor, ColliderType ctype, bodyType type)
+PhysBody* ModulePhysics::CreateCircle(int x, int y, int radius, bool isSensor, Module* listener, ColliderType ctype, bodyType type)
 {
 	b2BodyDef bodyDef;
 	if (type == DYNAMIC) bodyDef.type = b2_dynamicBody;
@@ -113,13 +113,14 @@ PhysBody* ModulePhysics::CreateCircle(int x, int y, int radius, bool isSensor, C
 	if (ctype == ColliderType::BOUNCE)
 		fixtureDef.restitution = 1.2f;
 	else
-		fixtureDef.restitution = 0.6f;
+		fixtureDef.restitution = 0.8f;
 
 	b->CreateFixture(&fixtureDef);
 
 	PhysBody* pbody = new PhysBody();
 	pbody->body = b;
 	pbody->ctype = ctype;
+	pbody->listener = listener;
 
 	b->GetUserData().pointer = (uintptr_t)pbody;
 

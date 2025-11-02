@@ -24,6 +24,7 @@ public:
 
     bool IsFinished() const { return finished; }
     int GetCurrentFrame() const { return currentFrame; }
+    const std::string& GetCurrentAnimName() const;
 
 private:
     Texture2D* texture = nullptr;

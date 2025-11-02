@@ -25,8 +25,7 @@ bool ModulePlayer::Start()
     position = { SCREEN_WIDTH - 20, SCREEN_HEIGHT - 250 };
 
     // Creates the ball
-    playerBody = App->physics->CreateCircle(position.x, position.y, radius, false, ColliderType::PLAYER, DYNAMIC);
-    playerBody->listener = this;
+    playerBody = App->physics->CreateCircle(position.x, position.y, radius, false, this, ColliderType::PLAYER, DYNAMIC);
 
     life = maxLife;
 
@@ -43,8 +42,12 @@ update_status ModulePlayer::Update()
 {
     if (!playerBody) return UPDATE_CONTINUE;
 
+    float deltaTime = GetFrameTime();
+
     GetPhysics();
     Reset();
+
+    coroutineManager.Update(deltaTime);
 
     if (IsKeyPressed(KEY_A)) TeleportBallDebug();
 
@@ -64,19 +67,19 @@ void ModulePlayer::Reset()
 {
     if (!needsReset) return;
 
-    float deltaTime = GetFrameTime();
-    resetDelayTimer -= deltaTime;
-
-    // Teleport when the time passed
-    if (resetDelayTimer <= 0.0f)
+    if (!teleporting)
     {
-        App->physics->SetBodyPosition(playerBody, initialPosition.x, initialPosition.y, true);
-        playerBody->body->SetLinearVelocity(b2Vec2(0, 0));
-        needsReset = false;
-        resetDelayTimer = resetDelayDuration;
-        printf("Teleported back to start\n");
+        teleporting = true;
+
+        coroutineManager.StartCoroutine(resetDelayDuration, [this]() 
+            {
+                App->physics->SetBodyPosition(playerBody, initialPosition.x, initialPosition.y, true);
+                playerBody->body->SetLinearVelocity(b2Vec2(0, 0));
+                needsReset = false;
+                teleporting = false;
+                printf("Teleported back to start\n");
+            });
     }
-  
 }
 
 void ModulePlayer::DrawBall()
@@ -84,10 +87,11 @@ void ModulePlayer::DrawBall()
     // Draw the ball
     if (canDraw)
     {
-        if (currentPokeball == 0) DrawTexture(pokeBallTexture, position.x - radius, position.y - radius, WHITE);
-        else if (currentPokeball == 1) DrawTexture(superBallTexture, position.x - radius, position.y - radius, WHITE);
-        else if (currentPokeball == 2) DrawTexture(ultraBallTexture, position.x - radius, position.y - radius, WHITE);
-        else DrawTexture(masterBallTexture, position.x - radius, position.y - radius, WHITE);
+        float scale = 1.5f;
+        if (currentPokeball == 0) DrawTextureEx(pokeBallTexture, { position.x - radius, position.y - radius }, 0, scale, WHITE);
+        else if (currentPokeball == 1) DrawTextureEx(superBallTexture, { position.x - radius, position.y - radius }, 0, scale, WHITE);
+        else if (currentPokeball == 2) DrawTextureEx(ultraBallTexture, { position.x - radius, position.y - radius }, 0, scale, WHITE);
+        else DrawTextureEx(masterBallTexture, { position.x - radius, position.y - radius }, 0, scale, WHITE);
     }
 }
 
@@ -98,17 +102,19 @@ void ModulePlayer::TeleportBallDebug()
 
 void ModulePlayer::ChangeSkin()
 {
-    currentPokeball++;
     changingPokeball = true;
     playerBody->btype = KINEMATIC;
     playerBody->body->SetLinearVelocity(b2Vec2_zero);
+    canDraw = false;
 
-    // Añadir un timer para luego lanzar la pelota
-    // Timer(float time);
-    /*playerBody->body->SetLinearVelocity(b2Vec2_zero);
-    changingPokeball = false;
-    playerBody->btype = DYNAMIC;
-    canDraw = true;*/
+    coroutineManager.StartCoroutine(2.0f, [this]()
+        {
+            currentPokeball++;
+            changingPokeball = false;
+            playerBody->btype = DYNAMIC;
+            canDraw = true;
+            printf("Pokeball lista para lanzarse de nuevo\n");
+        });
 }
 
 bool ModulePlayer::CleanUp()
