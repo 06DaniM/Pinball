@@ -3,6 +3,7 @@
 #include "Globals.h"
 #include "Module.h"
 #include "Player.h"
+#include "Animation.h"
 
 #include "p2Point.h"
 
@@ -69,6 +70,12 @@ private:
     //  === OBJECTS === 
     PhysBody* changePokeBall = NULL;
 
+    Texture2D shroomish;
+
+    Animator shroomishAnim1;
+    Animator shroomishAnim2;
+    Animator shroomishAnim3;
+
     PhysBody* shroomish1 = NULL;
     PhysBody* shroomish2 = NULL;
     PhysBody* shroomish3 = NULL;
@@ -97,13 +104,16 @@ private:
     float rightFlipperPositionY = SCREEN_HEIGHT - 55;    // Set the right flipper y position
 
     // === SPRING ===
-    Texture2D springTexture;
+    Texture2D spoinkTexture;
+
+    Animator spoinkAnim;
 
     PhysBody* base;     // Physbody of the base of the plunger
     PhysBody* plunger;  // Physbody of the plunger
 
     b2PrismaticJoint* joint; // Prismatic joint of the spring
 
+    bool isPressing = false;  // Declare if is pressing the spring for the animations
     const float springGroundX = SCREEN_WIDTH - 20;  // x position of the spring
     const float springGroundY = SCREEN_HEIGHT - 40; // y position of the spring
     const float pullSpeed = 2.0f;    // pulling down speed

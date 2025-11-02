@@ -1,5 +1,6 @@
 ﻿#include "Globals.h"
 #include "Application.h"
+#include "Animation.h"
 #include "ModuleRender.h"
 #include "ModuleGame.h"
 #include "ModuleAudio.h"
@@ -49,9 +50,6 @@ update_status ModuleGame::Update()
     HandleInput();
     Draw();
 
-    DrawCircle(leftFlipperPositionX, leftFlipperPositionY, 5, RED);
-    DrawCircle(rightFlipperPositionX, rightFlipperPositionY, 5, RED);
-
     return UPDATE_CONTINUE;
 }
 
@@ -62,7 +60,27 @@ void ModuleGame::InitializeTextures()
     leftFlipperTexture = LoadTexture("Assets/LeftFlipperSprite.png");
     rightFlipperTexture = LoadTexture("Assets/RightFlipperSprite.png");
 
-    springTexture = LoadTexture("Assets/Spoink_Spritesheet.png");
+    spoinkTexture = LoadTexture("Assets/Spoink_Spritesheet.png");
+    spoinkAnim = Animator(&spoinkTexture, 20, 40);
+    spoinkAnim.AddAnim("idle", 0, 2, 2.0f, true);
+    spoinkAnim.AddAnim("spring_down", 2, 5, 5, false);
+    spoinkAnim.Play("idle");
+
+    shroomish = LoadTexture("Assets/Shroomish_Spritesheet.png");
+    shroomishAnim1 = Animator(&shroomish, 27, 31);
+    shroomishAnim1.AddAnim("idle", 0, 2, 2.0f, true);
+    shroomishAnim1.AddAnim("hitted", 2, 2, 6.0f, true);
+    shroomishAnim1.Play("idle");
+
+    shroomishAnim2 = Animator(&shroomish, 27, 31);
+    shroomishAnim2.AddAnim("idle", 0, 2, 2.0f, true);
+    shroomishAnim2.AddAnim("hitted", 2, 2, 6.0f, true);
+    shroomishAnim2.Play("idle");
+
+    shroomishAnim3 = Animator(&shroomish, 27, 31);
+    shroomishAnim3.AddAnim("idle", 0, 2, 2.0f, true);
+    shroomishAnim3.AddAnim("hitted", 2, 2, 6.0f, true);
+    shroomishAnim3.Play("idle");
 }
 
 void ModuleGame::CreateTable()
@@ -241,24 +259,31 @@ void ModuleGame::CreateScoreItems()
 void ModuleGame::HandleInput()
 {
     // === SPRING / PLUNGER ===
-    if (IsKeyDown(KEY_DOWN))
-    {
-        // Pull plunger downward
+    if (IsKeyPressed(KEY_DOWN)) {
+        spoinkAnim.Play("spring_down", false);
+        isPressing = true;
+    }
+    else if (IsKeyDown(KEY_DOWN)) {
         joint->SetMotorSpeed(pullSpeed);
+
+        spoinkAnim.Update(GetFrameTime());
     }
-    else if (IsKeyReleased(KEY_DOWN))
-    {
-        // Launch plunger upward
+    else if (IsKeyReleased(KEY_DOWN)) {
         joint->SetMotorSpeed(launchSpeed);
+
+        isPressing = false;
+        spoinkAnim.StopAnim();
+        spoinkAnim.PlayReverse("spring_down", false);
     }
-    
+
+    spoinkAnim.Update(GetFrameTime());
+
+    if (!isPressing && spoinkAnim.IsFinished()) spoinkAnim.Play("idle");
+
     // === FLIPPERS ===
-    // 
-    // Left flipper
     if (IsKeyDown(KEY_LEFT)) leftFlipperJoint->SetMotorSpeed(-12.5f);
     else leftFlipperJoint->SetMotorSpeed(12.5f);
 
-    // Right flipper
     if (IsKeyDown(KEY_RIGHT)) rightFlipperJoint->SetMotorSpeed(12.5f);
     else rightFlipperJoint->SetMotorSpeed(-12.5f);
 }
@@ -274,11 +299,27 @@ void ModuleGame::Draw()
 
     mPlayer->DrawBall();
 
-    // 🔹 Dibuja pivotes de referencia
-    DrawCircle(leftFlipperPositionX, leftFlipperPositionY, 5, RED);
-    DrawCircle(rightFlipperPositionX, rightFlipperPositionY, 5, RED);
+    DrawTextureEx(leftFlipperTexture, { leftFlipperPositionX - 5, leftFlipperPositionY - 15 }, 0, 1.5f, WHITE);
+    DrawTextureEx(rightFlipperTexture, { rightFlipperPositionX - 43, rightFlipperPositionY - 15 }, 0, 1.5f, WHITE);
 
-    DrawTextureEx(leftFlipperTexture, { leftFlipperPositionX, leftFlipperPositionY-15 }, 0, 1.5f, WHITE);
+    spoinkAnim.Draw({ springGroundX - 2, springGroundY-17 }, 1.5f);
+
+    // === Shroomish animado ===
+    shroomishAnim1.Update(GetFrameTime());
+    shroomishAnim2.Update(GetFrameTime());
+    shroomishAnim3.Update(GetFrameTime());
+
+    shroomish1->GetPosition(x, y);
+    shroomishAnim1.Draw({ (float)x, (float)y - 10 }, 1.5f);
+
+    shroomish2->GetPosition(x, y);
+    shroomishAnim2.Draw({ (float)x, (float)y - 10 }, 1.5f);
+
+    shroomish3->GetPosition(x, y);
+    shroomishAnim3.Draw({ (float)x, (float)y - 10 }, 1.5f);
+
+    /*DrawCircle(leftFlipperPositionX, leftFlipperPositionY, 5, RED);
+    DrawCircle(rightFlipperPositionX, rightFlipperPositionY, 5, RED);*/
 }
 
 bool ModuleGame::CleanUp()
@@ -335,7 +376,7 @@ void ModuleGame::Spring(PhysBody*& base, PhysBody*& plunger, b2PrismaticJoint*& 
 
     float rectangleH = 20.0f;
     float rectangleW = 40.0f;
-    float springH = 50.0f;
+    float springH = 40.0f;
 
     // Y axis points downward
     b2Vec2 worldAxis(0.0f, 1.0f);
@@ -348,10 +389,10 @@ void ModuleGame::Spring(PhysBody*& base, PhysBody*& plunger, b2PrismaticJoint*& 
 
     jointDef.enableLimit = true;
     jointDef.lowerTranslation = 0.0f;     // top position (rest)
-    jointDef.upperTranslation = 1.0f;     // how far it can go down
+    jointDef.upperTranslation = 0.4f;     // how far it can go down
 
     jointDef.enableMotor = true;
-    jointDef.maxMotorForce = 500.0f;
+    jointDef.maxMotorForce = 300.0f;
     jointDef.motorSpeed = 0.0f;
 
     joint = (b2PrismaticJoint*)App->physics->world->CreateJoint(&jointDef);
