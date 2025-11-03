@@ -67,6 +67,7 @@ void ModuleGame::InitializeTextures()
     spoinkTexture = LoadTexture("Assets/Spoink_Spritesheet.png");
     shroomish = LoadTexture("Assets/Shroomish_Spritesheet.png");
     whailLordTexture = LoadTexture("Assets/Whailord_Spritesheet.png");
+    changePokeballTexture = LoadTexture("Assets/Evo_Mart_Spritesheet.png");
 
     spoinkAnim = Animator(&spoinkTexture, 20, 40);
     spoinkAnim.AddAnim("idle", 0, 2, 2.0f, true);
@@ -93,6 +94,11 @@ void ModuleGame::InitializeTextures()
     whailordAnim.AddAnim("pickingBall", 0, 5, 8.0f, false);
     whailordAnim.AddAnim("throwingBall", 5, 3, 8.0f, false);
     whailordAnim.Play("idle");
+
+    changePokeballAnim = Animator(&changePokeballTexture, 49, 36);
+    changePokeballAnim.AddAnim("idle", 0, 3, 2.5f, true);
+    changePokeballAnim.AddAnim("evo", 4, 6, 2.5f, false);
+    changePokeballAnim.Play("idle");
 }
 
 void ModuleGame::CreateTable()
@@ -299,8 +305,11 @@ void ModuleGame::CreateObjects()
     changePokeBall = App->physics->CreateCircle(112, 340, 10, true, this, ColliderType::OBJECT, STATIC);
 
     shroomish1 = App->physics->CreateCircle(220, 250, 15, false, this, ColliderType::SHROOMISH, STATIC);
+    shroomish1->itemScore = 200;
     shroomish2 = App->physics->CreateCircle(193, 290, 15, false, this, ColliderType::SHROOMISH, STATIC);
+    shroomish2->itemScore = 200;
     shroomish3 = App->physics->CreateCircle(240, 285, 15, false, this, ColliderType::SHROOMISH, STATIC);
+    shroomish2->itemScore = 200;
 
     whailord = App->physics->CreateCircle(355, 345, 22.5f, true, this, ColliderType::WHAILORD, STATIC);
 }
@@ -323,6 +332,39 @@ void ModuleGame::CreateScoreItems()
     sumLife1 = App->physics->CreateCircle(164, 200, 10, true, this, ColliderType::SUMLIFE, STATIC);
     sumLife2 = App->physics->CreateCircle(204, 198, 10, true, this, ColliderType::SUMLIFE, STATIC);
     sumLife3 = App->physics->CreateCircle(243, 200, 10, true, this, ColliderType::SUMLIFE, STATIC);
+
+    pScore = App->physics->CreateCircle(288, 325, 10, true, this, ColliderType::ITEM, STATIC);
+    pScore->itemScore = 500;
+}
+
+void ModuleGame::ChangeSkin()
+{
+    mPlayer->canDraw = false;
+    if (!changingPokeball)
+    {
+        changingPokeball = true;
+        changePokeballAnim.Play("evo");
+
+        coroutineManager.StartCoroutine(2.0f, [this]()
+            {
+                int x, y;
+                changePokeBall->GetPosition(x, y);
+                App->physics->SetBodyPosition(mPlayer->playerBody, x, y, false);
+                mPlayer->currentPokeball++;
+                pokeballChanged = true;
+                mPlayer->canDraw = true;
+                changePokeballAnim.Play("idle");
+
+                if (pokeballChanged)
+                {
+                    coroutineManager.StartCoroutine(1.0f, [this]()
+                        {
+                            changingPokeball = false;
+                            pokeballChanged = false;
+                        });
+                }
+            });
+    }
 }
 
 void ModuleGame::WhailordAct()
@@ -396,15 +438,23 @@ void ModuleGame::HandleInput()
 
 void ModuleGame::Draw()
 {
+    int x, y;
+
     DrawTexture(mapTexture, 0, 0, WHITE);
 
-    int x, y;
+
     sumLife1->GetPosition(x, y);  DrawCircle(x, y, 10, SKYBLUE);
     sumLife2->GetPosition(x, y);  DrawCircle(x, y, 10, SKYBLUE);
     sumLife3->GetPosition(x, y);  DrawCircle(x, y, 10, SKYBLUE);
 
     DrawTextureEx(leftFlipperTexture, { leftFlipperPositionX - 5, leftFlipperPositionY - 15 }, 0, 1.5f, WHITE);
     DrawTextureEx(rightFlipperTexture, { rightFlipperPositionX - 43, rightFlipperPositionY - 15 }, 0, 1.5f, WHITE);
+
+    // === CHANGE POKEBALL SCREEN ===
+    changePokeballAnim.Update(GetFrameTime());
+
+    changePokeBall->GetPosition(x, y);
+    changePokeballAnim.Draw({ float(x) - 26, float(y) - 96 }, 2);
 
     // === SPOINK/PLUNGER ANIM ===
     spoinkAnim.Draw({ springGroundX - 2, springGroundY-17 }, 1.5f);
@@ -439,6 +489,9 @@ void ModuleGame::Draw()
 
     mPlayer->DrawBall();
 
+    DrawText(TextFormat("Current Score %d", currentScore), 350, 20, 12, WHITE);
+    DrawText(TextFormat("Highest Score %d", highestScore), 350, 35, 12, WHITE);
+    DrawText(TextFormat("Previous Score %d", previousScore), 350, 50, 12, WHITE);
     /*DrawCircle(leftFlipperPositionX, leftFlipperPositionY, 5, RED);
     DrawCircle(rightFlipperPositionX, rightFlipperPositionY, 5, RED);*/
 }
@@ -470,13 +523,25 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
             {
                 shroomishAnim3.Play("hitted", false);
             }
+            currentScore += physA->itemScore;
         }
 
-        if (physA->ctype == ColliderType::WHAILORD && !whailordHitted)
+        else if (physA->ctype == ColliderType::WHAILORD && !whailordHitted)
         {
             printf("Collide with whailord");
 
             WhailordAct();
+        }
+
+        else if (physA->ctype == ColliderType::OBJECT)
+        {
+            printf("Collide with an object\n");
+
+            if (!changingPokeball)
+            {
+                printf("Changing pokeball\n");
+                ChangeSkin();
+            }
         }
         break;
 

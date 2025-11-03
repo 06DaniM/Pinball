@@ -58,6 +58,8 @@ bool Application::Init()
 	// After all Init calls we call Start() in all modules
 	printf("Application Start --------------\n");
 
+	SetTargetFPS(60);
+
 	for (auto it = list_modules.begin(); it != list_modules.end() && ret; ++it)
 	{
 		Module* module = *it;

@@ -23,7 +23,6 @@ private:
     void GetPhysics();
     void Reset();
     void TeleportBallDebug();
-    void ChangeSkin();
 
 public:
     ModuleGame* mGame = NULL;
@@ -34,7 +33,6 @@ public:
     Texture2D masterBallTexture;
 
     bool canDraw = true;
-    bool changingPokeball = false;
     int currentPokeball = 0;
 
     // Teleport 

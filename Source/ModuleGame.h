@@ -32,6 +32,7 @@ private:
     void CreateObjects();
     void CreateScoreItems();
 
+    void ChangeSkin();
     void WhailordAct();
 
     void HandleInput();
@@ -50,6 +51,7 @@ public:
     int highestScore = 0;   // Set the highest score during gameplay
 
     bool isLaunching = false;
+    bool changingPokeball = false;
 
 private:
 
@@ -76,7 +78,12 @@ private:
     PhysBody* rectSumLife3 = NULL;
 
     //  === OBJECTS === 
+    Texture2D changePokeballTexture;
+
+    Animator changePokeballAnim;
+
     PhysBody* changePokeBall = NULL;
+    bool pokeballChanged = false;
 
     // Shroomish
     Texture2D shroomish;
@@ -106,6 +113,8 @@ private:
 
     PhysBody* sumTvScore = NULL;
     PhysBody* minusTvScore = NULL;
+
+    PhysBody* pScore = NULL;
 
     // === FLIPPERS ===
     Texture2D leftFlipperTexture;

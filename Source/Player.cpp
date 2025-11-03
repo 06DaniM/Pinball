@@ -100,23 +100,6 @@ void ModulePlayer::TeleportBallDebug()
     App->physics->SetBodyPosition(playerBody, GetMousePosition().x, GetMousePosition().y, false);
 }
 
-void ModulePlayer::ChangeSkin()
-{
-    changingPokeball = true;
-    playerBody->btype = KINEMATIC;
-    playerBody->body->SetLinearVelocity(b2Vec2_zero);
-    canDraw = false;
-
-    coroutineManager.StartCoroutine(2.0f, [this]()
-        {
-            currentPokeball++;
-            changingPokeball = false;
-            playerBody->btype = DYNAMIC;
-            canDraw = true;
-            printf("Pokeball lista para lanzarse de nuevo\n");
-        });
-}
-
 bool ModulePlayer::CleanUp()
 {
     printf("Unloading Player\n");
@@ -129,7 +112,7 @@ void ModulePlayer::OnCollision(PhysBody* physA, PhysBody* physB)
     switch (physB->ctype)
     {
     case ColliderType::VOID:
-        if (physA->ctype == ColliderType::PLAYER)
+        if (physA->ctype == ColliderType::PLAYER && mGame->changingPokeball)
         {
             if (!needsReset) // Avoid reset more than one time (just in case)
             {
@@ -149,19 +132,6 @@ void ModulePlayer::OnCollision(PhysBody* physA, PhysBody* physB)
 
             if (mGame->highestScore <= mGame->currentScore) mGame->highestScore = mGame->currentScore;
             printf("%d\n", mGame->currentScore);
-        }
-        break;
-
-    case ColliderType::OBJECT:
-        if (physA->ctype == ColliderType::PLAYER)
-        {
-            printf("Collide with an object\n");
-            
-            if (!changingPokeball)
-            {
-                printf("Changing pokeball\n");
-                ChangeSkin();
-            }
         }
         break;
 
