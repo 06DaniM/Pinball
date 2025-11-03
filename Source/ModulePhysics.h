@@ -18,6 +18,7 @@ enum class ColliderType {
     BOUNCE,
     OBJECT,
     SHROOMISH,
+    WHAILORD,
     VOID,
     UNKNOWN
 };

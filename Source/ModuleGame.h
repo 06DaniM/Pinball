@@ -4,6 +4,7 @@
 #include "Module.h"
 #include "Player.h"
 #include "Animation.h"
+#include "Coroutine.h"
 
 #include "p2Point.h"
 
@@ -30,6 +31,8 @@ private:
     void CreateObstacles();
     void CreateObjects();
     void CreateScoreItems();
+
+    void WhailordAct();
 
     void HandleInput();
 
@@ -75,6 +78,7 @@ private:
     //  === OBJECTS === 
     PhysBody* changePokeBall = NULL;
 
+    // Shroomish
     Texture2D shroomish;
 
     Animator shroomishAnim1;
@@ -85,6 +89,17 @@ private:
     PhysBody* shroomish2 = NULL;
     PhysBody* shroomish3 = NULL;
 
+    // Whailord
+    Texture2D whailLordTexture;
+
+    Animator whailordAnim;
+
+    PhysBody* whailord = NULL;
+    bool whailordHitted = false;
+    bool inWhailord = false;
+    bool readyToShot = false;
+
+    // Other objects
     PhysBody* sumLife1 = NULL;
     PhysBody* sumLife2 = NULL;
     PhysBody* sumLife3 = NULL;
@@ -127,4 +142,6 @@ private:
     // === VOID ===
     PhysBody* downVoid; // Physbody of the void
     b2Vec2 downVoidPos; // Set the position of the void
+
+    CoroutineManager coroutineManager;
 };

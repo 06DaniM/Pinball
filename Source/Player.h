@@ -49,10 +49,10 @@ public:
     int currentSumLife = 0;     // Set the the different number of times that has an item sumLife been hit
 
     CoroutineManager coroutineManager;
+    Vector2 position;               // Position of the ball
+    PhysBody* playerBody = nullptr; // Body of the ball
 
 private:
-    PhysBody* playerBody = nullptr; // Body of the ball
     float radius = 11.25f;            // Radius of the ball
-    Vector2 position;               // Position of the ball
     Vector2 initialPosition;        // Initial position of the ball
 };

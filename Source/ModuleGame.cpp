@@ -27,10 +27,10 @@ bool ModuleGame::Start()
     Flippers(leftFlipper, leftFlipperJoint, leftFlipperPositionX, leftFlipperPositionY, true);      // Left flipper
     Flippers(rightFlipper, rightFlipperJoint, rightFlipperPositionX, rightFlipperPositionY, false);   // Right flipper
 
-    // === LOAD THE SPRING
+    // === LOAD THE SPRING ===
     Spring(base, plunger, joint, springGroundX, springGroundY);
 
-    // === LOAD THE TABLE (MAP)
+    // === LOAD THE TABLE (MAP) ===
     CreateTable();
 
     CreateSlide();
@@ -45,6 +45,9 @@ bool ModuleGame::Start()
 
 update_status ModuleGame::Update()
 {
+    float deltaTime = GetFrameTime();
+    coroutineManager.Update(deltaTime);
+
     if (isLaunching) physTable->SetSensor(true);
     else physTable->SetSensor(false);
 
@@ -62,12 +65,14 @@ void ModuleGame::InitializeTextures()
     rightFlipperTexture = LoadTexture("Assets/RightFlipperSprite.png");
 
     spoinkTexture = LoadTexture("Assets/Spoink_Spritesheet.png");
+    shroomish = LoadTexture("Assets/Shroomish_Spritesheet.png");
+    whailLordTexture = LoadTexture("Assets/Whailord_Spritesheet.png");
+
     spoinkAnim = Animator(&spoinkTexture, 20, 40);
     spoinkAnim.AddAnim("idle", 0, 2, 2.0f, true);
     spoinkAnim.AddAnim("spring_down", 2, 5, 5, false);
     spoinkAnim.Play("idle");
 
-    shroomish = LoadTexture("Assets/Shroomish_Spritesheet.png");
     shroomishAnim1 = Animator(&shroomish, 27, 31);
     shroomishAnim1.AddAnim("idle", 0, 2, 2.0f, true);
     shroomishAnim1.AddAnim("hitted", 2, 2, 6.0f, false);
@@ -82,6 +87,12 @@ void ModuleGame::InitializeTextures()
     shroomishAnim3.AddAnim("idle", 0, 2, 2.0f, true);
     shroomishAnim3.AddAnim("hitted", 2, 2, 6.0f, false);
     shroomishAnim3.Play("idle");
+
+    whailordAnim = Animator(&whailLordTexture, 40, 30);
+    whailordAnim.AddAnim("idle", 0, 2, 2.0f, true);
+    whailordAnim.AddAnim("pickingBall", 0, 5, 8.0f, false);
+    whailordAnim.AddAnim("throwingBall", 5, 3, 8.0f, false);
+    whailordAnim.Play("idle");
 }
 
 void ModuleGame::CreateTable()
@@ -237,12 +248,12 @@ void ModuleGame::CreateObstacles()
         280, 315,
         267, 338,
         265, 338,
-        262, 310,
+        272, 310,
         290, 270,
-        310, 240,
-        300, 230,
-        290, 225,
-        270, 220,
+        330, 240,
+        320, 230,
+        310, 225,
+        280, 220,
         260, 215,
         255, 207,
         262, 182,
@@ -278,18 +289,20 @@ void ModuleGame::CreateObstacles()
     physGroundTerrain = App->physics->CreateChain(0, 0, terrainGrounPoints, p4, false, ColliderType::PLATFORM, STATIC);
     physGroundTerrain->listener = this;
 
-    rectSumLife1 = App->physics->CreateRectangle(145, 217, 10, 40, false, this, ColliderType::PLATFORM, STATIC);
-    rectSumLife2 = App->physics->CreateRectangle(185, 205, 10, 40, false, this, ColliderType::PLATFORM, STATIC);
-    rectSumLife3 = App->physics->CreateRectangle(225, 200, 10, 40, false, this, ColliderType::PLATFORM, STATIC);
+    rectSumLife1 = App->physics->CreateRectangle(145, 217, 10, 35, false, this, ColliderType::PLATFORM, STATIC);
+    rectSumLife2 = App->physics->CreateRectangle(185, 205, 10, 35, false, this, ColliderType::PLATFORM, STATIC);
+    rectSumLife3 = App->physics->CreateRectangle(225, 200, 10, 35, false, this, ColliderType::PLATFORM, STATIC);
 }
 
 void ModuleGame::CreateObjects()
 {
     changePokeBall = App->physics->CreateCircle(112, 340, 10, true, this, ColliderType::OBJECT, STATIC);
 
-    shroomish1 = App->physics->CreateCircle(215, 250, 15, false, this, ColliderType::SHROOMISH, STATIC);
-    shroomish2 = App->physics->CreateCircle(190, 285, 15, false, this, ColliderType::SHROOMISH, STATIC);
-    shroomish3 = App->physics->CreateCircle(240, 280, 15, false, this, ColliderType::SHROOMISH, STATIC);
+    shroomish1 = App->physics->CreateCircle(220, 250, 15, false, this, ColliderType::SHROOMISH, STATIC);
+    shroomish2 = App->physics->CreateCircle(193, 290, 15, false, this, ColliderType::SHROOMISH, STATIC);
+    shroomish3 = App->physics->CreateCircle(240, 285, 15, false, this, ColliderType::SHROOMISH, STATIC);
+
+    whailord = App->physics->CreateCircle(355, 345, 22.5f, true, this, ColliderType::WHAILORD, STATIC);
 }
 
 void ModuleGame::CreateVoid()
@@ -310,6 +323,43 @@ void ModuleGame::CreateScoreItems()
     sumLife1 = App->physics->CreateCircle(164, 200, 10, true, this, ColliderType::SUMLIFE, STATIC);
     sumLife2 = App->physics->CreateCircle(204, 198, 10, true, this, ColliderType::SUMLIFE, STATIC);
     sumLife3 = App->physics->CreateCircle(243, 200, 10, true, this, ColliderType::SUMLIFE, STATIC);
+}
+
+void ModuleGame::WhailordAct()
+{
+    printf("Acting");
+    whailordHitted = true;
+
+    if (!inWhailord)
+    {
+        inWhailord = true;
+        mPlayer->canDraw = false;
+        whailordAnim.Play("pickingBall");
+
+        coroutineManager.StartCoroutine(1.0f, [this]()
+            {
+                int x, y;
+                whailord->GetPosition(x, y);
+                App->physics->SetBodyPosition(mPlayer->playerBody, x, y, false);
+                whailordHitted = false;
+
+                whailordAnim.Play("throwingBall");
+                mPlayer->canDraw = true;
+                readyToShot = true;
+                mPlayer->playerBody->body->ApplyLinearImpulseToCenter({-1, 1.5}, true);
+            });
+    }
+
+    if (inWhailord && readyToShot)
+    {
+        coroutineManager.StartCoroutine(1.0f, [this]()
+            {
+                inWhailord = false;
+                readyToShot = false;
+                whailordHitted = false;
+                whailordAnim.Play("idle");
+            });
+    }
 }
 
 void ModuleGame::HandleInput()
@@ -372,6 +422,9 @@ void ModuleGame::Draw()
     if (shroomishAnim3.IsFinished() && shroomishAnim3.GetCurrentAnimName() == "hitted")
         shroomishAnim3.Play("idle");
 
+    // === WHAILORD ANIM ===
+    whailordAnim.Update(GetFrameTime());
+
     shroomish1->GetPosition(x, y);
     shroomishAnim1.Draw({ (float)x, (float)y - 10 }, 1.5f);
 
@@ -380,6 +433,9 @@ void ModuleGame::Draw()
 
     shroomish3->GetPosition(x, y);
     shroomishAnim3.Draw({ (float)x, (float)y - 10 }, 1.5f);
+
+    whailord->GetPosition(x, y);
+    whailordAnim.Draw({ float(x), (float)y }, 1.5f);
 
     mPlayer->DrawBall();
 
@@ -414,6 +470,13 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
             {
                 shroomishAnim3.Play("hitted", false);
             }
+        }
+
+        if (physA->ctype == ColliderType::WHAILORD && !whailordHitted)
+        {
+            printf("Collide with whailord");
+
+            WhailordAct();
         }
         break;
 
