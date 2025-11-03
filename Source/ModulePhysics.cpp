@@ -166,6 +166,77 @@ PhysBody* ModulePhysics::CreateChain(int x, int y, int* points, int size, bool i
 	return pbody;
 }
 
+void ModulePhysics::Flippers(PhysBody*& flipper, b2RevoluteJoint*& joint, float x, float y, bool isLeft)
+{
+	// Creates the flipper body
+	float flipperWidth = 45.0f;
+	float flipperHeight = 10.0f;
+
+	// Creates the dynamic body
+	flipper = CreateRectangle(x, y, flipperWidth, flipperHeight, false, this, ColliderType::PLATFORM, DYNAMIC);
+
+	// Creates the pivot point
+	b2Body* body = flipper->body;
+
+	b2BodyDef anchorDef;
+	anchorDef.type = b2_staticBody;
+	anchorDef.position.Set(PIXELS_TO_METERS(x), PIXELS_TO_METERS(y));
+	b2Body* anchor = world->CreateBody(&anchorDef);
+
+	// Creates the revolute joint
+	b2RevoluteJointDef jointDef;
+	jointDef.bodyA = anchor;
+	jointDef.bodyB = body;
+
+	// Desactivates the engine when the torque is being created
+	jointDef.enableMotor = false;
+	jointDef.maxMotorTorque = 250.0f;
+
+	// Puts the anchor at the ends
+	float halfWidth = PIXELS_TO_METERS(flipperWidth * 0.5f);
+	if (isLeft) jointDef.localAnchorB.Set(-halfWidth, 0);
+	else jointDef.localAnchorB.Set(halfWidth, 0);
+
+	// Limitate the angle of turn
+	jointDef.enableLimit = true;
+	jointDef.lowerAngle = -30 * DEG2RAD;
+	jointDef.upperAngle = 30 * DEG2RAD;
+
+	// Creates the joint
+	joint = (b2RevoluteJoint*)world->CreateJoint(&jointDef);
+
+	// Activates the engine when the flippers are in their position
+	joint->EnableMotor(true); // The flippers move at the begining until they were in their positions, activate the engine after solve it
+}
+
+void ModulePhysics::Spring(PhysBody*& base, PhysBody*& plunger, b2PrismaticJoint*& joint, float poxX, float posY) {
+
+	float rectangleH = 20.0f;
+	float rectangleW = 40.0f;
+	float springH = 40.0f;
+
+	// Y axis points downward
+	b2Vec2 worldAxis(0.0f, 1.0f);
+
+	base = CreateRectangle(poxX, posY, rectangleW, rectangleH, false, this, ColliderType::PLATFORM, STATIC);
+	plunger =CreateRectangle(poxX, posY - springH, rectangleW, rectangleH, false, this, ColliderType::PLATFORM, DYNAMIC);
+
+	b2PrismaticJointDef jointDef;
+	jointDef.Initialize(base->body, plunger->body, base->body->GetWorldCenter(), worldAxis);
+
+	jointDef.enableLimit = true;
+	jointDef.lowerTranslation = 0.0f;     // top position (rest)
+	jointDef.upperTranslation = 0.4f;     // how far it can go down
+
+	jointDef.enableMotor = true;
+	jointDef.maxMotorForce = 300.0f;
+	jointDef.motorSpeed = 0.0f;
+
+	joint = (b2PrismaticJoint*)world->CreateJoint(&jointDef);
+
+	plunger->body->SetGravityScale(0.0f);
+}
+
 void ModulePhysics::SetBodyPosition(PhysBody* pbody, int x, int y, bool resetRotation)
 {
 	if (pbody == nullptr || pbody->body == nullptr)

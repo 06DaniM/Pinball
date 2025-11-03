@@ -24,11 +24,11 @@ bool ModuleGame::Start()
     InitializeTextures();
 
     // === LOAD THE FLIPPERS ===
-    Flippers(leftFlipper, leftFlipperJoint, leftFlipperPositionX, leftFlipperPositionY, true);      // Left flipper
-    Flippers(rightFlipper, rightFlipperJoint, rightFlipperPositionX, rightFlipperPositionY, false);   // Right flipper
+    App->physics->Flippers(leftFlipper, leftFlipperJoint, leftFlipperPositionX, leftFlipperPositionY, true);      // Left flipper
+    App->physics->Flippers(rightFlipper, rightFlipperJoint, rightFlipperPositionX, rightFlipperPositionY, false);   // Right flipper
 
     // === LOAD THE SPRING ===
-    Spring(base, plunger, joint, springGroundX, springGroundY);
+    App->physics->Spring(base, plunger, joint, springGroundX, springGroundY);
 
     // === LOAD THE TABLE (MAP) ===
     CreateTable();
@@ -54,8 +54,34 @@ update_status ModuleGame::Update()
     if (plusleAnim.GetCurrentAnimName() == "flip" && plusleAnim.IsFinished())
         plusleAnim.Play("idle");
 
-    if (isLaunching) physTable->SetSensor(true);
-    else physTable->SetSensor(false);
+    if (isLaunching)
+    {
+        physTable->SetSensor(true);
+        physSlidepPelliperIn->SetSensor(true);
+        physSlidepPelliperOut->SetSensor(true);
+        physSlideInGame->SetSensor(true);
+        physSlideBegin->SetSensor(false);
+    }
+
+    else if (!isLaunching && !inPelliperSlide)
+    {
+        physTable->SetSensor(false);
+        physSlideInGame->SetSensor(false);
+        physGroundTerrain->SetSensor(false);
+        physSlidepPelliperIn->SetSensor(true);
+        physSlidepPelliperOut->SetSensor(true);
+        physSlideBegin->SetSensor(true);
+    }
+
+    else if (inPelliperSlide)
+    {
+        physSlidepPelliperIn->SetSensor(false);
+        physSlidepPelliperOut->SetSensor(false);
+        physTable->SetSensor(true);
+        physSlideInGame->SetSensor(true);
+        physSlideBegin->SetSensor(true);
+        physGroundTerrain->SetSensor(true);
+    }
 
     HandleInput();
     Pikachu();
@@ -258,8 +284,8 @@ void ModuleGame::CreateSlide()
     32, 363,
     52, 403,
     68, 433,
-    83, 460,
-    90, 457,
+    80, 460,
+    85, 457,
     65, 430,
     47, 400,
     27, 360,
@@ -298,6 +324,96 @@ void ModuleGame::CreateSlide()
 
     physSlideInGame = App->physics->CreateChain(0, 0, slideInGame, p2, false, ColliderType::PLATFORM, STATIC);
     physSlideInGame->listener = this;
+
+    const int p3 = 80;
+
+    static int slidePelipperOut[p3] = {
+        309, 230,
+        309, 205,
+        307, 175,
+        300, 147,
+        260, 105,
+        220, 86,
+        180, 82,
+        130, 88,
+        75, 120,
+        33, 163,
+        20, 203,
+        17, 243,
+        18, 263,
+        20, 303,
+        25, 323,
+        32, 363,
+        52, 403,
+        68, 433,
+        80, 460,
+        85, 457,
+        83, 450,
+        80, 440,
+        65, 420,
+        50, 390,
+        31, 350,
+        26, 320,
+        21, 280,
+        19, 240,
+        23, 200,
+        32, 170,
+        55, 140,
+        80, 120,
+        132, 90,
+        182, 86,
+        224, 90,
+        262, 107,
+        297, 149,
+        305, 178,
+        307, 205,
+        307, 230,
+    };
+
+    physSlidepPelliperOut = App->physics->CreateChain(0, 0, slidePelipperOut, p3, false, ColliderType::PLATFORM, STATIC);
+    physSlidepPelliperOut->listener = this;
+
+    const int p4 = 56;
+
+    static int slidePelipperIn[p4] = {
+        273, 228,
+        273, 180,
+        264, 148,
+        247, 128,
+        225, 115,
+        197, 113,
+        157, 113,
+        113, 132,
+        90, 152,
+        63, 183,
+        48, 223,
+        48, 263,
+        55, 298,
+        58, 315,
+
+        60, 315,
+        57, 300,
+        50, 265,
+        50, 225,
+        65, 185,
+        92, 155,
+        115, 135,
+        155, 115,
+        200, 115,
+        227, 120,
+        245, 130,
+        262, 150,
+        270, 180,
+        270, 228,
+    };
+
+    physSlidepPelliperIn = App->physics->CreateChain(0, 0, slidePelipperIn, p4, false, ColliderType::PLATFORM, STATIC);
+    physSlidepPelliperIn->listener = this;
+
+    launchingSensor = App->physics->CreateCircle(97, 440, 10, true, this, ColliderType::LAUNCHING, STATIC);
+
+    pelliperSlideSensor1 = App->physics->CreateCircle(70, 400, 10, true, this, ColliderType::PSlIDEBEGIN, STATIC);
+    pelliperSlideSensor2 = App->physics->CreateCircle(290, 220, 10, true, this, ColliderType::PSLIDEEND, STATIC);
 }
 
 void ModuleGame::CreateObstacles()
@@ -587,12 +703,14 @@ void ModuleGame::Pikachu()
 void ModuleGame::HandleInput()
 {
     if (gameOver) return;
+
     // === SPRING / PLUNGER ===
     if (IsKeyPressed(KEY_DOWN)) {
         spoinkAnim.Play("spring_down", false);
         isPressing = true;
     }
-    else if (IsKeyDown(KEY_DOWN)) {
+    else if (IsKeyDown(KEY_DOWN)) 
+    {
         joint->SetMotorSpeed(pullSpeed);
 
         spoinkAnim.Update(GetFrameTime());
@@ -610,10 +728,10 @@ void ModuleGame::HandleInput()
     if (!isPressing && spoinkAnim.IsFinished()) spoinkAnim.Play("idle");
 
     // === FLIPPERS ===
-    if (IsKeyDown(KEY_LEFT)) leftFlipperJoint->SetMotorSpeed(-12.5f);
+    if (IsKeyDown(KEY_LEFT)) leftFlipperJoint->SetMotorSpeed(-20.5f);
     else leftFlipperJoint->SetMotorSpeed(12.5f);
 
-    if (IsKeyDown(KEY_RIGHT)) rightFlipperJoint->SetMotorSpeed(12.5f);
+    if (IsKeyDown(KEY_RIGHT)) rightFlipperJoint->SetMotorSpeed(20.5f);
     else rightFlipperJoint->SetMotorSpeed(-12.5f);
 }
 
@@ -829,12 +947,34 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
             sumLife1->isActive = true;
             sumLife2->isActive = true;
             sumLife3->isActive = true;
+
+            isLaunching = true;
         }
 
         else if (physA->ctype == ColliderType::WHAILORD && !whailordHitted)
         {
-            printf("Collide with whailord");
+            printf("Collide with whailord\n");
             WhailordAct();
+        }
+
+        else if (physA->ctype == ColliderType::LAUNCHING)
+        {
+            printf("Collide with launching sensor\n");
+            isLaunching = false;
+
+            if (!isLaunching && inPelliperSlide) inPelliperSlide = false;
+        }
+
+        else if (physA->ctype == ColliderType::PSlIDEBEGIN)
+        {
+            printf("Collide with pelliper slide 1 sensor\n");
+            if (!isLaunching) inPelliperSlide = true;
+        }
+
+        else if (physA->ctype == ColliderType::PSLIDEEND)
+        {
+            printf("Collide with pelliper slide 2 sensor\n");
+            inPelliperSlide = false;
         }
         break;
 
@@ -873,76 +1013,4 @@ void ModuleGame::EndCollision(PhysBody* physA, PhysBody* physB)
     default:
         break;
     }
-}
-
-// MOVER LOS FLIPPERS Y EL SPRING AL MODULEPHYSICS ¿coña? (NOPE xd)<--------------------------------------------------------------------------------------------------------------------------
-void ModuleGame::Flippers(PhysBody*& flipper, b2RevoluteJoint*& joint, float x, float y, bool isLeft)
-{
-    // Creates the flipper body
-    float flipperWidth = 45.0f;
-    float flipperHeight = 10.0f;
-
-    // Creates the dynamic body
-    flipper = App->physics->CreateRectangle(x, y, flipperWidth, flipperHeight, false, this, ColliderType::PLATFORM, DYNAMIC);
-
-    // Creates the pivot point
-    b2Body* body = flipper->body;
-
-    b2BodyDef anchorDef;
-    anchorDef.type = b2_staticBody;
-    anchorDef.position.Set(PIXELS_TO_METERS(x), PIXELS_TO_METERS(y));
-    b2Body* anchor = App->physics->world->CreateBody(&anchorDef);
-
-    // Creates the revolute joint
-    b2RevoluteJointDef jointDef;
-    jointDef.bodyA = anchor;
-    jointDef.bodyB = body;
-
-    // Desactivates the engine when the torque is being created
-    jointDef.enableMotor = false;
-    jointDef.maxMotorTorque = 500.0f;
-
-    // Puts the anchor at the ends
-    float halfWidth = PIXELS_TO_METERS(flipperWidth * 0.5f);
-    if (isLeft) jointDef.localAnchorB.Set(-halfWidth, 0);
-    else jointDef.localAnchorB.Set(halfWidth, 0);
-
-    // Limitate the angle of turn
-    jointDef.enableLimit = true;
-    jointDef.lowerAngle = -30 * DEG2RAD;
-    jointDef.upperAngle = 30 * DEG2RAD;
-
-    // Creates the joint
-    joint = (b2RevoluteJoint*)App->physics->world->CreateJoint(&jointDef);
-
-    // Activates the engine when the flippers are in their position
-    joint->EnableMotor(true); // The flippers move at the begining until they were in their positions, activate the engine after solve it
-}
-
-void ModuleGame::Spring(PhysBody*& base, PhysBody*& plunger, b2PrismaticJoint*& joint, float poxX, float posY) {
-
-    float rectangleH = 20.0f;
-    float rectangleW = 40.0f;
-    float springH = 40.0f;
-
-    // Y axis points downward
-    b2Vec2 worldAxis(0.0f, 1.0f);
-
-    base = App->physics->CreateRectangle(poxX, posY, rectangleW, rectangleH, false, this, ColliderType::PLATFORM, STATIC);
-    plunger = App->physics->CreateRectangle(poxX, posY - springH, rectangleW, rectangleH, false, this, ColliderType::PLATFORM, DYNAMIC);
-
-    b2PrismaticJointDef jointDef;
-    jointDef.Initialize(base->body, plunger->body, base->body->GetWorldCenter(), worldAxis);
-
-    jointDef.enableLimit = true;
-    jointDef.lowerTranslation = 0.0f;     // top position (rest)
-    jointDef.upperTranslation = 0.4f;     // how far it can go down
-
-    jointDef.enableMotor = true;
-    jointDef.maxMotorForce = 300.0f;
-    jointDef.motorSpeed = 0.0f;
-
-    joint = (b2PrismaticJoint*)App->physics->world->CreateJoint(&jointDef);
-
-    plunger->body->SetGravityScale(0.0f);
 }

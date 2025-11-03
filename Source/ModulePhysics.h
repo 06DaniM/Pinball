@@ -21,6 +21,9 @@ enum class ColliderType {
     WHAILORD,
     PHITPIKA,
     PIKACHU,
+    LAUNCHING,
+    PSlIDEBEGIN,
+    PSLIDEEND,
     VOID,
     UNKNOWN
 };
@@ -92,6 +95,8 @@ public:
     PhysBody* CreateRectangle(int x, int y, int width, int height, bool isSensor, Module* listener, ColliderType ctype, bodyType type);
     PhysBody* CreateCircle(int x, int y, int radius, bool isSensor, Module* listener, ColliderType ctype = ColliderType::UNKNOWN, bodyType type = bodyType::DYNAMIC);
     PhysBody* CreateChain(int x, int y, int* points, int size, bool isSensor, ColliderType ctype = ColliderType::UNKNOWN, bodyType type = bodyType::STATIC);
+    void Flippers(PhysBody*& flipper, b2RevoluteJoint*& joint, float posX, float posY, bool isLeft);
+    void Spring(PhysBody*& base, PhysBody*& plunger, b2PrismaticJoint*& joint, float poxX, float posY);
 
     void SetBodyPosition(PhysBody* pbody, int x, int y, bool resetRotation);
 

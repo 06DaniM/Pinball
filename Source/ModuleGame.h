@@ -42,10 +42,6 @@ private:
 
     void Draw();
 
-    void Flippers(PhysBody*& flipper, b2RevoluteJoint*& joint, float posX, float posY, bool isLeft);
-
-    void Spring(PhysBody*& base, PhysBody*& plunger, b2PrismaticJoint*& joint, float poxX, float posY);
-
 public:
 
     // === SCORE === 
@@ -53,7 +49,7 @@ public:
     int previousScore = 0;  // Set the previous score during gameplay
     int highestScore = 0;   // Set the highest score during gameplay
 
-    bool isLaunching = false;
+    bool isLaunching = true;
     bool changingPokeball = false;
     bool gameOver = false;
 
@@ -67,6 +63,11 @@ private:
     PhysBody* physTable = NULL;     // Physbody of the table (map)
     PhysBody* physSlideBegin = NULL;
     PhysBody* physSlideInGame = NULL;
+    PhysBody* physSlidepPelliperOut = NULL;
+    PhysBody* physSlidepPelliperIn = NULL;
+    PhysBody* launchingSensor = NULL;
+    PhysBody* pelliperSlideSensor1 = NULL;
+    PhysBody* pelliperSlideSensor2 = NULL;
 
     PhysBody* leftTriangle = NULL;
     PhysBody* rightTriangle = NULL;
@@ -163,6 +164,7 @@ private:
 
     bool isRespawning = false;
     bool canContinue = false;
+    bool inPelliperSlide = false;
 
     // === FLIPPERS ===
     Texture2D leftFlipperTexture;
