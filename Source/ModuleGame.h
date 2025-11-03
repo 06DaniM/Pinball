@@ -65,7 +65,8 @@ private:
 
     // === TABLE (MAP) ===
     PhysBody* physTable = NULL;     // Physbody of the table (map)
-    PhysBody* physSlide = NULL;
+    PhysBody* physSlideBegin = NULL;
+    PhysBody* physSlideInGame = NULL;
 
     PhysBody* leftTriangle = NULL;
     PhysBody* rightTriangle = NULL;

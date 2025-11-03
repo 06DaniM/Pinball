@@ -81,7 +81,7 @@ void ModuleGame::InitializeTextures()
     pikachu = LoadTexture("Assets/Pikachu_Spritesheet.png");
     plusle = LoadTexture("Assets/Plusle_Spritesheet.png");
     minum = LoadTexture("Assets/Minum_Spritesheet.png");
-    peliperTexture = LoadTexture("Assets/Peliper_Spritesheet.png");
+    peliperTexture = LoadTexture("Assets/Pelliper_Spritesheet.png");
     eggTexture = LoadTexture("Assets/Huevo_Pokemon_Spritesheet.png");
 
     spoinkAnim = Animator(&spoinkTexture, 20, 40);
@@ -133,7 +133,7 @@ void ModuleGame::InitializeTextures()
     minumAnim.AddAnim("flip", 3, 10, 4.0f, false);
     minumAnim.Play("idle");
 
-    peliperAnim = Animator(&peliperTexture, 40, 37);
+    peliperAnim = Animator(&peliperTexture, 43, 37);
     peliperAnim.AddAnim("idle", 0, 2, 3.0f, true);
     peliperAnim.AddAnim("pickBall", 2, 14, 3.0f, false);
     peliperAnim.Play("idle");
@@ -208,9 +208,86 @@ void ModuleGame::CreateTable()
 
 void ModuleGame::CreateSlide()
 {
-    const int p = 12;
+    const int p1 = 138;
 
-    static int slide[p] = {
+    static int slideBegin[p1] = {
+    437, 145,
+    407, 110,
+    390, 100,
+    370, 94,
+    280, 94,
+    170, 113,
+    140, 120,
+    120, 130,
+    106, 140,
+    93, 150,
+    71, 170,
+    56, 200,
+    52, 230,
+    54, 280,
+    60, 320,
+    52, 200,
+    55, 197,
+    68, 167,
+    90, 148,
+    103, 138,
+    117, 128,
+    137, 118,
+    167, 110,
+    277, 93,
+    367, 93,
+    387, 97,
+    410, 110,
+    440, 145,
+    440, 780,
+    470, 780,
+    470, 145,
+    453, 105,
+    449, 95,
+    427, 81,
+    367, 58,
+    267, 58,
+    130, 88,
+    75, 120,
+    33, 163,
+    20, 203,
+    17, 243,
+    17, 263,
+    18, 303,
+    25, 323,
+    32, 363,
+    52, 403,
+    68, 433,
+    83, 460,
+    90, 457,
+    65, 430,
+    47, 400,
+    27, 360,
+    18, 320,
+    18, 300,
+    16, 260,
+    16, 240,
+    27, 200,
+    40, 160,
+    77, 117,
+    127, 85,
+    260, 55,
+    380, 55,
+    430, 78,
+    442, 87,
+    452, 95,
+    456, 100,
+    475, 145,
+    475, 790,
+    438, 790,
+    };
+
+    physSlideBegin = App->physics->CreateChain(0, 0, slideBegin, p1, false, ColliderType::PLATFORM, STATIC);
+    physSlideBegin->listener = this;
+
+    const int p2 = 12;
+
+    static int slideInGame[p2] = {
         78, 456,
         50, 400,
         60, 320,
@@ -219,8 +296,8 @@ void ModuleGame::CreateSlide()
         84, 456,
     };
 
-    physSlide = App->physics->CreateChain(0, 0, slide, p, false, ColliderType::PLATFORM, STATIC);
-    physSlide->listener = this;
+    physSlideInGame = App->physics->CreateChain(0, 0, slideInGame, p2, false, ColliderType::PLATFORM, STATIC);
+    physSlideInGame->listener = this;
 }
 
 void ModuleGame::CreateObstacles()
