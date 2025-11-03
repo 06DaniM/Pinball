@@ -21,6 +21,7 @@ public:
     update_status Update();
     bool CleanUp();
     void OnCollision(PhysBody* bodyA, PhysBody* bodyB);
+    void EndCollision(PhysBody* bodyA, PhysBody* bodyB);
     
 private:
     void InitializeTextures();
@@ -34,6 +35,7 @@ private:
 
     void ChangeSkin();
     void WhailordAct();
+    void Pikachu();
 
     void HandleInput();
 
@@ -114,7 +116,20 @@ private:
     PhysBody* sumTvScore = NULL;
     PhysBody* minusTvScore = NULL;
 
-    PhysBody* pScore = NULL;
+    Texture2D pikachu;
+
+    Animator rightPikachuAnim;
+    Animator leftPikachuAnim;
+
+    PhysBody* pHitPikachu = NULL;
+    PhysBody* rightPikachu = NULL;
+    PhysBody* leftPikachu = NULL;
+
+    bool playingPikachuAnimation = false;
+    bool collideWithRightPikachu = false;
+    bool collidingWithPikachu = NULL;
+    float pikachuTime = 0;
+    int pCount = 0;
 
     // === FLIPPERS ===
     Texture2D leftFlipperTexture;

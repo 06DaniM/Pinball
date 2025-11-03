@@ -19,6 +19,8 @@ enum class ColliderType {
     OBJECT,
     SHROOMISH,
     WHAILORD,
+    PHITPIKA,
+    PIKACHU,
     VOID,
     UNKNOWN
 };

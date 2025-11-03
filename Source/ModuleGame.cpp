@@ -52,6 +52,7 @@ update_status ModuleGame::Update()
     else physTable->SetSensor(false);
 
     HandleInput();
+    Pikachu();
     Draw();
 
     return UPDATE_CONTINUE;
@@ -68,6 +69,7 @@ void ModuleGame::InitializeTextures()
     shroomish = LoadTexture("Assets/Shroomish_Spritesheet.png");
     whailLordTexture = LoadTexture("Assets/Whailord_Spritesheet.png");
     changePokeballTexture = LoadTexture("Assets/Evo_Mart_Spritesheet.png");
+    pikachu = LoadTexture("Assets/Pikachu_Spritesheet.png");
 
     spoinkAnim = Animator(&spoinkTexture, 20, 40);
     spoinkAnim.AddAnim("idle", 0, 2, 2.0f, true);
@@ -96,9 +98,17 @@ void ModuleGame::InitializeTextures()
     whailordAnim.Play("idle");
 
     changePokeballAnim = Animator(&changePokeballTexture, 49, 36);
-    changePokeballAnim.AddAnim("idle", 0, 3, 2.5f, true);
-    changePokeballAnim.AddAnim("evo", 4, 6, 2.5f, false);
+    changePokeballAnim.AddAnim("idle", 0, 3, 3.0f, true);
+    changePokeballAnim.AddAnim("evo", 4, 6, 3.0f, false);
     changePokeballAnim.Play("idle");
+
+    leftPikachuAnim = Animator(&pikachu, 38, 92);
+    leftPikachuAnim.AddAnim("idle", 0, 2, 3.0f, true);
+    leftPikachuAnim.AddAnim("attack", 2, 12, 6.0f, true);
+
+    rightPikachuAnim = Animator(&pikachu, 38, 92);
+    rightPikachuAnim.AddAnim("idle", 0, 3, 3.0f, true);
+    rightPikachuAnim.AddAnim("attack", 2, 12, 6.0f, true);
 }
 
 void ModuleGame::CreateTable()
@@ -312,6 +322,9 @@ void ModuleGame::CreateObjects()
     shroomish2->itemScore = 200;
 
     whailord = App->physics->CreateCircle(355, 345, 22.5f, true, this, ColliderType::WHAILORD, STATIC);
+
+    rightPikachu = App->physics->CreateRectangle(388, 690, 40, 100, true, this, ColliderType::PIKACHU, STATIC);
+    leftPikachu = App->physics->CreateRectangle(58, 690, 40, 100, true, this, ColliderType::PIKACHU, STATIC);
 }
 
 void ModuleGame::CreateVoid()
@@ -333,8 +346,7 @@ void ModuleGame::CreateScoreItems()
     sumLife2 = App->physics->CreateCircle(204, 198, 10, true, this, ColliderType::SUMLIFE, STATIC);
     sumLife3 = App->physics->CreateCircle(243, 200, 10, true, this, ColliderType::SUMLIFE, STATIC);
 
-    pScore = App->physics->CreateCircle(288, 325, 10, true, this, ColliderType::ITEM, STATIC);
-    pScore->itemScore = 500;
+    pHitPikachu = App->physics->CreateCircle(288, 325, 10, true, this, ColliderType::PHITPIKA, STATIC);
 }
 
 void ModuleGame::ChangeSkin()
@@ -402,6 +414,52 @@ void ModuleGame::WhailordAct()
                 whailordAnim.Play("idle");
             });
     }
+}
+
+void ModuleGame::Pikachu()
+{
+    if (!collidingWithPikachu && !playingPikachuAnimation) return;
+
+    if (!collidingWithPikachu)
+    {
+        if (collideWithRightPikachu)
+        {
+            rightPikachuAnim.StopAnim();
+            rightPikachuAnim.Play("idle", true);
+            playingPikachuAnimation = false;
+            return;
+        }
+
+        else
+        {
+            leftPikachuAnim.StopAnim();
+            leftPikachuAnim.Play("idle", true);
+            playingPikachuAnimation = false;
+            return;
+        }
+    }
+
+    pikachuTime += GetFrameTime();
+
+    if (!playingPikachuAnimation)
+    {
+        printf("Playing attack anim\n");
+        if (collideWithRightPikachu) rightPikachuAnim.Play("attack", true);
+        else leftPikachuAnim.Play("attack", true);
+
+        playingPikachuAnimation = true;
+    }
+
+    if (pikachuTime >= 1.6f)
+    {
+        printf("Add force\n");
+        if (collideWithRightPikachu) mPlayer->playerBody->body->ApplyLinearImpulseToCenter({ 0.5f, -1.5f }, true);
+        else mPlayer->playerBody->body->ApplyLinearImpulseToCenter({ -0.5f, -1.5f }, true);
+
+        pikachuTime = 0;
+    }
+
+    else printf("Timing: %f\n", pikachuTime);
 }
 
 void ModuleGame::HandleInput()
@@ -487,6 +545,15 @@ void ModuleGame::Draw()
     whailord->GetPosition(x, y);
     whailordAnim.Draw({ float(x), (float)y }, 1.5f);
 
+    rightPikachuAnim.Update(GetFrameTime());
+    leftPikachuAnim.Update(GetFrameTime());
+
+    rightPikachu->GetPosition(x, y);
+    if (pCount >= 1) rightPikachuAnim.Draw({ float(x), (float)y }, 1.5f);
+
+    leftPikachu->GetPosition(x, y);
+    if (pCount >= 2)leftPikachuAnim.Draw({ float(x), (float)y }, 1.5f);
+
     mPlayer->DrawBall();
 
     DrawText(TextFormat("Current Score %d", currentScore), 350, 20, 12, WHITE);
@@ -511,26 +578,11 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
         {
             printf("Collide with a shroomish\n");
 
-            if (physA == shroomish1)
-            {
-                shroomishAnim1.Play("hitted", false);
-            }
-            else if (physA == shroomish2)
-            {
-                shroomishAnim2.Play("hitted", false);
-            }
-            else if (physA == shroomish3)
-            {
-                shroomishAnim3.Play("hitted", false);
-            }
+            if (physA == shroomish1) shroomishAnim1.Play("hitted", false);
+            else if (physA == shroomish2) shroomishAnim2.Play("hitted", false);
+            else if (physA == shroomish3) shroomishAnim3.Play("hitted", false);
+
             currentScore += physA->itemScore;
-        }
-
-        else if (physA->ctype == ColliderType::WHAILORD && !whailordHitted)
-        {
-            printf("Collide with whailord");
-
-            WhailordAct();
         }
 
         else if (physA->ctype == ColliderType::OBJECT)
@@ -542,6 +594,68 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
                 printf("Changing pokeball\n");
                 ChangeSkin();
             }
+        }
+
+        else if (physA->ctype == ColliderType::PIKACHU)
+        {
+            if (physA == rightPikachu && pCount >= 1)
+            {
+                printf("Collide with pikachu\n");
+                collidingWithPikachu = true;
+                collideWithRightPikachu = true;
+            }
+            else if (physA == leftPikachu && pCount >= 2)
+            {
+                printf("Collide with pikachu\n");
+                collidingWithPikachu = true;
+                collideWithRightPikachu = false;
+            }
+        }
+
+        else if (physA->ctype == ColliderType::PHITPIKA)
+        {
+            printf("Collide with the P object\n");
+            pCount++;
+            if (pCount == 1) rightPikachuAnim.Play("idle");
+            else if (pCount == 2) leftPikachuAnim.Play("idle");
+        }
+
+        else if (physA->ctype == ColliderType::VOID)
+        {
+            printf("Collide with void MG\n");
+            pCount = 0;
+        }
+
+        else if (physA->ctype == ColliderType::WHAILORD && !whailordHitted)
+        {
+            printf("Collide with whailord");
+            WhailordAct();
+        }
+        break;
+
+    default:
+        break;
+    }
+}
+
+void ModuleGame::EndCollision(PhysBody* physA, PhysBody* physB)
+{
+    switch (physB->ctype)
+    {
+    case ColliderType::PLAYER:
+        if (physA->ctype == ColliderType::PIKACHU)
+        {
+            if (physA == rightPikachu && pCount >= 1)
+            {
+                printf("End collide with pikachu\n");
+                collidingWithPikachu = false;
+            }
+            else if (physA == leftPikachu && pCount >= 2)
+            {
+                printf("End collide with pikachu\n");
+                collidingWithPikachu = false;
+            }
+            pikachuTime = 0;
         }
         break;
 

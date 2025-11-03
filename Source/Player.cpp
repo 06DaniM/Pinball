@@ -112,7 +112,7 @@ void ModulePlayer::OnCollision(PhysBody* physA, PhysBody* physB)
     switch (physB->ctype)
     {
     case ColliderType::VOID:
-        if (physA->ctype == ColliderType::PLAYER && mGame->changingPokeball)
+        if (physA->ctype == ColliderType::PLAYER && !mGame->changingPokeball)
         {
             if (!needsReset) // Avoid reset more than one time (just in case)
             {
