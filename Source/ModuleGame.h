@@ -130,7 +130,21 @@ private:
 
     Animator minumAnim;
 
+    // Peliper
+    Texture2D peliperTexture;
+
+    Animator peliperAnim;
+
+    // Egg
+    Texture2D eggTexture;
+
+    Animator eggAnim;
+
+    PhysBody* egg;
+
     // Other objects
+    Texture2D sumLifeTexture;
+
     PhysBody* sumLife1 = NULL;
     PhysBody* sumLife2 = NULL;
     PhysBody* sumLife3 = NULL;
@@ -145,6 +159,9 @@ private:
     float pikachuTime = 0;
     int pCount = 0;
     float scoreMultiplier = 1;
+
+    bool isRespawning = false;
+    bool canContinue = false;
 
     // === FLIPPERS ===
     Texture2D leftFlipperTexture;

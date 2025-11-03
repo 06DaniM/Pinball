@@ -73,6 +73,7 @@ void ModulePlayer::Reset()
 
         coroutineManager.StartCoroutine(resetDelayDuration, [this]() 
             {
+                canDraw = true;
                 App->physics->SetBodyPosition(playerBody, initialPosition.x, initialPosition.y, true);
                 playerBody->body->SetLinearVelocity(b2Vec2(0, 0));
                 needsReset = false;

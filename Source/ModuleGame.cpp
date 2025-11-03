@@ -59,6 +59,7 @@ update_status ModuleGame::Update()
 
     HandleInput();
     Pikachu();
+    GameOver();
     Draw();
 
     return UPDATE_CONTINUE;
@@ -66,7 +67,9 @@ update_status ModuleGame::Update()
 
 void ModuleGame::InitializeTextures()
 {
-    mapTexture = LoadTexture("Assets/Pinball table pokemon1.png");
+    mapTexture = LoadTexture("Assets/Pinball table pokemon2.png");
+
+    sumLifeTexture = LoadTexture("Assets/Extra_life.png");
 
     leftFlipperTexture = LoadTexture("Assets/LeftFlipperSprite.png");
     rightFlipperTexture = LoadTexture("Assets/RightFlipperSprite.png");
@@ -78,6 +81,8 @@ void ModuleGame::InitializeTextures()
     pikachu = LoadTexture("Assets/Pikachu_Spritesheet.png");
     plusle = LoadTexture("Assets/Plusle_Spritesheet.png");
     minum = LoadTexture("Assets/Minum_Spritesheet.png");
+    peliperTexture = LoadTexture("Assets/Peliper_Spritesheet.png");
+    eggTexture = LoadTexture("Assets/Huevo_Pokemon_Spritesheet.png");
 
     spoinkAnim = Animator(&spoinkTexture, 20, 40);
     spoinkAnim.AddAnim("idle", 0, 2, 2.0f, true);
@@ -118,15 +123,25 @@ void ModuleGame::InitializeTextures()
     rightPikachuAnim.AddAnim("idle", 0, 3, 3.0f, true);
     rightPikachuAnim.AddAnim("attack", 2, 12, 6.0f, true);
 
-    plusleAnim = Animator(&plusle, 25, 36);
-    plusleAnim.AddAnim("idle", 0, 3, 2.5f, true);
-    plusleAnim.AddAnim("flip", 3, 10, 5.0f, false);
-    plusleAnim.Play("idle", true);
+    plusleAnim = Animator(&plusle, 30, 36);
+    plusleAnim.AddAnim("idle", 0, 4, 2.5f, true);
+    plusleAnim.AddAnim("flip", 3, 10, 4.0f, false);
+    plusleAnim.Play("idle");
 
-    minumAnim = Animator(&minum, 25, 36);
-    minumAnim.AddAnim("idle", 0, 3, 2.5f, true);
-    minumAnim.AddAnim("flip", 3, 10, 5.0f, false);
-    minumAnim.Play("idle", true);
+    minumAnim = Animator(&minum, 30, 36);
+    minumAnim.AddAnim("idle", 0, 4, 2.5f, true);
+    minumAnim.AddAnim("flip", 3, 10, 4.0f, false);
+    minumAnim.Play("idle");
+
+    peliperAnim = Animator(&peliperTexture, 40, 37);
+    peliperAnim.AddAnim("idle", 0, 2, 3.0f, true);
+    peliperAnim.AddAnim("pickBall", 2, 14, 3.0f, false);
+    peliperAnim.Play("idle");
+
+    eggAnim = Animator(&eggTexture, 18, 18);
+    eggAnim.AddAnim("idle", 0, 4, 2.0f, true);
+    eggAnim.AddAnim("hitted", 2, 6, 3.0f, false);
+    eggAnim.Play("idle");
 }
 
 void ModuleGame::CreateTable()
@@ -193,11 +208,13 @@ void ModuleGame::CreateTable()
 
 void ModuleGame::CreateSlide()
 {
-    const int p = 8;
+    const int p = 12;
 
     static int slide[p] = {
         78, 456,
         50, 400,
+        60, 320,
+        65, 330,
         55, 400,
         84, 456,
     };
@@ -284,18 +301,18 @@ void ModuleGame::CreateObstacles()
         265, 338,
         272, 310,
         290, 270,
-        330, 240,
-        320, 230,
-        310, 225,
-        280, 220,
+        320, 240,
+        310, 230,
+        290, 225,
+        275, 220,
         260, 215,
         255, 207,
-        262, 182,
-        270, 182,
-        280, 185,
-        300, 192,
-        325, 200,
-        350, 224,
+        262, 196,
+        270, 196,
+        280, 198,
+        300, 199,
+        325, 210,
+        350, 230,
         360, 250,
         380, 280,
         390, 300,
@@ -343,6 +360,8 @@ void ModuleGame::CreateObjects()
 
     rightPikachu = App->physics->CreateRectangle(388, 690, 40, 100, true, this, ColliderType::PIKACHU, STATIC);
     leftPikachu = App->physics->CreateRectangle(58, 690, 40, 100, true, this, ColliderType::PIKACHU, STATIC);
+
+    egg = App->physics->CreateCircle(SCREEN_WIDTH / 2-13, SCREEN_HEIGHT / 2 + 150, 20, false, this, ColliderType::BOUNCE, KINEMATIC);
 }
 
 void ModuleGame::CreateVoid()
@@ -524,6 +543,28 @@ void ModuleGame::HandleInput()
 void ModuleGame::GameOver()
 {
     if (!gameOver) return;
+
+    if (!isRespawning)
+    {
+        isRespawning = true;
+
+        coroutineManager.StartCoroutine(1.0f, [this]()
+            {
+                canContinue = true;
+            });
+    }
+    
+    if (canContinue)
+    {
+        if (GetKeyPressed() != 0)
+        {
+            gameOver = false;
+            mPlayer->life = 3;
+            mPlayer->needsReset = true;
+            isRespawning = false;
+            canContinue = false;
+        }
+    }
 }
 
 void ModuleGame::Draw()
@@ -533,9 +574,14 @@ void ModuleGame::Draw()
     DrawTexture(mapTexture, 0, 0, WHITE);
 
 
-    sumLife1->GetPosition(x, y);  DrawCircle(x, y, 10, SKYBLUE);
-    sumLife2->GetPosition(x, y);  DrawCircle(x, y, 10, SKYBLUE);
-    sumLife3->GetPosition(x, y);  DrawCircle(x, y, 10, SKYBLUE);
+    sumLife1->GetPosition(x, y);  
+    if(!sumLife1->isActive) DrawTextureEx(sumLifeTexture, { (float)x - 7, (float)y-8 }, 0, 2,WHITE);
+
+    sumLife2->GetPosition(x, y);
+    if (!sumLife2->isActive) DrawTextureEx(sumLifeTexture, { (float)x - 9, (float)y - 7 }, 0, 2, WHITE);
+
+    sumLife3->GetPosition(x, y);
+    if (!sumLife3->isActive) DrawTextureEx(sumLifeTexture, { (float)x - 7, (float)y - 8 }, 0, 2, WHITE);
 
     DrawTextureEx(leftFlipperTexture, { leftFlipperPositionX - 5, leftFlipperPositionY - 15 }, 0, 1.5f, WHITE);
     DrawTextureEx(rightFlipperTexture, { rightFlipperPositionX - 43, rightFlipperPositionY - 15 }, 0, 1.5f, WHITE);
@@ -546,10 +592,10 @@ void ModuleGame::Draw()
     changePokeBall->GetPosition(x, y);
     changePokeballAnim.Draw({ float(x) - 26, float(y) - 96 }, 2);
 
-    // === SPOINK/PLUNGER ANIM ===
+    // === SPOINK/PLUNGER ===
     spoinkAnim.Draw({ springGroundX - 2, springGroundY-17 }, 1.5f);
 
-    // === SHROOMISH ANIM ===
+    // === SHROOMISH ===
     shroomishAnim1.Update(GetFrameTime());
     shroomishAnim2.Update(GetFrameTime());
     shroomishAnim3.Update(GetFrameTime());
@@ -562,9 +608,6 @@ void ModuleGame::Draw()
     if (shroomishAnim3.IsFinished() && shroomishAnim3.GetCurrentAnimName() == "hitted")
         shroomishAnim3.Play("idle");
 
-    // === WHAILORD ANIM ===
-    whailordAnim.Update(GetFrameTime());
-
     shroomish1->GetPosition(x, y);
     shroomishAnim1.Draw({ (float)x, (float)y - 10 }, 1.5f);
 
@@ -574,9 +617,19 @@ void ModuleGame::Draw()
     shroomish3->GetPosition(x, y);
     shroomishAnim3.Draw({ (float)x, (float)y - 10 }, 1.5f);
 
+    // === WHAILORD ===
+    whailordAnim.Update(GetFrameTime());
+
     whailord->GetPosition(x, y);
     whailordAnim.Draw({ float(x), (float)y }, 1.5f);
 
+    // === EGG ===
+    eggAnim.Update(GetFrameTime());
+
+    egg->GetPosition(x, y);
+    eggAnim.Draw({ (float)x+2, (float)y-2 }, 2.5f);
+    
+    // === PIKACHU ===
     rightPikachuAnim.Update(GetFrameTime());
     leftPikachuAnim.Update(GetFrameTime());
 
@@ -596,10 +649,15 @@ void ModuleGame::Draw()
 
     minumAnim.Draw({ 166, 326 }, 1.5f);
 
-    mPlayer->DrawBall();
+    // === PELIPER ===
+    peliperAnim.Update(GetFrameTime());
+
+    peliperAnim.Draw({ 318, 260 }, 1.75f);
 
     if (!gameOver) 
     {
+        mPlayer->DrawBall();
+
         DrawText(TextFormat("Current Score %d", currentScore), 350, 20, 12, WHITE);
         DrawText(TextFormat("Highest Score %d", highestScore), 350, 35, 12, WHITE);
         DrawText(TextFormat("Previous Score %d", previousScore), 350, 50, 12, WHITE);
@@ -607,6 +665,7 @@ void ModuleGame::Draw()
 
     else
     {
+        mPlayer->canDraw = false;
         DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, { 0, 0, 0, 220 });
         DrawText("GAMEOVER", SCREEN_WIDTH / 2 - 124, SCREEN_HEIGHT / 2, 40, RED);
 
@@ -690,6 +749,9 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
         {
             printf("Collide with void MG\n");
             pCount = 0;
+            sumLife1->isActive = true;
+            sumLife2->isActive = true;
+            sumLife3->isActive = true;
         }
 
         else if (physA->ctype == ColliderType::WHAILORD && !whailordHitted)
