@@ -48,6 +48,12 @@ update_status ModuleGame::Update()
     float deltaTime = GetFrameTime();
     coroutineManager.Update(deltaTime);
 
+    if (minumAnim.GetCurrentAnimName() == "flip" && minumAnim.IsFinished())
+        minumAnim.Play("idle");
+
+    if (plusleAnim.GetCurrentAnimName() == "flip" && plusleAnim.IsFinished())
+        plusleAnim.Play("idle");
+
     if (isLaunching) physTable->SetSensor(true);
     else physTable->SetSensor(false);
 
@@ -70,6 +76,8 @@ void ModuleGame::InitializeTextures()
     whailLordTexture = LoadTexture("Assets/Whailord_Spritesheet.png");
     changePokeballTexture = LoadTexture("Assets/Evo_Mart_Spritesheet.png");
     pikachu = LoadTexture("Assets/Pikachu_Spritesheet.png");
+    plusle = LoadTexture("Assets/Plusle_Spritesheet.png");
+    minum = LoadTexture("Assets/Minum_Spritesheet.png");
 
     spoinkAnim = Animator(&spoinkTexture, 20, 40);
     spoinkAnim.AddAnim("idle", 0, 2, 2.0f, true);
@@ -109,6 +117,16 @@ void ModuleGame::InitializeTextures()
     rightPikachuAnim = Animator(&pikachu, 38, 92);
     rightPikachuAnim.AddAnim("idle", 0, 3, 3.0f, true);
     rightPikachuAnim.AddAnim("attack", 2, 12, 6.0f, true);
+
+    plusleAnim = Animator(&plusle, 25, 36);
+    plusleAnim.AddAnim("idle", 0, 3, 2.5f, true);
+    plusleAnim.AddAnim("flip", 3, 10, 5.0f, false);
+    plusleAnim.Play("idle", true);
+
+    minumAnim = Animator(&minum, 25, 36);
+    minumAnim.AddAnim("idle", 0, 3, 2.5f, true);
+    minumAnim.AddAnim("flip", 3, 10, 5.0f, false);
+    minumAnim.Play("idle", true);
 }
 
 void ModuleGame::CreateTable()
@@ -362,10 +380,18 @@ void ModuleGame::ChangeSkin()
                 int x, y;
                 changePokeBall->GetPosition(x, y);
                 App->physics->SetBodyPosition(mPlayer->playerBody, x, y, false);
-                mPlayer->currentPokeball++;
                 pokeballChanged = true;
                 mPlayer->canDraw = true;
                 changePokeballAnim.Play("idle");
+                if (canChangeSkin)
+                {
+                    mPlayer->currentPokeball++;
+                    if (mPlayer->currentPokeball == 0) scoreMultiplier = 1.0f;
+                    else if (mPlayer->currentPokeball == 1) scoreMultiplier = 1.25f;
+                    else if (mPlayer->currentPokeball == 2) scoreMultiplier = 1.5f;
+                    else if (mPlayer->currentPokeball == 3) scoreMultiplier = 2.0f;
+                    canChangeSkin = false;
+                }
 
                 if (pokeballChanged)
                 {
@@ -464,6 +490,7 @@ void ModuleGame::Pikachu()
 
 void ModuleGame::HandleInput()
 {
+    if (gameOver) return;
     // === SPRING / PLUNGER ===
     if (IsKeyPressed(KEY_DOWN)) {
         spoinkAnim.Play("spring_down", false);
@@ -492,6 +519,11 @@ void ModuleGame::HandleInput()
 
     if (IsKeyDown(KEY_RIGHT)) rightFlipperJoint->SetMotorSpeed(12.5f);
     else rightFlipperJoint->SetMotorSpeed(-12.5f);
+}
+
+void ModuleGame::GameOver()
+{
+    if (!gameOver) return;
 }
 
 void ModuleGame::Draw()
@@ -554,11 +586,34 @@ void ModuleGame::Draw()
     leftPikachu->GetPosition(x, y);
     if (pCount >= 2)leftPikachuAnim.Draw({ float(x), (float)y }, 1.5f);
 
+    // === PLUSLE ===
+    plusleAnim.Update(GetFrameTime());
+
+    plusleAnim.Draw({ 106, 362 }, 1.5f);
+
+    // === MINUM ===
+    minumAnim.Update(GetFrameTime());
+
+    minumAnim.Draw({ 166, 326 }, 1.5f);
+
     mPlayer->DrawBall();
 
-    DrawText(TextFormat("Current Score %d", currentScore), 350, 20, 12, WHITE);
-    DrawText(TextFormat("Highest Score %d", highestScore), 350, 35, 12, WHITE);
-    DrawText(TextFormat("Previous Score %d", previousScore), 350, 50, 12, WHITE);
+    if (!gameOver) 
+    {
+        DrawText(TextFormat("Current Score %d", currentScore), 350, 20, 12, WHITE);
+        DrawText(TextFormat("Highest Score %d", highestScore), 350, 35, 12, WHITE);
+        DrawText(TextFormat("Previous Score %d", previousScore), 350, 50, 12, WHITE);
+    }
+
+    else
+    {
+        DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, { 0, 0, 0, 220 });
+        DrawText("GAMEOVER", SCREEN_WIDTH / 2 - 124, SCREEN_HEIGHT / 2, 40, RED);
+
+        DrawText(TextFormat("Current Score %d", currentScore), SCREEN_WIDTH / 2 - 80, SCREEN_HEIGHT / 2 + 70, 20, WHITE);
+        DrawText(TextFormat("Highest Score %d", highestScore), SCREEN_WIDTH / 2 - 80, SCREEN_HEIGHT / 2 + 100, 20, WHITE);
+        DrawText(TextFormat("Previous Score %d", previousScore), SCREEN_WIDTH / 2 - 80, SCREEN_HEIGHT / 2 + 130, 20, WHITE);
+    }
     /*DrawCircle(leftFlipperPositionX, leftFlipperPositionY, 5, RED);
     DrawCircle(rightFlipperPositionX, rightFlipperPositionY, 5, RED);*/
 }
@@ -582,7 +637,7 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
             else if (physA == shroomish2) shroomishAnim2.Play("hitted", false);
             else if (physA == shroomish3) shroomishAnim3.Play("hitted", false);
 
-            currentScore += physA->itemScore;
+            currentScore += physA->itemScore * scoreMultiplier;
         }
 
         else if (physA->ctype == ColliderType::OBJECT)
@@ -594,6 +649,17 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
                 printf("Changing pokeball\n");
                 ChangeSkin();
             }
+        }
+
+        else if (physA->ctype == ColliderType::ITEM)
+        {
+            printf("Collide with an item\n");
+            currentScore += physA->itemScore * scoreMultiplier;
+            if (physA->itemScore > 0) plusleAnim.Play("flip", true);
+            if (physA->itemScore < 0) minumAnim.Play("flip", true);
+
+            if (highestScore <= currentScore) highestScore = currentScore;
+            printf("%d\n", currentScore);
         }
 
         else if (physA->ctype == ColliderType::PIKACHU)
@@ -657,6 +723,12 @@ void ModuleGame::EndCollision(PhysBody* physA, PhysBody* physB)
             }
             pikachuTime = 0;
         }
+        
+        else if (physA->ctype == ColliderType::OBJECT)
+        {
+            canChangeSkin = true;
+        }
+
         break;
 
     default:

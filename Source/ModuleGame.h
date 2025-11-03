@@ -38,6 +38,7 @@ private:
     void Pikachu();
 
     void HandleInput();
+    void GameOver();
 
     void Draw();
 
@@ -54,6 +55,7 @@ public:
 
     bool isLaunching = false;
     bool changingPokeball = false;
+    bool gameOver = false;
 
 private:
 
@@ -108,14 +110,7 @@ private:
     bool inWhailord = false;
     bool readyToShot = false;
 
-    // Other objects
-    PhysBody* sumLife1 = NULL;
-    PhysBody* sumLife2 = NULL;
-    PhysBody* sumLife3 = NULL;
-
-    PhysBody* sumTvScore = NULL;
-    PhysBody* minusTvScore = NULL;
-
+    // Pikachu
     Texture2D pikachu;
 
     Animator rightPikachuAnim;
@@ -125,11 +120,31 @@ private:
     PhysBody* rightPikachu = NULL;
     PhysBody* leftPikachu = NULL;
 
+    // Plusle
+    Texture2D plusle;
+
+    Animator plusleAnim;
+
+    // Minum
+    Texture2D minum;
+
+    Animator minumAnim;
+
+    // Other objects
+    PhysBody* sumLife1 = NULL;
+    PhysBody* sumLife2 = NULL;
+    PhysBody* sumLife3 = NULL;
+
+    PhysBody* sumTvScore = NULL;
+    PhysBody* minusTvScore = NULL;
+
     bool playingPikachuAnimation = false;
     bool collideWithRightPikachu = false;
-    bool collidingWithPikachu = NULL;
+    bool collidingWithPikachu = false;
+    bool canChangeSkin = true;
     float pikachuTime = 0;
     int pCount = 0;
+    float scoreMultiplier = 1;
 
     // === FLIPPERS ===
     Texture2D leftFlipperTexture;

@@ -17,10 +17,10 @@ bool ModulePlayer::Start()
 {
     printf("Loading Player\n");
 
-    pokeBallTexture = LoadTexture("Assets/Pokeball.png");
-    superBallTexture = LoadTexture("Assets/Superball.png");
-    ultraBallTexture = LoadTexture("Assets/UltraBall.png");
-    masterBallTexture = LoadTexture("Assets/Masterball.png");
+    pokeBallTexture = LoadTexture("Assets/Pokeball.png");       // Score x1
+    superBallTexture = LoadTexture("Assets/Superball.png");     // Score x1.25
+    ultraBallTexture = LoadTexture("Assets/UltraBall.png");     // Score x1.5
+    masterBallTexture = LoadTexture("Assets/Masterball.png");   // Score x2
 
     position = { SCREEN_WIDTH - 20, SCREEN_HEIGHT - 250 };
 
@@ -120,18 +120,8 @@ void ModulePlayer::OnCollision(PhysBody* physA, PhysBody* physB)
                 needsReset = true;
                 resetDelayTimer = resetDelayDuration;
                 life--;
+                if (life <= 0) mGame->gameOver = true;
             }
-        }
-        break;
-
-    case ColliderType::ITEM:
-        if (physA->ctype == ColliderType::PLAYER)
-        {
-            printf("Collide with an item\n");
-            mGame->currentScore += physB->itemScore;
-
-            if (mGame->highestScore <= mGame->currentScore) mGame->highestScore = mGame->currentScore;
-            printf("%d\n", mGame->currentScore);
         }
         break;
 
