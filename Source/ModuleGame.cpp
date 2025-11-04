@@ -229,7 +229,6 @@ void ModuleGame::ChangeValues()
     }
     else if (IsKeyPressed(KEY_TWO))
     {
-        PlaySound(gameOverSound);
         b2Vec2 gravity(0, 10);
         App->physics->world->SetGravity(gravity);
     }
@@ -1163,8 +1162,8 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
             else if (physA == shroomish2) shroomishAnim2.Play("hitted", false);
             else if (physA == shroomish3) shroomishAnim3.Play("hitted", false);
 
-            currentScore += physA->itemScore * scoreMultiplier;
-            if (highestScore <= currentScore) highestScore = currentScore;
+            currentScore += leftPikachu->itemScore * scoreMultiplier;
+            if (currentScore >= highestScore) highestScore = currentScore;
 
             PlaySound(shroomishSound);
         }
@@ -1172,7 +1171,9 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
             printf("Collide with 1 Point Triangle\n");
             showPoint1 = true;
             OnButtonActivated();
+
             currentScore += 150;
+            if (highestScore <= currentScore) highestScore = currentScore;
             PlaySound(mapObjectSound);
         }
         else if (physA->ctype == ColliderType::POINTSTRIANGLE_5 && !showPoint5 && showPoint10) {
@@ -1191,7 +1192,9 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
             printf("Collide with E_EVO Triangle\n");
             showE_EVO = true;
             OnButtonActivated();
+
             currentScore += 150;
+            if (highestScore <= currentScore) highestScore = currentScore;
             PlaySound(mapObjectSound);
         }
         else if (physA->ctype == ColliderType::V_EVO && !showV_EVO && showO_EVO) {
@@ -1210,7 +1213,9 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
             printf("Collide with G_GET Triangle\n");
             showG_GET = true;
             OnButtonActivated();
+
             currentScore += 150;
+            if (highestScore <= currentScore) highestScore = currentScore;
             PlaySound(mapObjectSound);
             OnButtonActivated();
         }

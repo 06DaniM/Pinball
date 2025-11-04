@@ -14,6 +14,7 @@ enum class ColliderType {
     PLAYER,
     PLATFORM,
     ITEM,
+    PLUNGER,
     SUMLIFE,
     BOUNCE,
     OBJECT,
@@ -118,4 +119,6 @@ public:
 
 private:
     bool debug = true;
+    b2MouseJoint* mouse_joint;
+    b2Body* ground;
 };

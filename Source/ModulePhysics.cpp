@@ -27,6 +27,10 @@ bool ModulePhysics::Start()
 	world = new b2World(gravity);
 	world->SetContactListener(this);
 
+	b2BodyDef bd;
+	bd.type = b2_staticBody;
+	ground = world->CreateBody(&bd);
+
 	return true;
 }
 
@@ -77,6 +81,9 @@ PhysBody* ModulePhysics::CreateRectangle(int x, int y, int width, int height, bo
 
 	if (ctype == ColliderType::BOUNCE)
 		fixtureDef.restitution = 1.0f;
+
+	else if (ctype == ColliderType::PLUNGER)
+		fixtureDef.restitution = 0.8f;
 
 	b->CreateFixture(&fixtureDef);
 
@@ -229,7 +236,7 @@ void ModulePhysics::Spring(PhysBody*& base, PhysBody*& plunger, b2PrismaticJoint
 	b2Vec2 worldAxis(0.0f, 1.0f);
 
 	base = CreateRectangle(poxX, posY, rectangleW, rectangleH, false, this, ColliderType::PLATFORM, STATIC);
-	plunger = CreateRectangle(poxX, posY - springH, rectangleW, rectangleH, false, this, ColliderType::BOUNCE, DYNAMIC);
+	plunger = CreateRectangle(poxX, posY - springH, rectangleW, rectangleH, false, this, ColliderType::PLUNGER, DYNAMIC);
 
 	b2PrismaticJointDef jointDef;
 	jointDef.Initialize(base->body, plunger->body, base->body->GetWorldCenter(), worldAxis);
@@ -292,17 +299,24 @@ void ModulePhysics::EndContact(b2Contact* contact)
 
 update_status ModulePhysics::PostUpdate()
 {
-	
 
 	if (IsKeyPressed(KEY_F1))
 	{
 		debug = !debug;
+
+		if (!debug && mouse_joint != nullptr)
+		{
+			world->DestroyJoint(mouse_joint);
+			mouse_joint = nullptr;
+		}
 	}
 
 	if (!debug)
-	{
 		return UPDATE_CONTINUE;
-	}
+
+	b2Body* mouseSelect = nullptr;
+	Vector2 mousePosition = GetMousePosition();
+	b2Vec2 pMousePosition = b2Vec2(PIXELS_TO_METERS(mousePosition.x), PIXELS_TO_METERS(mousePosition.y));
 
 	// Bonus code: this will iterate all objects in the world and draw the circles
 	// You need to provide your own macro to translate meters to pixels
@@ -375,13 +389,47 @@ update_status ModulePhysics::PostUpdate()
 				break;
 			}
 
-			
+			if (mouse_joint == nullptr && mouseSelect == nullptr && IsMouseButtonDown(MOUSE_BUTTON_LEFT))
+			{
+				if (f->TestPoint(pMousePosition))
+					mouseSelect = b;
+			}
 		}
 	}
 
+	if (mouseSelect)
+	{
+		b2MouseJointDef def;
+		def.bodyA = ground;
+		def.bodyB = mouseSelect;
+		def.target = pMousePosition;
+		def.damping = 0.5f;
+		def.stiffness = 20.f;
+		def.maxForce = 100.f * mouseSelect->GetMass();
+		mouse_joint = (b2MouseJoint*)world->CreateJoint(&def);
+	}
+
+	else if (mouse_joint && IsMouseButtonDown(MOUSE_BUTTON_LEFT))
+	{
+		mouse_joint->SetTarget(pMousePosition);
+
+		b2Vec2 anchorPosition = mouse_joint->GetBodyB()->GetPosition();
+		anchorPosition.x = METERS_TO_PIXELS(anchorPosition.x);
+		anchorPosition.y = METERS_TO_PIXELS(anchorPosition.y);
+
+		DrawLine(anchorPosition.x, anchorPosition.y, mousePosition.x, mousePosition.y, RED);
+	}
+
+	else if (mouse_joint && IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
+	{
+		world->DestroyJoint(mouse_joint);
+		mouse_joint = nullptr;
+	}
 	
 	return UPDATE_CONTINUE;
 }
+
+
 
 // Called before quitting
 bool ModulePhysics::CleanUp()
