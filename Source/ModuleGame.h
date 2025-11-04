@@ -65,6 +65,9 @@ private:
     ModulePlayer* mPlayer = NULL;
 
     Texture2D mapTexture;
+    Texture2D pelliperSlideUp;
+    Texture2D tv1;
+    Texture2D tv2;
 
     Music backgroundMusic;
 

@@ -101,6 +101,9 @@ update_status ModuleGame::Update()
 void ModuleGame::InitializeTextures()
 {
     mapTexture = LoadTexture("Assets/Pinball table pokemon2.png");
+    pelliperSlideUp = LoadTexture("Assets/Rail Pellipper Sobreposicion.png");
+    tv1 = LoadTexture("Assets/Pantalla Y rail sobreposicion 1.png");
+    tv2 = LoadTexture("Assets/Pantalla Sobreposicion 2.png");
 
     sumLifeTexture = LoadTexture("Assets/Extra_life.png");
 
@@ -1047,9 +1050,6 @@ void ModuleGame::Draw()
     // === CHANGE POKEBALL SCREEN ===
     changePokeballAnim.Update(GetFrameTime());
 
-    changePokeBall->GetPosition(x, y);
-    changePokeballAnim.Draw({ float(x) - 26, float(y) - 96 }, 2);
-
     // === SPOINK/PLUNGER ===
     spoinkAnim.Draw({ springGroundX - 2, springGroundY - 17 }, 1.5f);
 
@@ -1100,12 +1100,8 @@ void ModuleGame::Draw()
     // === PLUSLE ===
     plusleAnim.Update(GetFrameTime());
 
-    plusleAnim.Draw({ 106, 362 }, 1.5f);
-
     // === MINUM ===
     minumAnim.Update(GetFrameTime());
-
-    minumAnim.Draw({ 166, 326 }, 1.5f);
 
     // === PELIPER ===
     peliperAnim.Update(GetFrameTime());
@@ -1115,6 +1111,8 @@ void ModuleGame::Draw()
     if (!gameOver)
     {
         mPlayer->DrawBall();
+        if (!inPelliperSlide) DrawTextureEx(pelliperSlideUp, { 208, 115 }, 0, 2, WHITE);
+        DrawTextureEx(tv2, { 8, 175 }, 0, 2, WHITE);
 
         DrawText(TextFormat("Current Score %d", currentScore), 350, 20, 12, WHITE);
         DrawText(TextFormat("Highest Score %d", highestScore), 350, 35, 12, WHITE);
@@ -1141,8 +1139,11 @@ void ModuleGame::Draw()
         DrawText(TextFormat("Highest Score %d", highestScore), SCREEN_WIDTH / 2 - 80, SCREEN_HEIGHT / 2 + 100, 20, WHITE);
         DrawText(TextFormat("Previous Score %d", previousScore), SCREEN_WIDTH / 2 - 80, SCREEN_HEIGHT / 2 + 130, 20, WHITE);
     }
-    /*DrawCircle(leftFlipperPositionX, leftFlipperPositionY, 5, RED);
-    DrawCircle(rightFlipperPositionX, rightFlipperPositionY, 5, RED);*/
+    changePokeBall->GetPosition(x, y);
+    changePokeballAnim.Draw({ float(x) - 26, float(y) - 96 }, 2);
+
+    plusleAnim.Draw({ 106, 362 }, 1.5f);
+    minumAnim.Draw({ 166, 326 }, 1.5f);
 }
 
 bool ModuleGame::CleanUp()
@@ -1222,6 +1223,9 @@ bool ModuleGame::CleanUp()
 
 
     UnloadTexture(mapTexture);
+    UnloadTexture(pelliperSlideUp);
+    UnloadTexture(tv1);
+    UnloadTexture(tv2);
     UnloadTexture(sumLifeTexture);
     UnloadTexture(leftFlipperTexture);
     UnloadTexture(rightFlipperTexture);
