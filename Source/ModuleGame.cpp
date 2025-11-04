@@ -1062,14 +1062,11 @@ void ModuleGame::Draw()
     sumLife3->GetPosition(x, y);
     if (!sumLife3->isActive) DrawTextureEx(sumLifeTexture, { (float)x - 7, (float)y - 8 }, 0, 2, WHITE);
 
-    /*DrawTextureEx(leftFlipperTexture, { leftFlipperPositionX - 5, leftFlipperPositionY - 15 }, 0, 1.5f, WHITE);
-    DrawTextureEx(rightFlipperTexture, { rightFlipperPositionX - 43, rightFlipperPositionY - 15 }, 0, 1.5f, WHITE);*/
-
     leftFlipperAnim.Update(GetFrameTime());
     rightFlipperAnim.Update(GetFrameTime());
 
-    leftFlipperAnim.Draw({ leftFlipperPositionX + 20, leftFlipperPositionY + 5 }, 1.5f, WHITE);
-    rightFlipperAnim.Draw({ rightFlipperPositionX - 20, rightFlipperPositionY + 5 }, 1.5f, WHITE);
+    leftFlipperAnim.Draw({ leftFlipperPositionX + 20, leftFlipperPositionY + 5 }, 1.75f, WHITE);
+    rightFlipperAnim.Draw({ rightFlipperPositionX - 20, rightFlipperPositionY + 5 }, 1.75f, WHITE);
 
     // === CHANGE POKEBALL SCREEN ===
     changePokeballAnim.Update(GetFrameTime());
@@ -1156,11 +1153,24 @@ void ModuleGame::Draw()
         int spacing = 10;
         int startX = 10;
         int startY = 40;
-        int size = mPlayer->lifesTexture.width;
+
+        Texture2D* tex = nullptr;
+        switch (mPlayer->currentPokeball)
+        {
+        case 0: tex = &mPlayer->lifePokeBallTexture; break;
+        case 1: tex = &mPlayer->lifeSuperBallTexture; break;
+        case 2: tex = &mPlayer->lifeUltraBallTexture; break;
+        default: tex = &mPlayer->lifeMasterBallTexture; break;
+        }
+
+        int size = tex->width;
 
         for (int i = 0; i < mPlayer->life; i++)
         {
-            DrawTexture(mPlayer->lifesTexture, startX + i * (size + spacing), startY, WHITE);
+            int x = startX + i * (size + spacing);
+            int y = startY;
+
+            DrawTexture(*tex, x, y, WHITE);
         }
 
         changePokeBall->GetPosition(x, y);

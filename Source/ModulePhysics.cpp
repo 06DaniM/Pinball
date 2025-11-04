@@ -177,7 +177,7 @@ PhysBody* ModulePhysics::CreateChain(int x, int y, int* points, int size, bool i
 void ModulePhysics::Flippers(PhysBody*& flipper, b2RevoluteJoint*& joint, float x, float y, bool isLeft)
 {
 	// Creates the flipper body
-	float flipperWidth = 45.0f;
+	float flipperWidth = 50.0f;
 	float flipperHeight = 10.0f;
 
 	// Creates the dynamic body

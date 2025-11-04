@@ -17,11 +17,15 @@ bool ModulePlayer::Start()
 {
     printf("Loading Player\n");
 
-    lifesTexture = LoadTexture("Assets/Pokeball.png");
     pokeBallTexture = LoadTexture("Assets/PokeballAnim.png");       // Score x1
     superBallTexture = LoadTexture("Assets/SuperballAnim.png");     // Score x1.25
     ultraBallTexture = LoadTexture("Assets/UltraBallAnim.png");     // Score x1.5
     masterBallTexture = LoadTexture("Assets/MasterballAnim.png");   // Score x2
+
+    lifePokeBallTexture = LoadTexture("Assets/Pokeball.png");
+    lifeSuperBallTexture = LoadTexture("Assets/Superball.png");
+    lifeUltraBallTexture = LoadTexture("Assets/UltraBall.png");
+    lifeMasterBallTexture = LoadTexture("Assets/Masterball.png");
 
     position = { SCREEN_WIDTH - 20, SCREEN_HEIGHT - 250 };
 
@@ -127,7 +131,11 @@ bool ModulePlayer::CleanUp()
 
     playerBody = nullptr;
 
-    UnloadTexture(lifesTexture);
+    UnloadTexture(lifePokeBallTexture);
+    UnloadTexture(lifeSuperBallTexture);
+    UnloadTexture(lifeUltraBallTexture);
+    UnloadTexture(lifeMasterBallTexture);
+
     UnloadTexture(pokeBallTexture);
     UnloadTexture(superBallTexture);
     UnloadTexture(ultraBallTexture);

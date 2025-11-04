@@ -27,11 +27,15 @@ private:
 public:
     ModuleGame* mGame = NULL;
 
-    Texture2D lifesTexture;
     Texture2D pokeBallTexture;
     Texture2D superBallTexture;
     Texture2D ultraBallTexture;
     Texture2D masterBallTexture;
+
+    Texture2D lifePokeBallTexture;
+    Texture2D lifeSuperBallTexture;
+    Texture2D lifeUltraBallTexture;
+    Texture2D lifeMasterBallTexture;
 
     bool canDraw = true;
     int currentPokeball = 0;
