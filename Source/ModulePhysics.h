@@ -18,7 +18,7 @@ enum class ColliderType {
     BOUNCE,
     OBJECT,
     SHROOMISH,
-    WHAILORD,
+    WHAILMER,
     PHITPIKA,
     PIKACHU,
     LAUNCHING,

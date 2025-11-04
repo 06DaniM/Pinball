@@ -1,22 +1,24 @@
 #pragma once
-#include <vector>
 #include <functional>
-#include <algorithm>
+#include <vector>
 
 struct Coroutine
 {
-    float duration = 0.0f;
-    float timer = 0.0f;
-    bool finished = false;
+    int id;
+    float duration;
+    float timer;
+    bool finished;
     std::function<void()> callback;
 };
 
 class CoroutineManager
 {
 public:
-    void StartCoroutine(float duration, std::function<void()> callback);
+    int StartCoroutine(float duration, std::function<void()> callback);
+    void StopCoroutine(int id);
     void Update(float deltaTime);
 
 private:
     std::vector<Coroutine> coroutines;
+    int nextId = 0;
 };

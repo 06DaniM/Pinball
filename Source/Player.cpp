@@ -17,10 +17,11 @@ bool ModulePlayer::Start()
 {
     printf("Loading Player\n");
 
-    pokeBallTexture = LoadTexture("Assets/Pokeball.png");       // Score x1
-    superBallTexture = LoadTexture("Assets/Superball.png");     // Score x1.25
-    ultraBallTexture = LoadTexture("Assets/UltraBall.png");     // Score x1.5
-    masterBallTexture = LoadTexture("Assets/Masterball.png");   // Score x2
+    lifesTexture = LoadTexture("Assets/Pokeball.png");
+    pokeBallTexture = LoadTexture("Assets/PokeballAnim.png");       // Score x1
+    superBallTexture = LoadTexture("Assets/SuperballAnim.png");     // Score x1.25
+    ultraBallTexture = LoadTexture("Assets/UltraBallAnim.png");     // Score x1.5
+    masterBallTexture = LoadTexture("Assets/MasterballAnim.png");   // Score x2
 
     position = { SCREEN_WIDTH - 20, SCREEN_HEIGHT - 250 };
 
@@ -85,15 +86,34 @@ void ModulePlayer::Reset()
 
 void ModulePlayer::DrawBall()
 {
-    // Draw the ball
-    if (canDraw)
+    if (!canDraw) return;
+
+    float scale = 1.5f;
+    int frameCount = 16;
+    int frameWidth = 15;
+    int frameHeight = 15;
+
+    // Obtén la rotación real desde Box2D
+    float rotation = playerBody->body->GetAngle() * RAD2DEG;
+
+    int currentFrame = frameCount - 1 - ((int)(fabs(rotation) / 360.0f * frameCount) % frameCount);
+
+    Rectangle source = { (float)(currentFrame * frameWidth), 0.0f, (float)frameWidth, (float)frameHeight };
+
+    Rectangle dest = { position.x, position.y, frameWidth * scale, frameHeight * scale };
+    Vector2 origin = { (frameWidth * scale) / 2, (frameHeight * scale) / 2 };
+
+    Texture2D* tex = nullptr;
+    switch (currentPokeball)
     {
-        float scale = 1.5f;
-        if (currentPokeball == 0) DrawTextureEx(pokeBallTexture, { position.x - radius, position.y - radius }, 0, scale, WHITE);
-        else if (currentPokeball == 1) DrawTextureEx(superBallTexture, { position.x - radius, position.y - radius }, 0, scale, WHITE);
-        else if (currentPokeball == 2) DrawTextureEx(ultraBallTexture, { position.x - radius, position.y - radius }, 0, scale, WHITE);
-        else DrawTextureEx(masterBallTexture, { position.x - radius, position.y - radius }, 0, scale, WHITE);
+    case 0: tex = &pokeBallTexture; break;
+    case 1: tex = &superBallTexture; break;
+    case 2: tex = &ultraBallTexture; break;
+    default: tex = &masterBallTexture; break;
     }
+
+    // Dibuja el frame correspondiente (sin rotación real)
+    DrawTexturePro(*tex, source, dest, origin, 0.0f, WHITE);
 }
 
 void ModulePlayer::TeleportBallDebug()

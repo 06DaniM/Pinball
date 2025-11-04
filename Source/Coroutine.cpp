@@ -1,19 +1,33 @@
 #include "Coroutine.h"
+#include <algorithm>
 
-void CoroutineManager::StartCoroutine(float duration, std::function<void()> callback)
+int CoroutineManager::StartCoroutine(float duration, std::function<void()> callback)
 {
     Coroutine c;
+    c.id = nextId++;
     c.duration = duration;
     c.timer = 0.0f;
     c.finished = false;
     c.callback = callback;
 
     coroutines.push_back(c);
+    return c.id;
+}
+
+void CoroutineManager::StopCoroutine(int id)
+{
+    for (auto& c : coroutines)
+    {
+        if (c.id == id && !c.finished)
+        {
+            c.finished = true;
+            break;
+        }
+    }
 }
 
 void CoroutineManager::Update(float deltaTime)
 {
-    // Actualiza todas las corutinas
     for (auto& c : coroutines)
     {
         if (!c.finished)
@@ -28,7 +42,6 @@ void CoroutineManager::Update(float deltaTime)
         }
     }
 
-    // Elimina todas las corutinas terminadas
     coroutines.erase(
         std::remove_if(coroutines.begin(), coroutines.end(),
             [](const Coroutine& c) { return c.finished; }),

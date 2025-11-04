@@ -98,6 +98,7 @@ PhysBody* ModulePhysics::CreateCircle(int x, int y, int radius, bool isSensor, M
 	else bodyDef.type = b2_staticBody;
 
 	bodyDef.position.Set(PIXELS_TO_METERS(x), PIXELS_TO_METERS(y));
+	bodyDef.angularDamping = 0.0f;
 
 	b2Body* b = world->CreateBody(&bodyDef);
 
@@ -107,7 +108,7 @@ PhysBody* ModulePhysics::CreateCircle(int x, int y, int radius, bool isSensor, M
 	b2FixtureDef fixtureDef;
 	fixtureDef.shape = &shape;
 	fixtureDef.isSensor = isSensor;
-	fixtureDef.friction = 0;
+	fixtureDef.friction = 0.3f;
 	fixtureDef.density = 1.0f;
 
 	if (ctype == ColliderType::BOUNCE || ctype == ColliderType::EGG)
@@ -191,7 +192,7 @@ void ModulePhysics::Flippers(PhysBody*& flipper, b2RevoluteJoint*& joint, float 
 	// Desactivates the engine when the torque is being created
 	jointDef.enableMotor = false;
 	jointDef.motorSpeed = 0.0f;
-	jointDef.maxMotorTorque = 450.0f;
+	jointDef.maxMotorTorque = 350.0f;
 
 	// Puts the anchor at the ends
 	float halfWidth = PIXELS_TO_METERS(flipperWidth * 0.5f);
@@ -200,8 +201,16 @@ void ModulePhysics::Flippers(PhysBody*& flipper, b2RevoluteJoint*& joint, float 
 
 	// Limitate the angle of turn
 	jointDef.enableLimit = true;
-	jointDef.lowerAngle = -30 * DEG2RAD;
-	jointDef.upperAngle = 30 * DEG2RAD;
+	if (isLeft)
+    {
+        jointDef.lowerAngle = -15 * DEG2RAD;
+        jointDef.upperAngle = 30 * DEG2RAD;
+    }
+    else
+    {
+        jointDef.lowerAngle = -30 * DEG2RAD;
+        jointDef.upperAngle = 15 * DEG2RAD;
+    }
 
 	// Creates the joint
 	joint = (b2RevoluteJoint*)world->CreateJoint(&jointDef);
@@ -220,7 +229,7 @@ void ModulePhysics::Spring(PhysBody*& base, PhysBody*& plunger, b2PrismaticJoint
 	b2Vec2 worldAxis(0.0f, 1.0f);
 
 	base = CreateRectangle(poxX, posY, rectangleW, rectangleH, false, this, ColliderType::PLATFORM, STATIC);
-	plunger =CreateRectangle(poxX, posY - springH, rectangleW, rectangleH, false, this, ColliderType::PLATFORM, DYNAMIC);
+	plunger = CreateRectangle(poxX, posY - springH, rectangleW, rectangleH, false, this, ColliderType::BOUNCE, DYNAMIC);
 
 	b2PrismaticJointDef jointDef;
 	jointDef.Initialize(base->body, plunger->body, base->body->GetWorldCenter(), worldAxis);
@@ -230,7 +239,7 @@ void ModulePhysics::Spring(PhysBody*& base, PhysBody*& plunger, b2PrismaticJoint
 	jointDef.upperTranslation = 0.4f;     // how far it can go down
 
 	jointDef.enableMotor = true;
-	jointDef.maxMotorForce = 300.0f;
+	jointDef.maxMotorForce = 500.0f;
 	jointDef.motorSpeed = 0.0f;
 
 	joint = (b2PrismaticJoint*)world->CreateJoint(&jointDef);
