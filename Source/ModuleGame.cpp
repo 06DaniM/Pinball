@@ -983,6 +983,7 @@ void ModuleGame::GameOver()
     {
         if (GetKeyPressed() != 0)
         {
+            mPlayer->currentPokeball = 0;
             showPoint1 = false;
             showPoint5 = false;
             showPoint10 = false;
