@@ -1112,6 +1112,7 @@ void ModuleGame::Draw()
     {
         mPlayer->DrawBall();
         if (!inPelliperSlide) DrawTextureEx(pelliperSlideUp, { 208, 115 }, 0, 2, WHITE);
+        if (!isLaunching && !inPelliperSlide) DrawTextureEx(tv1, { 18, 145 }, 0, 1.9f, WHITE);
         DrawTextureEx(tv2, { 8, 175 }, 0, 2, WHITE);
 
         DrawText(TextFormat("Current Score %d", currentScore), 350, 20, 12, WHITE);
