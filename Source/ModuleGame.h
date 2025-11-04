@@ -37,8 +37,10 @@ private:
     void CreateObjects();
     void CreateScoreItems();
 
+    void OnButtonActivated();
+    void SwitchButtonsOff();
     void ChangeSkin();
-    void WhailordAct();
+    void WhailmerAct();
     void Pikachu();
     void MoveEgg();
 
@@ -63,7 +65,19 @@ private:
     ModulePlayer* mPlayer = NULL;
 
     Texture2D mapTexture;
+
     Music backgroundMusic;
+
+    Sound shroomishSound;
+    Sound spoinkSound;
+    Sound pikachuSound;
+    Sound whailmerSound;
+    Sound flippersSound;
+    Sound gameOverSound;
+    Sound looseLifeSound;
+    Sound mapObjectSound;
+    Sound randomCollideSound;
+
 
     // === TABLE (MAP) ===
     PhysBody* physTable = NULL;     // Physbody of the table (map)
@@ -108,14 +122,14 @@ private:
     PhysBody* shroomish2 = NULL;
     PhysBody* shroomish3 = NULL;
 
-    // Whailord
-    Texture2D whailLordTexture;
+    // Whailmer
+    Texture2D whailmerTexture;
 
-    Animator whailordAnim;
+    Animator whailmerAnim;
 
-    PhysBody* whailord = NULL;
-    bool whailordHitted = false;
-    bool inWhailord = false;
+    PhysBody* whailmer = NULL;
+    bool whailmerHitted = false;
+    bool inWhailmer = false;
     bool readyToShot = false;
 
     // Pikachu
@@ -205,6 +219,9 @@ private:
     Texture2D CATCHTTexture;
     bool showMART = false;
     bool showCATCH = false;
+    
+    int deactivateButton = -1;
+    bool switchButtonsOff = false;
 
     bool playingPikachuAnimation = false;
     bool collideWithRightPikachu = false;
@@ -223,6 +240,9 @@ private:
     // === FLIPPERS ===
     Texture2D leftFlipperTexture;
     Texture2D rightFlipperTexture;
+
+    Animator leftFlipperAnim;
+    Animator rightFlipperAnim;
 
     PhysBody* leftFlipper = NULL;   // Physbody of the left flipper 
     PhysBody* rightFlipper = NULL;  // Physbody of the right flipper

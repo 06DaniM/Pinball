@@ -14,11 +14,12 @@ enum class ColliderType {
     PLAYER,
     PLATFORM,
     ITEM,
+    PLUNGER,
     SUMLIFE,
     BOUNCE,
     OBJECT,
     SHROOMISH,
-    WHAILORD,
+    WHAILMER,
     PHITPIKA,
     PIKACHU,
     LAUNCHING,
@@ -120,4 +121,6 @@ public:
 
 private:
     bool debug = true;
+    b2MouseJoint* mouse_joint;
+    b2Body* ground;
 };

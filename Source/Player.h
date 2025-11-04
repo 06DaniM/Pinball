@@ -27,6 +27,7 @@ private:
 public:
     ModuleGame* mGame = NULL;
 
+    Texture2D lifesTexture;
     Texture2D pokeBallTexture;
     Texture2D superBallTexture;
     Texture2D ultraBallTexture;

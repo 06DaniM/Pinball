@@ -86,6 +86,7 @@ update_status ModuleGame::Update()
         physGroundTerrain->SetSensor(true);
     }
 
+    //SwitchButtonsOff();
     ChangeValues();
     HandleInput();
     Pikachu();
@@ -103,12 +104,12 @@ void ModuleGame::InitializeTextures()
 
     sumLifeTexture = LoadTexture("Assets/Extra_life.png");
 
-    leftFlipperTexture = LoadTexture("Assets/LeftFlipperSprite.png");
-    rightFlipperTexture = LoadTexture("Assets/RightFlipperSprite.png");
+    leftFlipperTexture = LoadTexture("Assets/LeftFlipper_Spritesheet.png");
+    rightFlipperTexture = LoadTexture("Assets/RightFlipper_Spritesheet.png");
 
     spoinkTexture = LoadTexture("Assets/Spoink_Spritesheet.png");
     shroomish = LoadTexture("Assets/Shroomish_Spritesheet.png");
-    whailLordTexture = LoadTexture("Assets/Whailord_Spritesheet.png");
+    whailmerTexture = LoadTexture("Assets/Whailord_Spritesheet.png");
     changePokeballTexture = LoadTexture("Assets/Evo_Mart_Spritesheet.png");
     pikachu = LoadTexture("Assets/Pikachu_Spritesheet.png");
     plusle = LoadTexture("Assets/Plusle_Spritesheet.png");
@@ -151,11 +152,11 @@ void ModuleGame::InitializeTextures()
     shroomishAnim3.AddAnim("hitted", 2, 2, 6.0f, false);
     shroomishAnim3.Play("idle");
 
-    whailordAnim = Animator(&whailLordTexture, 40, 30);
-    whailordAnim.AddAnim("idle", 0, 2, 2.0f, true);
-    whailordAnim.AddAnim("pickingBall", 0, 5, 8.0f, false);
-    whailordAnim.AddAnim("throwingBall", 5, 3, 8.0f, false);
-    whailordAnim.Play("idle");
+    whailmerAnim = Animator(&whailmerTexture, 40, 30);
+    whailmerAnim.AddAnim("idle", 0, 2, 2.0f, true);
+    whailmerAnim.AddAnim("pickingBall", 0, 5, 8.0f, false);
+    whailmerAnim.AddAnim("throwingBall", 5, 3, 8.0f, false);
+    whailmerAnim.Play("idle");
 
     changePokeballAnim = Animator(&changePokeballTexture, 49, 36);
     changePokeballAnim.AddAnim("idle", 0, 3, 3.0f, true);
@@ -189,11 +190,30 @@ void ModuleGame::InitializeTextures()
     eggAnim.AddAnim("idle", 0, 4, 2.0f, true);
     eggAnim.AddAnim("hitted", 4, 1, 3.0f, false);
     eggAnim.Play("idle");
+
+    leftFlipperAnim = Animator(&leftFlipperTexture, 31, 27);
+    leftFlipperAnim.AddAnim("idle", 0, 1, 0, false);
+    leftFlipperAnim.AddAnim("push", 0, 6, 50.0f, false);
+    leftFlipperAnim.Play("idle");
+
+    rightFlipperAnim = Animator(&rightFlipperTexture, 31, 27);
+    rightFlipperAnim.AddAnim("idle", 5, 1, 0, false);
+    rightFlipperAnim.AddAnim("push", 0, 6, 50.0f, false);
+    rightFlipperAnim.Play("idle");
 }
 
 void ModuleGame::InitializeSFX()
 {
     backgroundMusic = LoadMusicStream("Assets/SFX/13. Sapphire Table.mp3");
+    shroomishSound = LoadSound("Assets/SFX/Shroomish.mp3");
+    spoinkSound = LoadSound("Assets/SFX/Spoink.wav");
+    pikachuSound = LoadSound("Assets/SFX/pikachu.wav");
+    whailmerSound = LoadSound("Assets/SFX/wailmer traga.wav");
+    flippersSound = LoadSound("Assets/SFX/palancas.wav");
+    gameOverSound = LoadSound("Assets/SFX/GameOver.mp3");
+    looseLifeSound = LoadSound("Assets/SFX/Ball Loss.wav");
+    mapObjectSound = LoadSound("Assets/SFX/Pickup_coin 2.wav");
+    randomCollideSound = LoadSound("Assets/SFX/Random Impact.wav");
 
     PlayMusicStream(backgroundMusic);
 }
@@ -631,8 +651,8 @@ void ModuleGame::CreateObjects()
     shroomish3 = App->physics->CreateCircle(240, 285, 15, false, this, ColliderType::SHROOMISH, STATIC);
     shroomish3->itemScore = 20;
 
-    whailord = App->physics->CreateCircle(355, 345, 22.5f, true, this, ColliderType::WHAILORD, STATIC);
-    whailord->itemScore = 100;
+    whailmer = App->physics->CreateCircle(355, 345, 22.5f, true, this, ColliderType::WHAILMER, STATIC);
+    whailmer->itemScore = 100;
 
     rightPikachu = App->physics->CreateRectangle(388, 690, 40, 100, true, this, ColliderType::PIKACHU, STATIC);
     rightPikachu->itemScore = 100;
@@ -681,6 +701,47 @@ void ModuleGame::CreateScoreItems()
     CATCHitbox = App->physics->CreateCircle(295, 440, 25, true, this, ColliderType::CATCH, STATIC);
 }
 
+void ModuleGame::OnButtonActivated()
+{
+    switchButtonsOff = true;
+
+    if (deactivateButton != -1)
+    {
+        coroutineManager.StopCoroutine(deactivateButton);
+        deactivateButton = -1;
+    }
+
+    deactivateButton = coroutineManager.StartCoroutine(2.0f, [this]()
+        {
+            if (switchButtonsOff)
+            {
+                SwitchButtonsOff();
+            }
+
+            deactivateButton = -1;
+        });
+}
+
+void ModuleGame::SwitchButtonsOff()
+{
+    showPoint1 = false;
+    showPoint5 = false;
+    showPoint10 = false;
+    showE_EVO = false;
+    showV_EVO = false;
+    showO_EVO = false;
+    showG_GET = false;
+    showE_GET = false;
+    showT_GET = false;
+
+    switchButtonsOff = false;
+
+    if (deactivateButton != -1)
+    {
+        coroutineManager.StopCoroutine(deactivateButton);
+        deactivateButton = -1;
+    }
+}
 void ModuleGame::ChangeSkin()
 {
     mPlayer->canDraw = false;
@@ -719,39 +780,39 @@ void ModuleGame::ChangeSkin()
     }
 }
 
-void ModuleGame::WhailordAct()
+void ModuleGame::WhailmerAct()
 {
     printf("Acting");
-    whailordHitted = true;
+    whailmerHitted = true;
 
-    if (!inWhailord)
+    if (!inWhailmer)
     {
-        inWhailord = true;
+        inWhailmer = true;
         mPlayer->canDraw = false;
-        whailordAnim.Play("pickingBall");
+        whailmerAnim.Play("pickingBall");
 
         coroutineManager.StartCoroutine(1.0f, [this]()
             {
                 int x, y;
-                whailord->GetPosition(x, y);
+                whailmer->GetPosition(x, y);
                 App->physics->SetBodyPosition(mPlayer->playerBody, x, y, false);
-                whailordHitted = false;
+                whailmerHitted = false;
 
-                whailordAnim.Play("throwingBall");
+                whailmerAnim.Play("throwingBall");
                 mPlayer->canDraw = true;
                 readyToShot = true;
                 mPlayer->playerBody->body->ApplyLinearImpulseToCenter({-1, 1.5}, true);
             });
     }
 
-    if (inWhailord && readyToShot)
+    if (inWhailmer && readyToShot)
     {
         coroutineManager.StartCoroutine(1.0f, [this]()
             {
-                inWhailord = false;
+                inWhailmer = false;
                 readyToShot = false;
-                whailordHitted = false;
-                whailordAnim.Play("idle");
+                whailmerHitted = false;
+                whailmerAnim.Play("idle");
             });
     }
 }
@@ -802,6 +863,7 @@ void ModuleGame::Pikachu()
         if (collideWithRightPikachu) mPlayer->playerBody->body->ApplyLinearImpulseToCenter({ 0.5f, -1.5f }, true);
         else mPlayer->playerBody->body->ApplyLinearImpulseToCenter({ -0.5f, -1.5f }, true);
 
+        PlaySound(pikachuSound);
         pikachuTime = 0;
     }
 }
@@ -866,6 +928,7 @@ void ModuleGame::HandleInput()
         isPressing = false;
         spoinkAnim.StopAnim();
         spoinkAnim.PlayReverse("spring_down", false);
+        PlaySound(spoinkSound);
     }
 
     spoinkAnim.Update(GetFrameTime());
@@ -874,10 +937,28 @@ void ModuleGame::HandleInput()
 
     // === FLIPPERS ===
     if (IsKeyDown(KEY_LEFT)) leftFlipperJoint->SetMotorSpeed(-20.5f);
-    else leftFlipperJoint->SetMotorSpeed(12.5f);
+    else
+    {
+        leftFlipperAnim.Play("idle", true);
+        leftFlipperJoint->SetMotorSpeed(12.5f);
+    }
+    if (IsKeyPressed(KEY_LEFT))
+    {
+        leftFlipperAnim.Play("push", true);
+        PlaySound(flippersSound);
+    }
 
     if (IsKeyDown(KEY_RIGHT)) rightFlipperJoint->SetMotorSpeed(20.5f);
-    else rightFlipperJoint->SetMotorSpeed(-12.5f);
+    else
+    {
+        rightFlipperAnim.Play("idle", true);
+        rightFlipperJoint->SetMotorSpeed(-12.5f);
+    }
+    if (IsKeyPressed(KEY_RIGHT))
+    {
+        rightFlipperAnim.PlayReverse("push", true);
+        PlaySound(flippersSound);
+    }
 }
 
 void ModuleGame::GameOver()
@@ -886,6 +967,8 @@ void ModuleGame::GameOver()
 
     if (!isRespawning)
     {
+        StopMusicStream(backgroundMusic);
+        PlaySound(gameOverSound);
         isRespawning = true;
 
         coroutineManager.StartCoroutine(1.0f, [this]()
@@ -898,11 +981,23 @@ void ModuleGame::GameOver()
     {
         if (GetKeyPressed() != 0)
         {
+            showPoint1 = false;
+            showPoint5 = false;
+            showPoint10 = false;
+            showE_EVO = false;
+            showV_EVO = false;
+            showO_EVO = false;
+            showG_GET = false;
+            showE_GET = false;
+            showT_GET = false;
+            previousScore = currentScore;
+            currentScore = 0;
             gameOver = false;
             mPlayer->life = 3;
             mPlayer->needsReset = true;
             isRespawning = false;
             canContinue = false;
+            PlayMusicStream(backgroundMusic);
         }
     }
 }
@@ -937,8 +1032,14 @@ void ModuleGame::Draw()
     sumLife3->GetPosition(x, y);
     if (!sumLife3->isActive) DrawTextureEx(sumLifeTexture, { (float)x - 7, (float)y - 8 }, 0, 2, WHITE);
 
-    DrawTextureEx(leftFlipperTexture, { leftFlipperPositionX - 5, leftFlipperPositionY - 15 }, 0, 1.5f, WHITE);
-    DrawTextureEx(rightFlipperTexture, { rightFlipperPositionX - 43, rightFlipperPositionY - 15 }, 0, 1.5f, WHITE);
+    /*DrawTextureEx(leftFlipperTexture, { leftFlipperPositionX - 5, leftFlipperPositionY - 15 }, 0, 1.5f, WHITE);
+    DrawTextureEx(rightFlipperTexture, { rightFlipperPositionX - 43, rightFlipperPositionY - 15 }, 0, 1.5f, WHITE);*/
+
+    leftFlipperAnim.Update(GetFrameTime());
+    rightFlipperAnim.Update(GetFrameTime());
+
+    leftFlipperAnim.Draw({ leftFlipperPositionX + 20, leftFlipperPositionY + 5 }, 1.5f, WHITE);
+    rightFlipperAnim.Draw({ rightFlipperPositionX - 20, rightFlipperPositionY + 5 }, 1.5f, WHITE);
 
     // === CHANGE POKEBALL SCREEN ===
     changePokeballAnim.Update(GetFrameTime());
@@ -972,10 +1073,10 @@ void ModuleGame::Draw()
     shroomishAnim3.Draw({ (float)x, (float)y - 10 }, 1.5f);
 
     // === WHAILORD ===
-    whailordAnim.Update(GetFrameTime());
+    whailmerAnim.Update(GetFrameTime());
 
-    whailord->GetPosition(x, y);
-    whailordAnim.Draw({ float(x), (float)y }, 1.5f);
+    whailmer->GetPosition(x, y);
+    whailmerAnim.Draw({ float(x), (float)y }, 1.5f);
 
     // === EGG ===
     eggAnim.Update(GetFrameTime());
@@ -1008,9 +1109,6 @@ void ModuleGame::Draw()
 
     peliperAnim.Draw({ 318, 260 }, 1.75f);
 
-    
-    
-
     if (!gameOver) 
     {
         mPlayer->DrawBall();
@@ -1022,11 +1120,11 @@ void ModuleGame::Draw()
         int spacing = 10;
         int startX = 10;
         int startY = 40;
-        int size = mPlayer->pokeBallTexture.width;
+        int size = mPlayer->lifesTexture.width;
 
         for (int i = 0; i < mPlayer->life; i++)
         {
-            DrawTexture(mPlayer->pokeBallTexture, startX + i * (size + spacing), startY, WHITE);
+            DrawTexture(mPlayer->lifesTexture, startX + i * (size + spacing), startY, WHITE);
         }
     }
 
@@ -1055,7 +1153,16 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
     switch (physB->ctype)
     {
     case ColliderType::PLAYER:
-        if (physA->ctype == ColliderType::SHROOMISH)
+        if (changingPokeball || whailmerHitted) break;
+
+        if (physA->ctype == ColliderType::PLATFORM || physA->ctype == ColliderType::BOUNCE) 
+        {
+            printf("Collide with platform\n");
+
+            PlaySound(randomCollideSound);
+        }
+
+        else if (physA->ctype == ColliderType::SHROOMISH)
         {
             printf("Collide with a shroomish\n");
 
@@ -1063,56 +1170,87 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
             else if (physA == shroomish2) shroomishAnim2.Play("hitted", false);
             else if (physA == shroomish3) shroomishAnim3.Play("hitted", false);
 
-            currentScore += physA->itemScore * scoreMultiplier;
-            if (highestScore <= currentScore) highestScore = currentScore;
+            currentScore += leftPikachu->itemScore * scoreMultiplier;
+            if (currentScore >= highestScore) highestScore = currentScore;
+
+            PlaySound(shroomishSound);
         }
-        else if (physA->ctype == ColliderType::POINTSTRIANGLE_1 && showPoint1 == false) {
+        else if (physA->ctype == ColliderType::POINTSTRIANGLE_1 && !showPoint1 && showPoint5) {
             printf("Collide with 1 Point Triangle\n");
             showPoint1 = true;
-            currentScore += 1;
+            OnButtonActivated();
+
+            currentScore += 150;
+            if (highestScore <= currentScore) highestScore = currentScore;
+            PlaySound(mapObjectSound);
         }
-        else if (physA->ctype == ColliderType::POINTSTRIANGLE_5 && showPoint5 == false) {
+        else if (physA->ctype == ColliderType::POINTSTRIANGLE_5 && !showPoint5 && showPoint10) {
             printf("Collide with 5 Point Triangle\n");
             showPoint5 = true;
-            currentScore += 5;
+            OnButtonActivated();
+            PlaySound(mapObjectSound);
         }
-        else if (physA->ctype == ColliderType::POINTSTRIANGLE_10 && showPoint10 == false) {
+        else if (physA->ctype == ColliderType::POINTSTRIANGLE_10 && !showPoint10) {
             printf("Collide with 10 Point Triangle\n");
             showPoint10 = true;
-            currentScore += 10;
+            OnButtonActivated();
+            PlaySound(mapObjectSound);
         }
-        else if (physA->ctype == ColliderType::E_EVO && showE_EVO == false) {
+        else if (physA->ctype == ColliderType::E_EVO && !showE_EVO && showV_EVO) {
             printf("Collide with E_EVO Triangle\n");
             showE_EVO = true;
+            OnButtonActivated();
+
+            currentScore += 150;
+            if (highestScore <= currentScore) highestScore = currentScore;
+            PlaySound(mapObjectSound);
         }
-        else if (physA->ctype == ColliderType::V_EVO && showV_EVO == false) {
+        else if (physA->ctype == ColliderType::V_EVO && !showV_EVO && showO_EVO) {
             printf("Collide with V_EVO Triangle\n");
             showV_EVO = true;
+            OnButtonActivated();
+            PlaySound(mapObjectSound);
         }
-        else if (physA->ctype == ColliderType::O_EVO && showO_EVO == false) {
+        else if (physA->ctype == ColliderType::O_EVO && !showO_EVO) {
             printf("Collide with O_EVO Triangle\n");
             showO_EVO = true;
+            OnButtonActivated();
+            PlaySound(mapObjectSound);
         }
-        else if (physA->ctype == ColliderType::G_GET && showG_GET == false) {
+        else if (physA->ctype == ColliderType::G_GET && !showG_GET && showE_GET) {
             printf("Collide with G_GET Triangle\n");
             showG_GET = true;
+            OnButtonActivated();
+
+            currentScore += 150;
+            if (highestScore <= currentScore) highestScore = currentScore;
+            PlaySound(mapObjectSound);
+            OnButtonActivated();
         }
-        else if (physA->ctype == ColliderType::E_GET && showE_GET == false) {
-            printf("Collide with T_GET Triangle\n");
+        else if (physA->ctype == ColliderType::E_GET && !showE_GET && showT_GET) {
+            printf("Collide with E_GET Triangle\n");
             showE_GET = true;
+            OnButtonActivated();
+            PlaySound(mapObjectSound);
         }
-        else if (physA->ctype == ColliderType::T_GET && showT_GET == false) {
+        else if (physA->ctype == ColliderType::T_GET && !showT_GET) {
             printf("Collide with T_GET Triangle\n");
             showT_GET = true;
+            OnButtonActivated();
+            PlaySound(mapObjectSound);
         }
-        else if (physA->ctype == ColliderType::CATCH && showCATCH == false) {
+        else if (physA->ctype == ColliderType::CATCH && !showCATCH) 
+        {
             printf("Collide with CATCH Triangle\n");
             showCATCH = true;
         }
-        else if (physA->ctype == ColliderType::MART && showMART == false) {
+
+        else if (physA->ctype == ColliderType::MART && !showMART) 
+        {
             printf("Collide with CATCH Triangle\n");
             showMART = true;
         }
+
         else if (physA->ctype == ColliderType::OBJECT)
         {
             printf("Collide with an object\n");
@@ -1135,6 +1273,8 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
 
             if (physA->itemScore > 0) plusleAnim.Play("flip", true);
             if (physA->itemScore < 0) minumAnim.Play("flip", true);
+
+            PlaySound(randomCollideSound);
         }
 
         else if (physA->ctype == ColliderType::PIKACHU)
@@ -1162,6 +1302,8 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
 
             currentScore += physA->itemScore * scoreMultiplier;
             if (highestScore <= currentScore) highestScore = currentScore;
+
+           PlaySound(randomCollideSound);
         }
 
         else if (physA->ctype == ColliderType::VOID)
@@ -1178,23 +1320,14 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
             showPoint5 = false;
             showPoint10 = false;
 
-            showE_EVO = false;
-            showV_EVO = false;
-            showO_EVO = false;
-
-            showG_GET = false;
-            showE_GET = false;
-            showT_GET = false;
-
-            showMART = true;
-            showCATCH = true;
+            PlaySound(looseLifeSound);
         }
 
-        else if (physA->ctype == ColliderType::WHAILORD && !whailordHitted)
+        else if (physA->ctype == ColliderType::WHAILMER && !whailmerHitted)
         {
             printf("Collide with whailord\n");
-            WhailordAct();
-
+            WhailmerAct();
+            PlaySound(whailmerSound);
             currentScore += physA->itemScore * scoreMultiplier;
             if (highestScore <= currentScore) highestScore = currentScore;
         }
@@ -1227,8 +1360,25 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
 
             currentScore += physA->itemScore * scoreMultiplier;
             if (highestScore <= currentScore) highestScore = currentScore;
+
+            PlaySound(randomCollideSound);
         }
+
+        else if (physA->ctype == ColliderType::SUMLIFE)
+        {
+            printf("Collide with a sum life\n");
+            if (physB->isActive)
+            {
+                physB->isActive = false;
+                mPlayer->currentSumLife++;
+                if (mPlayer->currentSumLife == 3) mPlayer->life++;
+
+                PlaySound(mapObjectSound);
+            }
+        }
+
         break;
+
 
     default:
         break;
