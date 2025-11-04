@@ -13,7 +13,16 @@ This project is a tribute to the classic Pokémon Pinball Sapphire, one of the m
  
 ## Controls
 
- - {ControlsScheme}
+### Gameplay Controls
+| Action | Key |
+|:--------|:----|
+| Left Flipper | Left arrow |
+| Right Flipper | Right arrow |
+| Kicker | Down arrow |
+| F2 | C |
+| F3 | ESC |
+| F4 | ESC |
+| 1 | ESC |
 
 ## Developers
 
