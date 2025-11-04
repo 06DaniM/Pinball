@@ -733,6 +733,8 @@ void ModuleGame::SwitchButtonsOff()
     showG_GET = false;
     showE_GET = false;
     showT_GET = false;
+    showMART = false;
+    showCATCH = false;
 
     switchButtonsOff = false;
 
@@ -1243,12 +1245,22 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
         {
             printf("Collide with CATCH Triangle\n");
             showCATCH = true;
+
+            currentScore += 10 * scoreMultiplier;
+            if (highestScore <= currentScore) highestScore = currentScore;
+            OnButtonActivated();
+            PlaySound(mapObjectSound);
         }
 
         else if (physA->ctype == ColliderType::MART && !showMART) 
         {
             printf("Collide with CATCH Triangle\n");
             showMART = true;
+            OnButtonActivated();
+
+            currentScore += 10 * scoreMultiplier;
+            if (highestScore <= currentScore) highestScore = currentScore;
+            PlaySound(mapObjectSound);
         }
 
         else if (physA->ctype == ColliderType::OBJECT)

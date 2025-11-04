@@ -38,7 +38,6 @@ enum class ColliderType {
     T_GET,
     MART,
     CATCH,
-
     UNKNOWN
 };
 
