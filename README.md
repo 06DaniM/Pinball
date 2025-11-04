@@ -1,6 +1,6 @@
-# {Project Name}
+# Pokemon Pinball Saphire Tribute
 
-## Description
+This project is a tribute to the classic Pokémon Pinball Sapphire, one of the most iconic pinball games for the Game Boy Advance. In this modified version, we’ve recreated the original gameplay, preserving the Pokémon theme with flippers, balls, and targets on the board. However, we’ve implemented new features to enhance the player experience. Among the improvements are more precise and adjustable physics, new combos and bonuses and the ability to manipulate elements like gravity and bounce. This project aims to offer both nostalgia for fans of the original and a fresh perspective with new, customizable mechanics.
 
 {project description}
 
@@ -17,10 +17,10 @@
 
 ## Developers
 
- - {Dev01} - {Role(s)}
- - {Dev02} - {Role(s)}
- - {Dev03} - {Role(s)}
- - {Dev04} - {Role(s)}
+ - Daniel Martínez - {Main Programmer}
+ - Adria Puerto - {Main Programmer}
+ - Héctor Tarroja - {Main Adapter/Designer}
+ - Adam Molina - {Main Re-Drawer}
 
 ## License
 
