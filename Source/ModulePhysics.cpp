@@ -209,15 +209,15 @@ void ModulePhysics::Flippers(PhysBody*& flipper, b2RevoluteJoint*& joint, float 
 	// Limitate the angle of turn
 	jointDef.enableLimit = true;
 	if (isLeft)
-    {
-        jointDef.lowerAngle = -15 * DEG2RAD;
-        jointDef.upperAngle = 30 * DEG2RAD;
-    }
-    else
-    {
-        jointDef.lowerAngle = -30 * DEG2RAD;
-        jointDef.upperAngle = 15 * DEG2RAD;
-    }
+	{
+		jointDef.lowerAngle = -15 * DEG2RAD;
+		jointDef.upperAngle = 30 * DEG2RAD;
+	}
+	else
+	{
+		jointDef.lowerAngle = -30 * DEG2RAD;
+		jointDef.upperAngle = 15 * DEG2RAD;
+	}
 
 	// Creates the joint
 	joint = (b2RevoluteJoint*)world->CreateJoint(&jointDef);
@@ -299,133 +299,140 @@ void ModulePhysics::EndContact(b2Contact* contact)
 
 update_status ModulePhysics::PostUpdate()
 {
-
 	if (IsKeyPressed(KEY_F1))
 	{
 		debug = !debug;
-
-		if (!debug && mouse_joint != nullptr)
-		{
-			world->DestroyJoint(mouse_joint);
-			mouse_joint = nullptr;
-		}
 	}
 
 	if (!debug)
 		return UPDATE_CONTINUE;
 
-	b2Body* mouseSelect = nullptr;
-	Vector2 mousePosition = GetMousePosition();
-	b2Vec2 pMousePosition = b2Vec2(PIXELS_TO_METERS(mousePosition.x), PIXELS_TO_METERS(mousePosition.y));
+	Vector2 mouse = GetMousePosition();
+	b2Vec2 pMousePosition = b2Vec2(PIXELS_TO_METERS(mouse.x), PIXELS_TO_METERS(mouse.y));
+
+	if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+	{
+		for (b2Body* b = world->GetBodyList(); b; b = b->GetNext())
+		{
+			if (b->GetType() != b2_dynamicBody) continue;
+
+			for (b2Fixture* f = b->GetFixtureList(); f; f = f->GetNext())
+			{
+				if (f->TestPoint(pMousePosition))
+				{
+					mouseSelect = b;
+
+					b2MouseJointDef def;
+					def.bodyA = ground;
+					def.bodyB = mouseSelect;
+					def.target = pMousePosition;
+					def.damping = 0.7f;
+					def.stiffness = 20.f;
+					def.maxForce = 100.0f * mouseSelect->GetMass();
+
+					mouse_joint = (b2MouseJoint*)world->CreateJoint(&def);
+					mouseSelect->SetAwake(true);
+					break;
+				}
+			}
+		}
+	}
+
+	if (mouse_joint && IsMouseButtonDown(MOUSE_BUTTON_LEFT))
+	{
+		mouse_joint->SetTarget(pMousePosition);
+
+		// Dibujar la línea entre el mouse y el cuerpo
+		b2Vec2 anchor = mouse_joint->GetBodyB()->GetPosition();
+		DrawLine(
+			METERS_TO_PIXELS(anchor.x),
+			METERS_TO_PIXELS(anchor.y),
+			mouse.x,
+			mouse.y,
+			RED
+		);
+	}
+
+	if (mouse_joint && IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
+	{
+		world->DestroyJoint(mouse_joint);
+		mouse_joint = nullptr;
+		mouseSelect = nullptr;
+	}
 
 	// Bonus code: this will iterate all objects in the world and draw the circles
 	// You need to provide your own macro to translate meters to pixels
 	for (b2Body* b = world->GetBodyList(); b; b = b->GetNext())
 	{
-		for(b2Fixture* f = b->GetFixtureList(); f; f = f->GetNext())
+		for (b2Fixture* f = b->GetFixtureList(); f; f = f->GetNext())
 		{
-			switch(f->GetType())
+			switch (f->GetType())
 			{
 				// Draw circles ------------------------------------------------
-				case b2Shape::e_circle:
-				{
-					b2CircleShape* shape = (b2CircleShape*)f->GetShape();
-					b2Vec2 pos = f->GetBody()->GetPosition();
-					
-					DrawCircle(METERS_TO_PIXELS(pos.x), METERS_TO_PIXELS(pos.y), (float)METERS_TO_PIXELS(shape->m_radius), Color{0, 0, 0, 128});
-				}
-				break;
-
-				// Draw polygons ------------------------------------------------
-				case b2Shape::e_polygon:
-				{
-					b2PolygonShape* polygonShape = (b2PolygonShape*)f->GetShape();
-					int32 count = polygonShape->m_count;
-					b2Vec2 prev, v;
-
-					for(int32 i = 0; i < count; ++i)
-					{
-						v = b->GetWorldPoint(polygonShape->m_vertices[i]);
-						if(i > 0)
-							DrawLine(METERS_TO_PIXELS(prev.x), METERS_TO_PIXELS(prev.y), METERS_TO_PIXELS(v.x), METERS_TO_PIXELS(v.y), RED);
-
-						prev = v;
-					}
-
-					v = b->GetWorldPoint(polygonShape->m_vertices[0]);
-					DrawLine(METERS_TO_PIXELS(prev.x), METERS_TO_PIXELS(prev.y), METERS_TO_PIXELS(v.x), METERS_TO_PIXELS(v.y), RED);
-				}
-				break;
-
-				// Draw chains contour -------------------------------------------
-				case b2Shape::e_chain:
-				{
-					b2ChainShape* shape = (b2ChainShape*)f->GetShape();
-					b2Vec2 prev, v;
-
-					for(int32 i = 0; i < shape->m_count; ++i)
-					{
-						v = b->GetWorldPoint(shape->m_vertices[i]);
-						if(i > 0)
-							DrawLine(METERS_TO_PIXELS(prev.x), METERS_TO_PIXELS(prev.y), METERS_TO_PIXELS(v.x), METERS_TO_PIXELS(v.y), BLACK);
-						prev = v;
-					}
-
-					v = b->GetWorldPoint(shape->m_vertices[0]);
-					DrawLine(METERS_TO_PIXELS(prev.x), METERS_TO_PIXELS(prev.y), METERS_TO_PIXELS(v.x), METERS_TO_PIXELS(v.y), BLACK);
-				}
-				break;
-
-				// Draw a single segment(edge) ----------------------------------
-				case b2Shape::e_edge:
-				{
-					b2EdgeShape* shape = (b2EdgeShape*)f->GetShape();
-					b2Vec2 v1, v2;
-
-					v1 = b->GetWorldPoint(shape->m_vertex0);
-					v1 = b->GetWorldPoint(shape->m_vertex1);
-					DrawLine(METERS_TO_PIXELS(v1.x), METERS_TO_PIXELS(v1.y), METERS_TO_PIXELS(v2.x), METERS_TO_PIXELS(v2.y), BLUE);
-				}
-				break;
-			}
-
-			if (mouse_joint == nullptr && mouseSelect == nullptr && IsMouseButtonDown(MOUSE_BUTTON_LEFT))
+			case b2Shape::e_circle:
 			{
-				if (f->TestPoint(pMousePosition))
-					mouseSelect = b;
+				b2CircleShape* shape = (b2CircleShape*)f->GetShape();
+				b2Vec2 pos = f->GetBody()->GetPosition();
+
+				DrawCircle(METERS_TO_PIXELS(pos.x), METERS_TO_PIXELS(pos.y), (float)METERS_TO_PIXELS(shape->m_radius), Color{ 0, 0, 0, 128 });
+			}
+			break;
+
+			// Draw polygons ------------------------------------------------
+			case b2Shape::e_polygon:
+			{
+				b2PolygonShape* polygonShape = (b2PolygonShape*)f->GetShape();
+				int32 count = polygonShape->m_count;
+				b2Vec2 prev, v;
+
+				for (int32 i = 0; i < count; ++i)
+				{
+					v = b->GetWorldPoint(polygonShape->m_vertices[i]);
+					if (i > 0)
+						DrawLine(METERS_TO_PIXELS(prev.x), METERS_TO_PIXELS(prev.y), METERS_TO_PIXELS(v.x), METERS_TO_PIXELS(v.y), RED);
+
+					prev = v;
+				}
+
+				v = b->GetWorldPoint(polygonShape->m_vertices[0]);
+				DrawLine(METERS_TO_PIXELS(prev.x), METERS_TO_PIXELS(prev.y), METERS_TO_PIXELS(v.x), METERS_TO_PIXELS(v.y), RED);
+			}
+			break;
+
+			// Draw chains contour -------------------------------------------
+			case b2Shape::e_chain:
+			{
+				b2ChainShape* shape = (b2ChainShape*)f->GetShape();
+				b2Vec2 prev, v;
+
+				for (int32 i = 0; i < shape->m_count; ++i)
+				{
+					v = b->GetWorldPoint(shape->m_vertices[i]);
+					if (i > 0)
+						DrawLine(METERS_TO_PIXELS(prev.x), METERS_TO_PIXELS(prev.y), METERS_TO_PIXELS(v.x), METERS_TO_PIXELS(v.y), BLACK);
+					prev = v;
+				}
+
+				v = b->GetWorldPoint(shape->m_vertices[0]);
+				DrawLine(METERS_TO_PIXELS(prev.x), METERS_TO_PIXELS(prev.y), METERS_TO_PIXELS(v.x), METERS_TO_PIXELS(v.y), BLACK);
+			}
+			break;
+
+			// Draw a single segment(edge) ----------------------------------
+			case b2Shape::e_edge:
+			{
+				b2EdgeShape* shape = (b2EdgeShape*)f->GetShape();
+				b2Vec2 v1, v2;
+
+				v1 = b->GetWorldPoint(shape->m_vertex0);
+				v1 = b->GetWorldPoint(shape->m_vertex1);
+				DrawLine(METERS_TO_PIXELS(v1.x), METERS_TO_PIXELS(v1.y), METERS_TO_PIXELS(v2.x), METERS_TO_PIXELS(v2.y), BLUE);
+			}
+			break;
 			}
 		}
 	}
 
-	if (mouseSelect)
-	{
-		b2MouseJointDef def;
-		def.bodyA = ground;
-		def.bodyB = mouseSelect;
-		def.target = pMousePosition;
-		def.damping = 0.5f;
-		def.stiffness = 20.f;
-		def.maxForce = 100.f * mouseSelect->GetMass();
-		mouse_joint = (b2MouseJoint*)world->CreateJoint(&def);
-	}
-
-	else if (mouse_joint && IsMouseButtonDown(MOUSE_BUTTON_LEFT))
-	{
-		mouse_joint->SetTarget(pMousePosition);
-
-		b2Vec2 anchorPosition = mouse_joint->GetBodyB()->GetPosition();
-		anchorPosition.x = METERS_TO_PIXELS(anchorPosition.x);
-		anchorPosition.y = METERS_TO_PIXELS(anchorPosition.y);
-
-		DrawLine(anchorPosition.x, anchorPosition.y, mousePosition.x, mousePosition.y, RED);
-	}
-
-	else if (mouse_joint && IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
-	{
-		world->DestroyJoint(mouse_joint);
-		mouse_joint = nullptr;
-	}
-	
 	return UPDATE_CONTINUE;
 }
 

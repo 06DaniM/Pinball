@@ -119,7 +119,8 @@ public:
     b2World* world = nullptr;
 
 private:
-    bool debug = true;
-    b2MouseJoint* mouse_joint;
-    b2Body* ground;
+    bool debug = false;
+    b2Body* ground = nullptr;
+    b2Body* mouseSelect = nullptr;
+    b2MouseJoint* mouse_joint = nullptr;
 };

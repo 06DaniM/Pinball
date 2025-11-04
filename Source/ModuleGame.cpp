@@ -120,7 +120,7 @@ void ModuleGame::InitializeTextures()
     E_EVOTexture = LoadTexture("Assets/E_EVO.png");
     V_EVOTexture = LoadTexture("Assets/V_EVO.png");
     O_EVOTexture = LoadTexture("Assets/O_EVO.png");
-    
+
     POINTTexture_1 = LoadTexture("Assets/1POINT.png");
     POINTTexture_5 = LoadTexture("Assets/5POINT.png");
     POINTTexture_10 = LoadTexture("Assets/10POINT.png");
@@ -276,13 +276,13 @@ void ModuleGame::CreateTable()
 {
     const int p = 102;
 
-	static int points[p] = {
+    static int points[p] = {
     30, 250,
     26, 260,
     22, 270,
     18, 300,
     15, 330,
-	15, 400,
+    15, 400,
     20, 430,
     28, 460,
     40, 490,
@@ -328,10 +328,10 @@ void ModuleGame::CreateTable()
     68, 200,
     60, 210,
     50, 220,
-	};
-    
-	physTable = App->physics->CreateChain(0, 0, points, p, false, ColliderType::PLATFORM, STATIC);
-	physTable->listener = this;
+    };
+
+    physTable = App->physics->CreateChain(0, 0, points, p, false, ColliderType::PLATFORM, STATIC);
+    physTable->listener = this;
 }
 
 void ModuleGame::CreateSlide()
@@ -541,7 +541,7 @@ void ModuleGame::CreateObstacles()
     rightTriangle->listener = this;
 
     const int p2 = 12;
-    
+
     static int leftPlatformPoints[p2] = {
         82, 702,
         82, 632,
@@ -660,7 +660,7 @@ void ModuleGame::CreateObjects()
     leftPikachu = App->physics->CreateRectangle(58, 690, 40, 100, true, this, ColliderType::PIKACHU, STATIC);
     leftPikachu->itemScore = 100;
 
-    egg = App->physics->CreateCircle(SCREEN_WIDTH / 2-13, SCREEN_HEIGHT / 2 + 150, 20, false, this, ColliderType::EGG, KINEMATIC);
+    egg = App->physics->CreateCircle(SCREEN_WIDTH / 2 - 13, SCREEN_HEIGHT / 2 + 150, 20, false, this, ColliderType::EGG, KINEMATIC);
     egg->itemScore = -20;
 }
 
@@ -803,7 +803,7 @@ void ModuleGame::WhailmerAct()
                 whailmerAnim.Play("throwingBall");
                 mPlayer->canDraw = true;
                 readyToShot = true;
-                mPlayer->playerBody->body->ApplyLinearImpulseToCenter({-1, 1.5}, true);
+                mPlayer->playerBody->body->ApplyLinearImpulseToCenter({ -1, 1.5 }, true);
             });
     }
 
@@ -918,7 +918,7 @@ void ModuleGame::HandleInput()
         spoinkAnim.Play("spring_down", false);
         isPressing = true;
     }
-    else if (IsKeyDown(KEY_DOWN)) 
+    else if (IsKeyDown(KEY_DOWN))
     {
         joint->SetMotorSpeed(pullSpeed);
 
@@ -978,7 +978,7 @@ void ModuleGame::GameOver()
                 canContinue = true;
             });
     }
-    
+
     if (canContinue)
     {
         if (GetKeyPressed() != 0)
@@ -1024,10 +1024,10 @@ void ModuleGame::Draw()
     if (showT_GET)DrawTextureEx(T_GETTexture, { 320, 538 }, 0, 2.0f, WHITE);
 
     if (showMART)DrawTextureEx(MARTTexture, { 140, 400 }, 0, 1.7f, WHITE);
-    if (showCATCH)DrawTextureEx(CATCHTTexture, { 270, 413}, 0, 1.8f, WHITE);
-        
-    sumLife1->GetPosition(x, y);  
-    if(!sumLife1->isActive) DrawTextureEx(sumLifeTexture, { (float)x - 7, (float)y-8 }, 0, 2,WHITE);
+    if (showCATCH)DrawTextureEx(CATCHTTexture, { 270, 413 }, 0, 1.8f, WHITE);
+
+    sumLife1->GetPosition(x, y);
+    if (!sumLife1->isActive) DrawTextureEx(sumLifeTexture, { (float)x - 7, (float)y - 8 }, 0, 2, WHITE);
 
     sumLife2->GetPosition(x, y);
     if (!sumLife2->isActive) DrawTextureEx(sumLifeTexture, { (float)x - 9, (float)y - 7 }, 0, 2, WHITE);
@@ -1051,7 +1051,7 @@ void ModuleGame::Draw()
     changePokeballAnim.Draw({ float(x) - 26, float(y) - 96 }, 2);
 
     // === SPOINK/PLUNGER ===
-    spoinkAnim.Draw({ springGroundX - 2, springGroundY-17 }, 1.5f);
+    spoinkAnim.Draw({ springGroundX - 2, springGroundY - 17 }, 1.5f);
 
     // === SHROOMISH ===
     shroomishAnim1.Update(GetFrameTime());
@@ -1086,7 +1086,7 @@ void ModuleGame::Draw()
 
     egg->GetPosition(x, y);
     eggAnim.Draw({ (float)x, (float)y - 2 }, 2.5f);
-    
+
     // === PIKACHU ===
     rightPikachuAnim.Update(GetFrameTime());
     leftPikachuAnim.Update(GetFrameTime());
@@ -1112,7 +1112,7 @@ void ModuleGame::Draw()
 
     peliperAnim.Draw({ 318, 260 }, 1.75f);
 
-    if (!gameOver) 
+    if (!gameOver)
     {
         mPlayer->DrawBall();
 
@@ -1268,7 +1268,7 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
     case ColliderType::PLAYER:
         if (changingPokeball || whailmerHitted) break;
 
-        if (physA->ctype == ColliderType::PLATFORM || physA->ctype == ColliderType::BOUNCE) 
+        if (physA->ctype == ColliderType::PLATFORM || physA->ctype == ColliderType::BOUNCE)
         {
             printf("Collide with platform\n");
 
@@ -1352,7 +1352,7 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
             OnButtonActivated();
             PlaySound(mapObjectSound);
         }
-        else if (physA->ctype == ColliderType::CATCH && !showCATCH) 
+        else if (physA->ctype == ColliderType::CATCH && !showCATCH)
         {
             printf("Collide with CATCH Triangle\n");
             showCATCH = true;
@@ -1363,7 +1363,7 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
             PlaySound(mapObjectSound);
         }
 
-        else if (physA->ctype == ColliderType::MART && !showMART) 
+        else if (physA->ctype == ColliderType::MART && !showMART)
         {
             printf("Collide with CATCH Triangle\n");
             showMART = true;
@@ -1426,7 +1426,7 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
             currentScore += physA->itemScore * scoreMultiplier;
             if (highestScore <= currentScore) highestScore = currentScore;
 
-           PlaySound(randomCollideSound);
+            PlaySound(randomCollideSound);
         }
 
         else if (physA->ctype == ColliderType::VOID)
@@ -1474,7 +1474,7 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
             printf("Collide with pelliper slide 2 sensor\n");
             inPelliperSlide = false;
         }
-        
+
 
         else if (physA->ctype == ColliderType::EGG)
         {
@@ -1527,7 +1527,7 @@ void ModuleGame::EndCollision(PhysBody* physA, PhysBody* physB)
             }
             pikachuTime = 0;
         }
-        
+
         else if (physA->ctype == ColliderType::OBJECT)
         {
             canChangeSkin = true;
