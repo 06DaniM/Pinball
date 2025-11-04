@@ -104,6 +104,7 @@ void ModuleGame::InitializeTextures()
     pelliperSlideUp = LoadTexture("Assets/Rail Pellipper Sobreposicion.png");
     tv1 = LoadTexture("Assets/Pantalla Y rail sobreposicion 1.png");
     tv2 = LoadTexture("Assets/Pantalla Sobreposicion 2.png");
+    pikachuRotationTexture = LoadTexture("Assets/Pikachu_Rotation_Spritesheet.png");
 
     sumLifeTexture = LoadTexture("Assets/Extra_life.png");
 
@@ -203,6 +204,11 @@ void ModuleGame::InitializeTextures()
     rightFlipperAnim.AddAnim("idle", 5, 1, 0, false);
     rightFlipperAnim.AddAnim("push", 0, 6, 50.0f, false);
     rightFlipperAnim.Play("idle");
+
+    pikachuRotationAnim = Animator(&pikachuRotationTexture, 20, 17);
+    pikachuRotationAnim.AddAnim("idle", 0, 1, 0, false);
+    pikachuRotationAnim.AddAnim("hitted", 0, 15, 20.0f, false);
+    pikachuRotationAnim.Play("idle");
 }
 
 void ModuleGame::InitializeSFX()
@@ -665,6 +671,9 @@ void ModuleGame::CreateObjects()
 
     egg = App->physics->CreateCircle(SCREEN_WIDTH / 2 - 13, SCREEN_HEIGHT / 2 + 150, 20, false, this, ColliderType::EGG, KINEMATIC);
     egg->itemScore = -20;
+
+    pikachuRotation = App->physics->CreateCircle(410, 350, 10, true, this, ColliderType::PIKACHUROT, STATIC);
+    pikachuRotation->itemScore = 100;
 }
 
 void ModuleGame::CreateVoid()
@@ -1145,6 +1154,14 @@ void ModuleGame::Draw()
 
     plusleAnim.Draw({ 106, 362 }, 1.5f);
     minumAnim.Draw({ 166, 326 }, 1.5f);
+
+    pikachuRotationAnim.Update(GetFrameTime());
+
+    if (pikachuRotationAnim.IsFinished() && pikachuRotationAnim.GetCurrentAnimName() == "hitted")
+        pikachuRotationAnim.Play("idle");
+
+    pikachuRotation->GetPosition(x, y);
+    pikachuRotationAnim.Draw({ (float)x + 2, (float)y }, 1.75f);
 }
 
 bool ModuleGame::CleanUp()
@@ -1161,6 +1178,7 @@ bool ModuleGame::CleanUp()
     launchingSensor = NULL;
     pelliperSlideSensor1 = NULL;
     pelliperSlideSensor2 = NULL;
+    pikachuRotation = NULL;
 
     leftTriangle = NULL;
     rightTriangle = NULL;
@@ -1225,6 +1243,7 @@ bool ModuleGame::CleanUp()
 
     UnloadTexture(mapTexture);
     UnloadTexture(pelliperSlideUp);
+    UnloadTexture(pikachuRotationTexture);
     UnloadTexture(tv1);
     UnloadTexture(tv2);
     UnloadTexture(sumLifeTexture);
@@ -1503,6 +1522,17 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
 
                 PlaySound(mapObjectSound);
             }
+        }
+
+        else if (physA->ctype == ColliderType::PIKACHUROT)
+        {
+            printf("Collide with pikachu rotation\n");
+            pikachuRotationAnim.Play("hitted", true);
+
+            currentScore += physA->itemScore * scoreMultiplier;
+            if (highestScore <= currentScore) highestScore = currentScore;
+
+            PlaySound(mapObjectSound);
         }
 
         break;

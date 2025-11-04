@@ -68,6 +68,7 @@ private:
     Texture2D pelliperSlideUp;
     Texture2D tv1;
     Texture2D tv2;
+    Texture2D pikachuRotationTexture;
 
     Music backgroundMusic;
 
@@ -107,6 +108,11 @@ private:
     PhysBody* rectSumLife3 = NULL;
 
     //  === OBJECTS === 
+
+    Animator pikachuRotationAnim;
+
+    PhysBody* pikachuRotation = NULL;
+
     Texture2D changePokeballTexture;
 
     Animator changePokeballAnim;
