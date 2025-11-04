@@ -19,10 +19,13 @@ This project is a tribute to the classic Pokémon Pinball Sapphire, one of the m
 | Left Flipper | Left arrow |
 | Right Flipper | Right arrow |
 | Kicker | Down arrow |
-| F2 | C |
-| F3 | ESC |
-| F4 | ESC |
-| 1 | ESC |
+| F2 | 60 FPS |
+| F3 | 120 FPS |
+| F4 | 240 FPS |
+| 1 | Gravity 5 |
+| 2 | Gravity 10 |
+| 3 | Gravity 15 |
+| R | -0.2 to Restitution Coeficient |
 
 ## Developers
 
