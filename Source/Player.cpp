@@ -124,7 +124,15 @@ void ModulePlayer::TeleportBallDebug()
 bool ModulePlayer::CleanUp()
 {
     printf("Unloading Player\n");
+
     playerBody = nullptr;
+
+    UnloadTexture(lifesTexture);
+    UnloadTexture(pokeBallTexture);
+    UnloadTexture(superBallTexture);
+    UnloadTexture(ultraBallTexture);
+    UnloadTexture(masterBallTexture);
+
     return true;
 }
 

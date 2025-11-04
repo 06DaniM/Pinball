@@ -261,10 +261,10 @@ private:
 
     Animator spoinkAnim;
 
-    PhysBody* base;     // Physbody of the base of the plunger
-    PhysBody* plunger;  // Physbody of the plunger
+    PhysBody* base = NULL;     // Physbody of the base of the plunger
+    PhysBody* plunger = NULL;  // Physbody of the plunger
 
-    b2PrismaticJoint* joint; // Prismatic joint of the spring
+    b2PrismaticJoint* joint = NULL; // Prismatic joint of the spring
 
     bool isPressing = false;  // Declare if is pressing the spring for the animations
     const float springGroundX = SCREEN_WIDTH - 20;  // x position of the spring
@@ -273,7 +273,7 @@ private:
     const float launchSpeed = -20.0f; // release (upwards) speed
 
     // === VOID ===
-    PhysBody* downVoid; // Physbody of the void
+    PhysBody* downVoid = NULL; // Physbody of the void
     b2Vec2 downVoidPos; // Set the position of the void
 
     CoroutineManager coroutineManager;

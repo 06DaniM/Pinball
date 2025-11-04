@@ -1148,6 +1148,116 @@ void ModuleGame::Draw()
 bool ModuleGame::CleanUp()
 {
     printf("Cleaning game scene\n");
+
+    mPlayer = NULL;
+
+    physTable = NULL;
+    physSlideBegin = NULL;
+    physSlideInGame = NULL;
+    physSlidepPelliperOut = NULL;
+    physSlidepPelliperIn = NULL;
+    launchingSensor = NULL;
+    pelliperSlideSensor1 = NULL;
+    pelliperSlideSensor2 = NULL;
+
+    leftTriangle = NULL;
+    rightTriangle = NULL;
+
+    leftPlatform = NULL;
+    rightPlatform = NULL;
+
+    physLeftTv = NULL;
+
+    physGroundTerrain = NULL;
+
+    rectSumLife1 = NULL;
+    rectSumLife2 = NULL;
+    rectSumLife3 = NULL;
+
+    changePokeBall = NULL;
+
+    shroomish1 = NULL;
+    shroomish2 = NULL;
+    shroomish3 = NULL;
+
+    whailmer = NULL;
+
+    pHitPikachu = NULL;
+    rightPikachu = NULL;
+    leftPikachu = NULL;
+
+    sumLife1 = NULL;
+    sumLife2 = NULL;
+    sumLife3 = NULL;
+
+    sumTvScore = NULL;
+    minusTvScore = NULL;
+
+    E_EVOHitbox = NULL;
+    V_EVOHitbox = NULL;
+    O_EVOHitbox = NULL;
+
+    POINTHitbox_1 = NULL;
+    POINTHitbox_5 = NULL;
+    POINTHitbox_10 = NULL;
+
+    G_GETHitbox = NULL;
+    E_GETHitbox = NULL;
+    T_GETHitbox = NULL;
+
+
+    MARTHitbox = NULL;
+    CATCHitbox = NULL;
+
+    leftFlipper = NULL;
+    rightFlipper = NULL;
+
+
+    base = NULL;
+    plunger = NULL;
+
+    joint = NULL;
+
+    downVoid = NULL;
+
+
+    UnloadTexture(mapTexture);
+    UnloadTexture(sumLifeTexture);
+    UnloadTexture(leftFlipperTexture);
+    UnloadTexture(rightFlipperTexture);
+    UnloadTexture(spoinkTexture);
+    UnloadTexture(shroomish);
+    UnloadTexture(whailmerTexture);
+    UnloadTexture(changePokeballTexture);
+    UnloadTexture(pikachu);
+    UnloadTexture(plusle);
+    UnloadTexture(minum);
+    UnloadTexture(peliperTexture);
+    UnloadTexture(eggTexture);
+    UnloadTexture(E_EVOTexture);
+    UnloadTexture(V_EVOTexture);
+    UnloadTexture(O_EVOTexture);
+    UnloadTexture(POINTTexture_1);
+    UnloadTexture(POINTTexture_5);
+    UnloadTexture(POINTTexture_10);
+    UnloadTexture(G_GETTexture);
+    UnloadTexture(E_GETTexture);
+    UnloadTexture(T_GETTexture);
+    UnloadTexture(MARTTexture);
+    UnloadTexture(T_GETTexture);
+
+    UnloadMusicStream(backgroundMusic);
+
+    UnloadSound(shroomishSound);
+    UnloadSound(spoinkSound);
+    UnloadSound(pikachuSound);
+    UnloadSound(whailmerSound);
+    UnloadSound(flippersSound);
+    UnloadSound(gameOverSound);
+    UnloadSound(looseLifeSound);
+    UnloadSound(mapObjectSound);
+    UnloadSound(randomCollideSound);
+
     return true;
 }
 
