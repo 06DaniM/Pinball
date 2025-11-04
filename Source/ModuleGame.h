@@ -10,6 +10,7 @@
 
 #include "raylib.h"
 #include <vector>
+#include <unordered_map>
 
 class ModuleGame : public Module
 {
@@ -25,6 +26,9 @@ public:
     
 private:
     void InitializeTextures();
+    void InitializeSFX();
+
+    void ChangeValues();
 
     void CreateVoid();
     void CreateTable();
@@ -36,6 +40,7 @@ private:
     void ChangeSkin();
     void WhailordAct();
     void Pikachu();
+    void MoveEgg();
 
     void HandleInput();
     void GameOver();
@@ -58,6 +63,7 @@ private:
     ModulePlayer* mPlayer = NULL;
 
     Texture2D mapTexture;
+    Music backgroundMusic;
 
     // === TABLE (MAP) ===
     PhysBody* physTable = NULL;     // Physbody of the table (map)
@@ -122,6 +128,8 @@ private:
     PhysBody* rightPikachu = NULL;
     PhysBody* leftPikachu = NULL;
 
+    bool pikachuLaunch = false;
+
     // Plusle
     Texture2D plusle;
 
@@ -144,6 +152,8 @@ private:
 
     PhysBody* egg;
 
+    bool eggHitted = false;
+
     // Other objects
     Texture2D sumLifeTexture;
 
@@ -165,6 +175,8 @@ private:
     bool isRespawning = false;
     bool canContinue = false;
     bool inPelliperSlide = false;
+    std::unordered_map<b2Fixture*, float> originalRestitutions;
+    bool restitutionToggled = false;
 
     // === FLIPPERS ===
     Texture2D leftFlipperTexture;

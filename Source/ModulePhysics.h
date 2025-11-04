@@ -24,6 +24,7 @@ enum class ColliderType {
     LAUNCHING,
     PSlIDEBEGIN,
     PSLIDEEND,
+    EGG,
     VOID,
     UNKNOWN
 };

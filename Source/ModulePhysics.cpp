@@ -76,7 +76,7 @@ PhysBody* ModulePhysics::CreateRectangle(int x, int y, int width, int height, bo
 	fixtureDef.density = 1.0f;
 
 	if (ctype == ColliderType::BOUNCE)
-		fixtureDef.restitution = 1.2f;
+		fixtureDef.restitution = 1.0f;
 
 	b->CreateFixture(&fixtureDef);
 
@@ -110,10 +110,10 @@ PhysBody* ModulePhysics::CreateCircle(int x, int y, int radius, bool isSensor, M
 	fixtureDef.friction = 0;
 	fixtureDef.density = 1.0f;
 
-	if (ctype == ColliderType::BOUNCE)
-		fixtureDef.restitution = 1.2f;
+	if (ctype == ColliderType::BOUNCE || ctype == ColliderType::EGG)
+		fixtureDef.restitution = 1.0f;
 	else
-		fixtureDef.restitution = 0.8f;
+		fixtureDef.restitution = 0.6f;
 
 	b->CreateFixture(&fixtureDef);
 
@@ -154,7 +154,7 @@ PhysBody* ModulePhysics::CreateChain(int x, int y, int* points, int size, bool i
 	fixtureDef.density = 1.0f;
 
 	if (ctype == ColliderType::BOUNCE)
-		fixtureDef.restitution = 1.2f;
+		fixtureDef.restitution = 1.0f;
 
 	b->CreateFixture(&fixtureDef);
 
@@ -190,7 +190,8 @@ void ModulePhysics::Flippers(PhysBody*& flipper, b2RevoluteJoint*& joint, float 
 
 	// Desactivates the engine when the torque is being created
 	jointDef.enableMotor = false;
-	jointDef.maxMotorTorque = 250.0f;
+	jointDef.motorSpeed = 0.0f;
+	jointDef.maxMotorTorque = 450.0f;
 
 	// Puts the anchor at the ends
 	float halfWidth = PIXELS_TO_METERS(flipperWidth * 0.5f);
