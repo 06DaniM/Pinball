@@ -992,9 +992,10 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
             printf("Collide with pelliper slide 2 sensor\n");
             inPelliperSlide = false;
         }
-        else if (physA->ctype == ColliderType::POINTSTRIANGLE_1) {
+        else if (physA->ctype == ColliderType::POINTSTRIANGLE_1 && showPoint1 == false) {
             printf("Collide with 1 Point Triangle\n");
             showPoint1 = true;
+            currentScore += 1;
         }
         break;
 
