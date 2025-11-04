@@ -121,6 +121,8 @@ void ModuleGame::InitializeTextures()
     O_EVOTexture = LoadTexture("Assets/O_EVO.png");
     
     POINTTexture_1 = LoadTexture("Assets/1POINT.png");
+    POINTTexture_5 = LoadTexture("Assets/5POINT.png");
+    POINTTexture_10 = LoadTexture("Assets/10POINT.png");
 
     spoinkAnim = Animator(&spoinkTexture, 20, 40);
     spoinkAnim.AddAnim("idle", 0, 2, 2.0f, true);
@@ -657,6 +659,8 @@ void ModuleGame::CreateScoreItems()
     pHitPikachu = App->physics->CreateCircle(288, 325, 10, true, this, ColliderType::PHITPIKA, STATIC);
 
     POINTHitbox_1 = App->physics->CreateCircle(95, 445, 15, true, this, ColliderType::POINTSTRIANGLE_1, STATIC);
+    POINTHitbox_5 = App->physics->CreateCircle(110, 475, 15, true, this, ColliderType::POINTSTRIANGLE_5, STATIC);
+    POINTHitbox_10 = App->physics->CreateCircle(125, 505, 15, true, this, ColliderType::POINTSTRIANGLE_10, STATIC);
 
 }
 
@@ -892,6 +896,9 @@ void ModuleGame::Draw()
 
     DrawTexture(mapTexture, 0, 0, WHITE);
 
+    if (showPoint10)DrawTextureEx(POINTTexture_10, { 114, 489 }, 0, 2.0f, WHITE);
+    if (showPoint5)DrawTextureEx(POINTTexture_5, { 100, 460 }, 0, 2.0f, WHITE);
+    if (showPoint1)DrawTextureEx(POINTTexture_1, { 86, 429 }, 0, 2.0f, WHITE);
 
     sumLife1->GetPosition(x, y);  
     if(!sumLife1->isActive) DrawTextureEx(sumLifeTexture, { (float)x - 7, (float)y-8 }, 0, 2,WHITE);
@@ -973,11 +980,8 @@ void ModuleGame::Draw()
 
     peliperAnim.Draw({ 318, 260 }, 1.75f);
 
-    if(showPoint1)
-    {
-        DrawTextureEx(POINTTexture_1, { 86, 429 }, 0, 2.0f, WHITE);
-        
-    }
+    
+    
 
     if (!gameOver) 
     {
@@ -1034,7 +1038,21 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
             currentScore += physA->itemScore * scoreMultiplier;
             if (highestScore <= currentScore) highestScore = currentScore;
         }
-
+        else if (physA->ctype == ColliderType::POINTSTRIANGLE_1 && showPoint1 == false) {
+            printf("Collide with 1 Point Triangle\n");
+            showPoint1 = true;
+            currentScore += 1;
+        }
+        else if (physA->ctype == ColliderType::POINTSTRIANGLE_5 && showPoint5 == false) {
+            printf("Collide with 5 Point Triangle\n");
+            showPoint5 = true;
+            currentScore += 5;
+        }
+        else if (physA->ctype == ColliderType::POINTSTRIANGLE_10 && showPoint10 == false) {
+            printf("Collide with 10 Point Triangle\n");
+            showPoint10 = true;
+            currentScore += 10;
+        }
         else if (physA->ctype == ColliderType::OBJECT)
         {
             printf("Collide with an object\n");
@@ -1095,7 +1113,10 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
             sumLife3->isActive = true;
 
             isLaunching = true;
+
             showPoint1 = false;
+            showPoint5 = false;
+            showPoint10 = false;
         }
 
         else if (physA->ctype == ColliderType::WHAILORD && !whailordHitted)
@@ -1126,11 +1147,7 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
             printf("Collide with pelliper slide 2 sensor\n");
             inPelliperSlide = false;
         }
-        else if (physA->ctype == ColliderType::POINTSTRIANGLE_1 && showPoint1 == false) {
-            printf("Collide with 1 Point Triangle\n");
-            showPoint1 = true;
-            currentScore += 1;
-        }
+        
 
         else if (physA->ctype == ColliderType::EGG)
         {

@@ -175,9 +175,11 @@ private:
 
 
     PhysBody* POINTHitbox_1 = NULL;
-    bool showPoint1 = false;
     PhysBody* POINTHitbox_5 = NULL;
     PhysBody* POINTHitbox_10 = NULL;
+    bool showPoint1 = false;
+    bool showPoint5 = false;
+    bool showPoint10 = false;
 
     Texture2D POINTTexture_1;
     Texture2D POINTTexture_5;

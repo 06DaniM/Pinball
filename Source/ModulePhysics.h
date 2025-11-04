@@ -27,6 +27,9 @@ enum class ColliderType {
     EGG,
     VOID,
     POINTSTRIANGLE_1,
+    POINTSTRIANGLE_5,
+    POINTSTRIANGLE_10,
+
 
     UNKNOWN
 };
