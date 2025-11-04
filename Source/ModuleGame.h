@@ -107,7 +107,17 @@ private:
     PhysBody* rectSumLife2 = NULL;
     PhysBody* rectSumLife3 = NULL;
 
+    PhysBody* zigzagoon = NULL;
+    PhysBody* seedot = NULL;
+
     //  === OBJECTS === 
+    Animator zigzagoonAnim;
+    Animator seedotAnim;
+
+    Texture2D zigzagoonTexture;
+    Texture2D seedotTexture;
+
+    int numberOfSeedots = 0;
 
     Animator pikachuRotationAnim;
 

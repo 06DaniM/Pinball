@@ -27,6 +27,8 @@ enum class ColliderType {
     PSLIDEEND,
     EGG,
     PIKACHUROT,
+    ZIGZAGOON,
+    SEEDOT,
     VOID,
     POINTSTRIANGLE_1,
     POINTSTRIANGLE_5,

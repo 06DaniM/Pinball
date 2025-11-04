@@ -120,6 +120,8 @@ void ModuleGame::InitializeTextures()
     minum = LoadTexture("Assets/Minum_Spritesheet.png");
     peliperTexture = LoadTexture("Assets/Pelliper_Spritesheet.png");
     eggTexture = LoadTexture("Assets/Huevo_Pokemon_Spritesheet.png");
+    zigzagoonTexture = LoadTexture("Assets/Zigzagoon_Spritesheet.png");
+    seedotTexture = LoadTexture("Assets/Seedot_Spritesheet.png");
 
     E_EVOTexture = LoadTexture("Assets/E_EVO.png");
     V_EVOTexture = LoadTexture("Assets/V_EVO.png");
@@ -209,6 +211,14 @@ void ModuleGame::InitializeTextures()
     pikachuRotationAnim.AddAnim("idle", 0, 1, 0, false);
     pikachuRotationAnim.AddAnim("hitted", 0, 15, 20.0f, false);
     pikachuRotationAnim.Play("idle");
+
+    zigzagoonAnim = Animator(&zigzagoonTexture, 40, 30);
+    zigzagoonAnim.AddAnim("idle", 0, 2, 2.0f, true);
+    zigzagoonAnim.Play("idle");
+
+    seedotAnim = Animator(&seedotTexture, 20, 23);
+    seedotAnim.AddAnim("idle", 0, 3, 2.0f, true);
+    seedotAnim.Play("idle");
 }
 
 void ModuleGame::InitializeSFX()
@@ -674,6 +684,11 @@ void ModuleGame::CreateObjects()
 
     pikachuRotation = App->physics->CreateCircle(410, 350, 10, true, this, ColliderType::PIKACHUROT, STATIC);
     pikachuRotation->itemScore = 100;
+
+    zigzagoon = App->physics->CreateCircle(360, 580, 10, true, this, ColliderType::ZIGZAGOON, STATIC);
+    zigzagoon->itemScore = 50;
+
+    seedot = App->physics->CreateCircle(90, 580, 10, true, this, ColliderType::SEEDOT, STATIC);
 }
 
 void ModuleGame::CreateVoid()
@@ -1117,6 +1132,16 @@ void ModuleGame::Draw()
 
     peliperAnim.Draw({ 318, 260 }, 1.75f);
 
+    zigzagoonAnim.Update(GetFrameTime());
+
+    zigzagoonAnim.Draw({400, 550}, 2);
+
+    seedotAnim.Update(GetFrameTime());
+
+    if (numberOfSeedots >= 1) seedotAnim.Draw({ 50, 535 }, 1.5f);
+    if (numberOfSeedots >= 2) seedotAnim.Draw({ 60, 565 }, 1.5f);
+    if (numberOfSeedots >= 3) seedotAnim.Draw({ 37, 560 }, 1.5f);
+
     if (!gameOver)
     {
         mPlayer->DrawBall();
@@ -1124,9 +1149,9 @@ void ModuleGame::Draw()
         if (!isLaunching && !inPelliperSlide) DrawTextureEx(tv1, { 18, 145 }, 0, 1.9f, WHITE);
         DrawTextureEx(tv2, { 8, 175 }, 0, 2, WHITE);
 
-        DrawText(TextFormat("Current Score %d", currentScore), 350, 20, 12, WHITE);
-        DrawText(TextFormat("Highest Score %d", highestScore), 350, 35, 12, WHITE);
-        DrawText(TextFormat("Previous Score %d", previousScore), 350, 50, 12, WHITE);
+        DrawText(TextFormat("Current Score %d", currentScore), 300, 15, 15, WHITE);
+        DrawText(TextFormat("Highest Score %d", highestScore), 300, 32, 15, WHITE);
+        DrawText(TextFormat("Previous Score %d", previousScore), 300, 49, 15, WHITE);
 
         int spacing = 10;
         int startX = 10;
@@ -1137,10 +1162,38 @@ void ModuleGame::Draw()
         {
             DrawTexture(mPlayer->lifesTexture, startX + i * (size + spacing), startY, WHITE);
         }
+
+        changePokeBall->GetPosition(x, y);
+        changePokeballAnim.Draw({ float(x) - 26, float(y) - 96 }, 2);
+
+        plusleAnim.Draw({ 106, 362 }, 1.5f);
+        minumAnim.Draw({ 166, 326 }, 1.5f);
+
+        pikachuRotationAnim.Update(GetFrameTime());
+
+        if (pikachuRotationAnim.IsFinished() && pikachuRotationAnim.GetCurrentAnimName() == "hitted")
+            pikachuRotationAnim.Play("idle");
+
+        pikachuRotation->GetPosition(x, y);
+        pikachuRotationAnim.Draw({ (float)x + 2, (float)y }, 1.75f);
     }
 
     else
     {
+        changePokeBall->GetPosition(x, y);
+        changePokeballAnim.Draw({ float(x) - 26, float(y) - 96 }, 2);
+
+        plusleAnim.Draw({ 106, 362 }, 1.5f);
+        minumAnim.Draw({ 166, 326 }, 1.5f);
+
+        pikachuRotationAnim.Update(GetFrameTime());
+
+        if (pikachuRotationAnim.IsFinished() && pikachuRotationAnim.GetCurrentAnimName() == "hitted")
+            pikachuRotationAnim.Play("idle");
+
+        pikachuRotation->GetPosition(x, y);
+        pikachuRotationAnim.Draw({ (float)x + 2, (float)y }, 1.75f);
+
         mPlayer->canDraw = false;
         DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, { 0, 0, 0, 220 });
         DrawText("GAMEOVER", SCREEN_WIDTH / 2 - 124, SCREEN_HEIGHT / 2, 40, RED);
@@ -1149,19 +1202,6 @@ void ModuleGame::Draw()
         DrawText(TextFormat("Highest Score %d", highestScore), SCREEN_WIDTH / 2 - 80, SCREEN_HEIGHT / 2 + 100, 20, WHITE);
         DrawText(TextFormat("Previous Score %d", previousScore), SCREEN_WIDTH / 2 - 80, SCREEN_HEIGHT / 2 + 130, 20, WHITE);
     }
-    changePokeBall->GetPosition(x, y);
-    changePokeballAnim.Draw({ float(x) - 26, float(y) - 96 }, 2);
-
-    plusleAnim.Draw({ 106, 362 }, 1.5f);
-    minumAnim.Draw({ 166, 326 }, 1.5f);
-
-    pikachuRotationAnim.Update(GetFrameTime());
-
-    if (pikachuRotationAnim.IsFinished() && pikachuRotationAnim.GetCurrentAnimName() == "hitted")
-        pikachuRotationAnim.Play("idle");
-
-    pikachuRotation->GetPosition(x, y);
-    pikachuRotationAnim.Draw({ (float)x + 2, (float)y }, 1.75f);
 }
 
 bool ModuleGame::CleanUp()
@@ -1201,6 +1241,9 @@ bool ModuleGame::CleanUp()
     shroomish3 = NULL;
 
     whailmer = NULL;
+
+    zigzagoon = NULL;
+    seedot = NULL;
 
     pHitPikachu = NULL;
     rightPikachu = NULL;
@@ -1254,6 +1297,8 @@ bool ModuleGame::CleanUp()
     UnloadTexture(whailmerTexture);
     UnloadTexture(changePokeballTexture);
     UnloadTexture(pikachu);
+    UnloadTexture(zigzagoonTexture);
+    UnloadTexture(seedotTexture);
     UnloadTexture(plusle);
     UnloadTexture(minum);
     UnloadTexture(peliperTexture);
@@ -1317,7 +1362,7 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
             showPoint1 = true;
             OnButtonActivated();
 
-            currentScore += 150;
+            currentScore += 150 * scoreMultiplier;
             if (highestScore <= currentScore) highestScore = currentScore;
             PlaySound(mapObjectSound);
         }
@@ -1338,7 +1383,7 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
             showE_EVO = true;
             OnButtonActivated();
 
-            currentScore += 150;
+            currentScore += 150 * scoreMultiplier;
             if (highestScore <= currentScore) highestScore = currentScore;
             PlaySound(mapObjectSound);
         }
@@ -1359,7 +1404,7 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
             showG_GET = true;
             OnButtonActivated();
 
-            currentScore += 150;
+            currentScore += 150 * scoreMultiplier;
             if (highestScore <= currentScore) highestScore = currentScore;
             PlaySound(mapObjectSound);
             OnButtonActivated();
@@ -1467,6 +1512,8 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
             showPoint5 = false;
             showPoint10 = false;
 
+            numberOfSeedots = 0;
+
             PlaySound(looseLifeSound);
         }
 
@@ -1528,6 +1575,28 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
         {
             printf("Collide with pikachu rotation\n");
             pikachuRotationAnim.Play("hitted", true);
+
+            currentScore += physA->itemScore * scoreMultiplier;
+            if (highestScore <= currentScore) highestScore = currentScore;
+
+            PlaySound(mapObjectSound);
+        }
+
+        else if (physA->ctype == ColliderType::SEEDOT)
+        {
+            printf("Collide with seedot\n");
+
+            numberOfSeedots++;
+
+            if (numberOfSeedots == 3) currentScore += 150 * scoreMultiplier;
+            if (highestScore <= currentScore) highestScore = currentScore;
+
+            PlaySound(mapObjectSound);
+        }
+
+        else if (physA->ctype == ColliderType::ZIGZAGOON)
+        {
+            printf("Collide with zigzagoon\n");
 
             currentScore += physA->itemScore * scoreMultiplier;
             if (highestScore <= currentScore) highestScore = currentScore;
