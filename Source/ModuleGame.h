@@ -172,18 +172,20 @@ private:
     Texture2D E_EVOTexture;
     Texture2D V_EVOTexture;
     Texture2D O_EVOTexture;
-
+    bool showE_EVO = false;
+    bool showV_EVO = false;
+    bool showO_EVO = false;
 
     PhysBody* POINTHitbox_1 = NULL;
     PhysBody* POINTHitbox_5 = NULL;
     PhysBody* POINTHitbox_10 = NULL;
-    bool showPoint1 = false;
-    bool showPoint5 = false;
-    bool showPoint10 = false;
 
     Texture2D POINTTexture_1;
     Texture2D POINTTexture_5;
     Texture2D POINTTexture_10;
+    bool showPoint1 = false;
+    bool showPoint5 = false;
+    bool showPoint10 = false;
 
     bool playingPikachuAnimation = false;
     bool collideWithRightPikachu = false;

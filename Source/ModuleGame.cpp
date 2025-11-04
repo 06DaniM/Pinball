@@ -662,6 +662,9 @@ void ModuleGame::CreateScoreItems()
     POINTHitbox_5 = App->physics->CreateCircle(110, 475, 15, true, this, ColliderType::POINTSTRIANGLE_5, STATIC);
     POINTHitbox_10 = App->physics->CreateCircle(125, 505, 15, true, this, ColliderType::POINTSTRIANGLE_10, STATIC);
 
+    E_EVOHitbox = App->physics->CreateCircle(70, 490, 15, true, this, ColliderType::E_EVO, STATIC);
+    V_EVOHitbox = App->physics->CreateCircle(90, 525, 15, true, this, ColliderType::V_EVO, STATIC);
+    O_EVOHitbox = App->physics->CreateCircle(110, 560, 15, true, this, ColliderType::O_EVO, STATIC);
 }
 
 void ModuleGame::ChangeSkin()
@@ -900,6 +903,11 @@ void ModuleGame::Draw()
     if (showPoint5)DrawTextureEx(POINTTexture_5, { 100, 460 }, 0, 2.0f, WHITE);
     if (showPoint1)DrawTextureEx(POINTTexture_1, { 86, 429 }, 0, 2.0f, WHITE);
 
+    if (showE_EVO)DrawTextureEx(E_EVOTexture, { 60, 475 }, 0, 2.0f, WHITE);
+    if (showV_EVO)DrawTextureEx(V_EVOTexture, { 81, 508 }, 0, 2.0f, WHITE);
+    if (showO_EVO)DrawTextureEx(O_EVOTexture, { 98, 538 }, 0, 2.0f, WHITE);
+
+
     sumLife1->GetPosition(x, y);  
     if(!sumLife1->isActive) DrawTextureEx(sumLifeTexture, { (float)x - 7, (float)y-8 }, 0, 2,WHITE);
 
@@ -1052,6 +1060,18 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
             printf("Collide with 10 Point Triangle\n");
             showPoint10 = true;
             currentScore += 10;
+        }
+        else if (physA->ctype == ColliderType::E_EVO && showE_EVO == false) {
+            printf("Collide with E_EVO Point Triangle\n");
+            showE_EVO = true;
+        }
+        else if (physA->ctype == ColliderType::V_EVO && showV_EVO == false) {
+            printf("Collide with V_EVO Point Triangle\n");
+            showV_EVO = true;
+        }
+        else if (physA->ctype == ColliderType::O_EVO && showO_EVO == false) {
+            printf("Collide with O_EVO Point Triangle\n");
+            showO_EVO = true;
         }
         else if (physA->ctype == ColliderType::OBJECT)
         {

@@ -29,7 +29,9 @@ enum class ColliderType {
     POINTSTRIANGLE_1,
     POINTSTRIANGLE_5,
     POINTSTRIANGLE_10,
-
+    E_EVO,
+    V_EVO,
+    O_EVO,
 
     UNKNOWN
 };
