@@ -24,6 +24,7 @@ enum class ColliderType {
     LAUNCHING,
     PSlIDEBEGIN,
     PSLIDEEND,
+    EGG,
     VOID,
 
     //Alomejor es fumada pero creo que hay que hacer un colliderType por triangulo

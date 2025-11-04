@@ -22,6 +22,7 @@ bool ModuleGame::Start()
     mPlayer = App->player;
 
     InitializeTextures();
+    InitializeSFX();
 
     // === LOAD THE FLIPPERS ===
     App->physics->Flippers(leftFlipper, leftFlipperJoint, leftFlipperPositionX, leftFlipperPositionY, true);      // Left flipper
@@ -45,6 +46,8 @@ bool ModuleGame::Start()
 
 update_status ModuleGame::Update()
 {
+    UpdateMusicStream(backgroundMusic);
+
     float deltaTime = GetFrameTime();
     coroutineManager.Update(deltaTime);
 
@@ -83,9 +86,12 @@ update_status ModuleGame::Update()
         physGroundTerrain->SetSensor(true);
     }
 
+    ChangeValues();
     HandleInput();
     Pikachu();
+    MoveEgg();
     GameOver();
+
     Draw();
 
     return UPDATE_CONTINUE;
@@ -170,10 +176,71 @@ void ModuleGame::InitializeTextures()
     peliperAnim.AddAnim("pickBall", 2, 14, 3.0f, false);
     peliperAnim.Play("idle");
 
-    eggAnim = Animator(&eggTexture, 18, 18);
+    eggAnim = Animator(&eggTexture, 18, 19);
     eggAnim.AddAnim("idle", 0, 4, 2.0f, true);
-    eggAnim.AddAnim("hitted", 2, 6, 3.0f, false);
+    eggAnim.AddAnim("hitted", 4, 1, 3.0f, false);
     eggAnim.Play("idle");
+}
+
+void ModuleGame::InitializeSFX()
+{
+    backgroundMusic = LoadMusicStream("Assets/SFX/13. Sapphire Table.mp3");
+
+    PlayMusicStream(backgroundMusic);
+}
+
+void ModuleGame::ChangeValues()
+{
+    if (IsKeyPressed(KEY_F2)) SetTargetFPS(60);
+    else if (IsKeyPressed(KEY_F3)) SetTargetFPS(120);
+    else if (IsKeyPressed(KEY_F4)) SetTargetFPS(240);
+
+    // Cambiar gravedad
+    if (IsKeyPressed(KEY_ONE))
+    {
+        b2Vec2 gravity(0, 5);
+        App->physics->world->SetGravity(gravity);
+    }
+    else if (IsKeyPressed(KEY_TWO))
+    {
+        b2Vec2 gravity(0, 10);
+        App->physics->world->SetGravity(gravity);
+    }
+    else if (IsKeyPressed(KEY_THREE))
+    {
+        b2Vec2 gravity(0, 15);
+        App->physics->world->SetGravity(gravity);
+    }
+
+    if (IsKeyPressed(KEY_R))
+    {
+        restitutionToggled = !restitutionToggled;
+
+        if (restitutionToggled)
+        {
+            float newRestitution = -0.2f;
+            originalRestitutions.clear();
+
+            for (b2Body* b = App->physics->world->GetBodyList(); b; b = b->GetNext())
+            {
+                for (b2Fixture* f = b->GetFixtureList(); f; f = f->GetNext())
+                {
+                    originalRestitutions[f] = f->GetRestitution();
+                    f->SetRestitution(f->GetRestitution() + newRestitution);
+                }
+            }
+        }
+        else
+        {
+            // Restaurar los valores originales
+            for (auto& pair : originalRestitutions)
+            {
+                b2Fixture* f = pair.first;
+                float originalValue = pair.second;
+                f->SetRestitution(originalValue);
+            }
+        }
+    }
 }
 
 void ModuleGame::CreateTable()
@@ -549,18 +616,23 @@ void ModuleGame::CreateObjects()
     changePokeBall = App->physics->CreateCircle(112, 340, 10, true, this, ColliderType::OBJECT, STATIC);
 
     shroomish1 = App->physics->CreateCircle(220, 250, 15, false, this, ColliderType::SHROOMISH, STATIC);
-    shroomish1->itemScore = 200;
+    shroomish1->itemScore = 20;
     shroomish2 = App->physics->CreateCircle(193, 290, 15, false, this, ColliderType::SHROOMISH, STATIC);
-    shroomish2->itemScore = 200;
+    shroomish2->itemScore = 20;
     shroomish3 = App->physics->CreateCircle(240, 285, 15, false, this, ColliderType::SHROOMISH, STATIC);
-    shroomish2->itemScore = 200;
+    shroomish3->itemScore = 20;
 
     whailord = App->physics->CreateCircle(355, 345, 22.5f, true, this, ColliderType::WHAILORD, STATIC);
+    whailord->itemScore = 100;
 
     rightPikachu = App->physics->CreateRectangle(388, 690, 40, 100, true, this, ColliderType::PIKACHU, STATIC);
-    leftPikachu = App->physics->CreateRectangle(58, 690, 40, 100, true, this, ColliderType::PIKACHU, STATIC);
+    rightPikachu->itemScore = 100;
 
-    egg = App->physics->CreateCircle(SCREEN_WIDTH / 2-13, SCREEN_HEIGHT / 2 + 150, 20, false, this, ColliderType::BOUNCE, KINEMATIC);
+    leftPikachu = App->physics->CreateRectangle(58, 690, 40, 100, true, this, ColliderType::PIKACHU, STATIC);
+    leftPikachu->itemScore = 100;
+
+    egg = App->physics->CreateCircle(SCREEN_WIDTH / 2-13, SCREEN_HEIGHT / 2 + 150, 20, false, this, ColliderType::EGG, KINEMATIC);
+    egg->itemScore = -20;
 }
 
 void ModuleGame::CreateVoid()
@@ -665,6 +737,13 @@ void ModuleGame::WhailordAct()
 
 void ModuleGame::Pikachu()
 {
+    if (pikachuLaunch)
+    {
+        currentScore += leftPikachu->itemScore * scoreMultiplier;
+        if (highestScore <= currentScore) highestScore = currentScore;
+
+        pikachuLaunch = false;
+    }
     if (!collidingWithPikachu && !playingPikachuAnimation) return;
 
     if (!collidingWithPikachu)
@@ -690,7 +769,6 @@ void ModuleGame::Pikachu()
 
     if (!playingPikachuAnimation)
     {
-        printf("Playing attack anim\n");
         if (collideWithRightPikachu) rightPikachuAnim.Play("attack", true);
         else leftPikachuAnim.Play("attack", true);
 
@@ -699,14 +777,51 @@ void ModuleGame::Pikachu()
 
     if (pikachuTime >= 1.6f)
     {
-        printf("Add force\n");
+        pikachuLaunch = true;
         if (collideWithRightPikachu) mPlayer->playerBody->body->ApplyLinearImpulseToCenter({ 0.5f, -1.5f }, true);
         else mPlayer->playerBody->body->ApplyLinearImpulseToCenter({ -0.5f, -1.5f }, true);
 
         pikachuTime = 0;
     }
+}
 
-    else printf("Timing: %f\n", pikachuTime);
+void ModuleGame::MoveEgg()
+{
+    if (egg == nullptr || egg->body == nullptr) return;
+
+    static int direction = 1;
+    float speed = 100.0f;
+    float limit = 90.0f;
+
+    static float startX = 0.0f;
+    static bool initialized = false;
+
+    b2Vec2 pos = egg->body->GetPosition();
+    float currentX = pos.x * 50;
+
+    if (!initialized)
+    {
+        startX = currentX;
+        initialized = true;
+    }
+
+    if (direction > 0 && currentX >= startX + limit)
+        direction = -1.0f;
+    else if (direction < 0 && currentX <= startX - limit)
+        direction = 1.0f;
+
+    egg->body->SetLinearVelocity(b2Vec2((speed * direction) / 50, 0.0f));
+
+    if (eggHitted)
+    {
+        eggAnim.Play("hitted");
+        coroutineManager.StartCoroutine(0.4f, [this]()
+            {
+                eggAnim.StopAnim();
+                eggAnim.Play("idle", true);
+                eggHitted = false;
+            });
+    }
 }
 
 void ModuleGame::HandleInput()
@@ -831,7 +946,7 @@ void ModuleGame::Draw()
     eggAnim.Update(GetFrameTime());
 
     egg->GetPosition(x, y);
-    eggAnim.Draw({ (float)x+2, (float)y-2 }, 2.5f);
+    eggAnim.Draw({ (float)x, (float)y - 2 }, 2.5f);
     
     // === PIKACHU ===
     rightPikachuAnim.Update(GetFrameTime());
@@ -871,6 +986,16 @@ void ModuleGame::Draw()
         DrawText(TextFormat("Current Score %d", currentScore), 350, 20, 12, WHITE);
         DrawText(TextFormat("Highest Score %d", highestScore), 350, 35, 12, WHITE);
         DrawText(TextFormat("Previous Score %d", previousScore), 350, 50, 12, WHITE);
+
+        int spacing = 10;
+        int startX = 10;
+        int startY = 40;
+        int size = mPlayer->pokeBallTexture.width;
+
+        for (int i = 0; i < mPlayer->life; i++)
+        {
+            DrawTexture(mPlayer->pokeBallTexture, startX + i * (size + spacing), startY, WHITE);
+        }
     }
 
     else
@@ -907,6 +1032,7 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
             else if (physA == shroomish3) shroomishAnim3.Play("hitted", false);
 
             currentScore += physA->itemScore * scoreMultiplier;
+            if (highestScore <= currentScore) highestScore = currentScore;
         }
 
         else if (physA->ctype == ColliderType::OBJECT)
@@ -918,17 +1044,19 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
                 printf("Changing pokeball\n");
                 ChangeSkin();
             }
+
+            currentScore += physA->itemScore * scoreMultiplier;
+            if (highestScore <= currentScore) highestScore = currentScore;
         }
 
         else if (physA->ctype == ColliderType::ITEM)
         {
             printf("Collide with an item\n");
             currentScore += physA->itemScore * scoreMultiplier;
+            if (highestScore <= currentScore) highestScore = currentScore;
+
             if (physA->itemScore > 0) plusleAnim.Play("flip", true);
             if (physA->itemScore < 0) minumAnim.Play("flip", true);
-
-            if (highestScore <= currentScore) highestScore = currentScore;
-            printf("%d\n", currentScore);
         }
 
         else if (physA->ctype == ColliderType::PIKACHU)
@@ -953,6 +1081,9 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
             pCount++;
             if (pCount == 1) rightPikachuAnim.Play("idle");
             else if (pCount == 2) leftPikachuAnim.Play("idle");
+
+            currentScore += physA->itemScore * scoreMultiplier;
+            if (highestScore <= currentScore) highestScore = currentScore;
         }
 
         else if (physA->ctype == ColliderType::VOID)
@@ -971,6 +1102,9 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
         {
             printf("Collide with whailord\n");
             WhailordAct();
+
+            currentScore += physA->itemScore * scoreMultiplier;
+            if (highestScore <= currentScore) highestScore = currentScore;
         }
 
         else if (physA->ctype == ColliderType::LAUNCHING)
@@ -996,6 +1130,14 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
             printf("Collide with 1 Point Triangle\n");
             showPoint1 = true;
             currentScore += 1;
+
+        else if (physA->ctype == ColliderType::EGG)
+        {
+            printf("Collide with the egg\n");
+            eggHitted = true;
+
+            currentScore += physA->itemScore * scoreMultiplier;
+            if (highestScore <= currentScore) highestScore = currentScore;
         }
         break;
 
