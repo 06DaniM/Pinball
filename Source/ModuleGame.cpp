@@ -128,6 +128,9 @@ void ModuleGame::InitializeTextures()
     E_GETTexture = LoadTexture("Assets/E_GET.png");
     T_GETTexture = LoadTexture("Assets/T_GET.png");
 
+    MARTTexture = LoadTexture("Assets/MartSig.png");
+    CATCHTTexture = LoadTexture("Assets/CatchSig.png");
+
     spoinkAnim = Animator(&spoinkTexture, 20, 40);
     spoinkAnim.AddAnim("idle", 0, 2, 2.0f, true);
     spoinkAnim.AddAnim("spring_down", 2, 5, 5, false);
@@ -673,6 +676,9 @@ void ModuleGame::CreateScoreItems()
     G_GETHitbox = App->physics->CreateCircle(375, 490, 15, true, this, ColliderType::G_GET, STATIC);
     E_GETHitbox = App->physics->CreateCircle(355, 525, 15, true, this, ColliderType::E_GET, STATIC);
     T_GETHitbox = App->physics->CreateCircle(335, 560, 15, true, this, ColliderType::T_GET, STATIC);
+
+    MARTHitbox = App->physics->CreateCircle(165, 430, 25, true, this, ColliderType::MART, STATIC);
+    CATCHitbox = App->physics->CreateCircle(295, 440, 25, true, this, ColliderType::CATCH, STATIC);
 }
 
 void ModuleGame::ChangeSkin()
@@ -919,7 +925,9 @@ void ModuleGame::Draw()
     if (showE_GET)DrawTextureEx(E_GETTexture, { 340, 508 }, 0, 2.0f, WHITE);
     if (showT_GET)DrawTextureEx(T_GETTexture, { 320, 538 }, 0, 2.0f, WHITE);
 
-
+    if (showMART)DrawTextureEx(MARTTexture, { 140, 400 }, 0, 1.7f, WHITE);
+    if (showCATCH)DrawTextureEx(CATCHTTexture, { 270, 413}, 0, 1.8f, WHITE);
+        
     sumLife1->GetPosition(x, y);  
     if(!sumLife1->isActive) DrawTextureEx(sumLifeTexture, { (float)x - 7, (float)y-8 }, 0, 2,WHITE);
 
@@ -1097,6 +1105,14 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
             printf("Collide with T_GET Triangle\n");
             showT_GET = true;
         }
+        else if (physA->ctype == ColliderType::CATCH && showCATCH == false) {
+            printf("Collide with CATCH Triangle\n");
+            showCATCH = true;
+        }
+        else if (physA->ctype == ColliderType::MART && showMART == false) {
+            printf("Collide with CATCH Triangle\n");
+            showMART = true;
+        }
         else if (physA->ctype == ColliderType::OBJECT)
         {
             printf("Collide with an object\n");
@@ -1161,6 +1177,17 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
             showPoint1 = false;
             showPoint5 = false;
             showPoint10 = false;
+
+            showE_EVO = false;
+            showV_EVO = false;
+            showO_EVO = false;
+
+            showG_GET = false;
+            showE_GET = false;
+            showT_GET = false;
+
+            showMART = true;
+            showCATCH = true;
         }
 
         else if (physA->ctype == ColliderType::WHAILORD && !whailordHitted)

@@ -198,6 +198,13 @@ private:
     bool showE_GET = false;
     bool showT_GET = false;
 
+    PhysBody* MARTHitbox = NULL;
+    PhysBody* CATCHitbox = NULL;
+
+    Texture2D MARTTexture;
+    Texture2D CATCHTTexture;
+    bool showMART = false;
+    bool showCATCH = false;
 
     bool playingPikachuAnimation = false;
     bool collideWithRightPikachu = false;
