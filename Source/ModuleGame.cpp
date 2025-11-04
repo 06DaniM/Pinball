@@ -1130,6 +1130,7 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
             printf("Collide with 1 Point Triangle\n");
             showPoint1 = true;
             currentScore += 1;
+        }
 
         else if (physA->ctype == ColliderType::EGG)
         {

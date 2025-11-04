@@ -26,8 +26,6 @@ enum class ColliderType {
     PSLIDEEND,
     EGG,
     VOID,
-
-    //Alomejor es fumada pero creo que hay que hacer un colliderType por triangulo
     POINTSTRIANGLE_1,
 
     UNKNOWN
