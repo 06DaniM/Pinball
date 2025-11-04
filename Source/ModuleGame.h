@@ -154,6 +154,25 @@ private:
     PhysBody* sumTvScore = NULL;
     PhysBody* minusTvScore = NULL;
 
+    //triangles that iluminate and do cool stuff
+    PhysBody* E_EVOHitbox = NULL;
+    PhysBody* V_EVOHitbox = NULL;
+    PhysBody* O_EVOHitbox = NULL;
+
+    Texture2D E_EVOTexture;
+    Texture2D V_EVOTexture;
+    Texture2D O_EVOTexture;
+
+
+    PhysBody* POINTHitbox_1 = NULL;
+    bool showPoint1 = false;
+    PhysBody* POINTHitbox_5 = NULL;
+    PhysBody* POINTHitbox_10 = NULL;
+
+    Texture2D POINTTexture_1;
+    Texture2D POINTTexture_5;
+    Texture2D POINTTexture_10;
+
     bool playingPikachuAnimation = false;
     bool collideWithRightPikachu = false;
     bool collidingWithPikachu = false;

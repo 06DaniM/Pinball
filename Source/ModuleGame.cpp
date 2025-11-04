@@ -110,6 +110,12 @@ void ModuleGame::InitializeTextures()
     peliperTexture = LoadTexture("Assets/Pelliper_Spritesheet.png");
     eggTexture = LoadTexture("Assets/Huevo_Pokemon_Spritesheet.png");
 
+    E_EVOTexture = LoadTexture("Assets/E_EVO.png");
+    V_EVOTexture = LoadTexture("Assets/V_EVO.png");
+    O_EVOTexture = LoadTexture("Assets/O_EVO.png");
+    
+    POINTTexture_1 = LoadTexture("Assets/1POINT.png");
+
     spoinkAnim = Animator(&spoinkTexture, 20, 40);
     spoinkAnim.AddAnim("idle", 0, 2, 2.0f, true);
     spoinkAnim.AddAnim("spring_down", 2, 5, 5, false);
@@ -577,6 +583,9 @@ void ModuleGame::CreateScoreItems()
     sumLife3 = App->physics->CreateCircle(243, 200, 10, true, this, ColliderType::SUMLIFE, STATIC);
 
     pHitPikachu = App->physics->CreateCircle(288, 325, 10, true, this, ColliderType::PHITPIKA, STATIC);
+
+    POINTHitbox_1 = App->physics->CreateCircle(95, 445, 15, true, this, ColliderType::POINTSTRIANGLE_1, STATIC);
+
 }
 
 void ModuleGame::ChangeSkin()
@@ -849,6 +858,12 @@ void ModuleGame::Draw()
 
     peliperAnim.Draw({ 318, 260 }, 1.75f);
 
+    if(showPoint1)
+    {
+        DrawTextureEx(POINTTexture_1, { 86, 429 }, 0, 2.0f, WHITE);
+        
+    }
+
     if (!gameOver) 
     {
         mPlayer->DrawBall();
@@ -949,6 +964,7 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
             sumLife3->isActive = true;
 
             isLaunching = true;
+            showPoint1 = false;
         }
 
         else if (physA->ctype == ColliderType::WHAILORD && !whailordHitted)
@@ -975,6 +991,10 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
         {
             printf("Collide with pelliper slide 2 sensor\n");
             inPelliperSlide = false;
+        }
+        else if (physA->ctype == ColliderType::POINTSTRIANGLE_1) {
+            printf("Collide with 1 Point Triangle\n");
+            showPoint1 = true;
         }
         break;
 
