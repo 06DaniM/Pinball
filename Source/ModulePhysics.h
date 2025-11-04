@@ -32,6 +32,9 @@ enum class ColliderType {
     E_EVO,
     V_EVO,
     O_EVO,
+    G_GET,
+    E_GET,
+    T_GET,
 
     UNKNOWN
 };

@@ -124,6 +124,10 @@ void ModuleGame::InitializeTextures()
     POINTTexture_5 = LoadTexture("Assets/5POINT.png");
     POINTTexture_10 = LoadTexture("Assets/10POINT.png");
 
+    G_GETTexture = LoadTexture("Assets/G_GET.png");
+    E_GETTexture = LoadTexture("Assets/E_GET.png");
+    T_GETTexture = LoadTexture("Assets/T_GET.png");
+
     spoinkAnim = Animator(&spoinkTexture, 20, 40);
     spoinkAnim.AddAnim("idle", 0, 2, 2.0f, true);
     spoinkAnim.AddAnim("spring_down", 2, 5, 5, false);
@@ -665,6 +669,10 @@ void ModuleGame::CreateScoreItems()
     E_EVOHitbox = App->physics->CreateCircle(70, 490, 15, true, this, ColliderType::E_EVO, STATIC);
     V_EVOHitbox = App->physics->CreateCircle(90, 525, 15, true, this, ColliderType::V_EVO, STATIC);
     O_EVOHitbox = App->physics->CreateCircle(110, 560, 15, true, this, ColliderType::O_EVO, STATIC);
+
+    G_GETHitbox = App->physics->CreateCircle(375, 490, 15, true, this, ColliderType::G_GET, STATIC);
+    E_GETHitbox = App->physics->CreateCircle(355, 525, 15, true, this, ColliderType::E_GET, STATIC);
+    T_GETHitbox = App->physics->CreateCircle(335, 560, 15, true, this, ColliderType::T_GET, STATIC);
 }
 
 void ModuleGame::ChangeSkin()
@@ -907,6 +915,10 @@ void ModuleGame::Draw()
     if (showV_EVO)DrawTextureEx(V_EVOTexture, { 81, 508 }, 0, 2.0f, WHITE);
     if (showO_EVO)DrawTextureEx(O_EVOTexture, { 98, 538 }, 0, 2.0f, WHITE);
 
+    if (showG_GET)DrawTextureEx(G_GETTexture, { 360, 475 }, 0, 2.0f, WHITE);
+    if (showE_GET)DrawTextureEx(E_GETTexture, { 340, 508 }, 0, 2.0f, WHITE);
+    if (showT_GET)DrawTextureEx(T_GETTexture, { 320, 538 }, 0, 2.0f, WHITE);
+
 
     sumLife1->GetPosition(x, y);  
     if(!sumLife1->isActive) DrawTextureEx(sumLifeTexture, { (float)x - 7, (float)y-8 }, 0, 2,WHITE);
@@ -1062,16 +1074,28 @@ void ModuleGame::OnCollision(PhysBody* physA, PhysBody* physB)
             currentScore += 10;
         }
         else if (physA->ctype == ColliderType::E_EVO && showE_EVO == false) {
-            printf("Collide with E_EVO Point Triangle\n");
+            printf("Collide with E_EVO Triangle\n");
             showE_EVO = true;
         }
         else if (physA->ctype == ColliderType::V_EVO && showV_EVO == false) {
-            printf("Collide with V_EVO Point Triangle\n");
+            printf("Collide with V_EVO Triangle\n");
             showV_EVO = true;
         }
         else if (physA->ctype == ColliderType::O_EVO && showO_EVO == false) {
-            printf("Collide with O_EVO Point Triangle\n");
+            printf("Collide with O_EVO Triangle\n");
             showO_EVO = true;
+        }
+        else if (physA->ctype == ColliderType::G_GET && showG_GET == false) {
+            printf("Collide with G_GET Triangle\n");
+            showG_GET = true;
+        }
+        else if (physA->ctype == ColliderType::E_GET && showE_GET == false) {
+            printf("Collide with T_GET Triangle\n");
+            showE_GET = true;
+        }
+        else if (physA->ctype == ColliderType::T_GET && showT_GET == false) {
+            printf("Collide with T_GET Triangle\n");
+            showT_GET = true;
         }
         else if (physA->ctype == ColliderType::OBJECT)
         {

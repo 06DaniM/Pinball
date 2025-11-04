@@ -187,6 +187,18 @@ private:
     bool showPoint5 = false;
     bool showPoint10 = false;
 
+    PhysBody* G_GETHitbox = NULL;
+    PhysBody* E_GETHitbox = NULL;
+    PhysBody* T_GETHitbox = NULL;
+
+    Texture2D G_GETTexture;
+    Texture2D E_GETTexture;
+    Texture2D T_GETTexture;
+    bool showG_GET = false;
+    bool showE_GET = false;
+    bool showT_GET = false;
+
+
     bool playingPikachuAnimation = false;
     bool collideWithRightPikachu = false;
     bool collidingWithPikachu = false;
