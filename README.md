@@ -44,3 +44,6 @@ This project is a tribute to the classic Pokémon Pinball Sapphire, one of the m
 This project is licensed under an unmodified MIT license, which is an OSI-certified license that allows static linking with closed source software. Check [LICENSE](LICENSE) for further details.
 
 {AdditionalLicenses}
+
+## Github Link
+https://github.com/06DaniM/Pinball/tree/main
